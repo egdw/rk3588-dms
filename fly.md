@@ -10,7 +10,7 @@
 - 项目性质：本地全栈司机状态检测开发平台。前端保持无构建、原生 HTML/CSS/JavaScript；Python 后端负责持久化、数据加工和 ML 任务编排；浏览器端可直接运行现成 ONNX 模型完成图片与摄像头推理。
 - 当前主应用：`智证先锋 | 司机状态检测模型训练与评估平台`，内部服务名仍沿用 `Vision Sentinel backend`；前端必须完全对齐 `stitch_/` 中 Vision Sentinel 四页 UI：控制台、数据集管理、实时检测演示、系统设置；页面内容承载数据集、标注、加工、训练、分析、导出部署完整流程，并接入 Python 标准库后端 API。
 - 附带原型：`stitch_/` 下保存 Vision Sentinel 相关静态 HTML 原型和设计文档，是当前 UI 对齐依据。
-- Git 状态：2026-09-09 起为 Git 仓库（用户明确要求创建，仓库名 `rk3588-dms`，本地目录 `D:\project\dms` 未改名）。默认分支 `main`；尚无远程仓库，推送外部托管前必须经用户确认（代码含比赛业务与内网地址，建议私有仓库）。规范见下文“分支与提交规则”。
+- Git 状态：2026-09-09 起为 Git 仓库（用户明确要求创建，仓库名 `rk3588-dms`，本地目录 `D:\project\dms` 未改名）。默认分支 `main`；远程 `origin = https://github.com/egdw/rk3588-dms.git`（**私有仓库**，2026-09-09 经用户确认由 gh CLI 创建并推送）。gh CLI 位于 `%LOCALAPPDATA%\Programs\gh-cli\bin\gh.exe`（用户级免安装解压版，非系统安装）。规范见下文“分支与提交规则”。
 - 本文件状态：本目录 `fly.md` 为当前项目权威记忆。此前文件中提到迁移到上级目录的说明已作废。
 
 ## 项目结构
@@ -225,7 +225,7 @@ python3 -m py_compile backend/server.py
 - 提交信息格式：Conventional Commits（`feat:`/`fix:`/`docs:`/`chore:` + 中文简述）。
 - 提交前必须检查 `git status`，保护用户已有改动；小步提交，新代码集中，不随意格式化整仓。
 - 不改写历史、不强制推送；模型大文件（*.onnx/*.pt）当前随仓库提交，`*.rknn` 与运行时数据（`storage/`、`logs/`、`board_results/`、`.venv-rknn/`）已忽略。
-- 尚无远程仓库；创建 GitHub/Gitee 等远程并推送属于对外发布动作，必须先经用户明确确认（建议私有仓库）。
+- 远程仓库：`egdw/rk3588-dms`（GitHub 私有）。创建新的远程/公开化现有仓库属于对外发布动作，必须先经用户明确确认。
 - PR/Review、合并策略、发布或回滚流程：暂无（单人本地仓库），启用时补充。
 
 ## 项目约定
