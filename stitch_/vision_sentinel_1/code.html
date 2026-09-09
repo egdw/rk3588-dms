@@ -1,0 +1,263 @@
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"background":"#f8fafc","tertiary-container":"#de8712","on-surface":"#191c1e","secondary-fixed":"#c4e7ff","on-primary-fixed-variant":"#004c6e","secondary":"#00668a","secondary-fixed-dim":"#7bd0ff","primary-fixed-dim":"#89ceff","on-secondary":"#ffffff","surface-container-high":"#e6e8ea","surface-bright":"#f7f9fb","on-error-container":"#93000a","on-secondary-fixed-variant":"#004c69","primary-container":"#0ea5e9","on-background":"#191c1e","surface-dim":"#d8dadc","secondary-container":"#40c2fd","surface-tint":"#006591","tertiary-fixed-dim":"#ffb86e","surface":"#ffffff","primary":"#006591","on-tertiary":"#ffffff","outline":"#6e7881","border-subtle":"#e2e8f0","on-secondary-container":"#004d6a","on-error":"#ffffff","surface-container":"#eceef0","warning":"#f59e0b","on-tertiary-fixed":"#2c1600","outline-variant":"#bec8d2","text-secondary":"#475569","danger":"#ef4444","tertiary":"#8a5100","on-primary-container":"#003751","on-surface-variant":"#3e4850","primary-fixed":"#c9e6ff","error-container":"#ffdad6","surface-container-highest":"#e0e3e5","on-tertiary-container":"#4d2b00","on-tertiary-fixed-variant":"#693c00","on-secondary-fixed":"#001e2c","inverse-primary":"#89ceff","tertiary-fixed":"#ffdcbd","on-primary-fixed":"#001e2f","text-primary":"#082f49","success":"#22c55e","on-primary":"#ffffff","error":"#ba1a1a","inverse-surface":"#2d3133","surface-container-low":"#f2f4f6","inverse-on-surface":"#eff1f3","surface-variant":"#e0e3e5"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"gutter":"1.5rem","component-gap":"0.75rem","bento-padding":"2rem","container-margin":"2.5rem"},"fontFamily":{"body-md":["Geist"],"label-bold":["Geist"],"display-xl":["Geist"],"body-sm":["Geist"],"headline-md":["Geist"],"headline-lg":["Geist"],"headline-lg-mobile":["Geist"]},"fontSize":{"body-md":["16px",{"lineHeight":"1.6","fontWeight":"400"}],"label-bold":["12px",{"lineHeight":"1","letterSpacing":"0.05em","fontWeight":"700"}],"display-xl":["56px",{"lineHeight":"1","letterSpacing":"-0.03em","fontWeight":"300"}],"body-sm":["14px",{"lineHeight":"1.5","fontWeight":"400"}],"headline-md":["24px",{"lineHeight":"1.3","fontWeight":"500"}],"headline-lg":["32px",{"lineHeight":"1.2","letterSpacing":"-0.02em","fontWeight":"600"}],"headline-lg-mobile":["24px",{"lineHeight":"1.2","fontWeight":"600"}]}}}}</script><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet"/></head><body class="bg-background font-body-md text-on-background"><header class="fixed top-0 w-full z-50 bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(14,165,233,0.06)]"><div class="h-[72px] w-full px-container-margin flex items-center justify-between"><div class="flex items-center gap-4"><img alt="Vision Sentinel" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1Wxt3i9JaedquRjnzMvgLAt5Z0shJf_pmDwlaIixZbCKYEaEJu0HWrI4IxmFF02JmI4TNbKo0UXWi_0BOeOfu2qf0g9cpam5xWib99i5FcDw9cRHV0urm1ZFT-8_E3-H26l5ImSqCo8NRgX87PCNowzvn6hf9IQXEQjrsTBR1WrU8hhSaFzS9U4Ms2JEv01FaTS-USftLlSerFh6qBYVacJJD3pv1NcwlNVZInpaCS2lZKiwecCbWcEig"/><span class="font-headline-md text-text-primary tracking-tight">Vision Sentinel</span></div><nav class="hidden lg:flex items-center gap-component-gap" data-active-classes="bg-primary-container/10 text-primary font-bold"><a aria-current="page" class="px-4 py-2 rounded-full transition-all bg-primary-container/10 text-primary font-bold" data-path="dashboard" href="#">控制台</a><a class="px-4 py-2 rounded-full text-body-sm text-on-surface-variant hover:text-primary transition-all" data-path="dataset" href="#">数据集管理</a><a class="px-4 py-2 rounded-full text-body-sm text-on-surface-variant hover:text-primary transition-all" data-path="live-detection" href="#">实时检测演示</a><a class="px-4 py-2 rounded-full text-body-sm text-on-surface-variant hover:text-primary transition-all" data-path="settings" href="#">系统设置</a></nav><div class="flex items-center gap-4"><button class="p-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-colors"><span class="material-symbols-outlined">notifications</span></button><div class="flex items-center gap-3 pl-4 border-l border-border-subtle"><div class="text-right hidden sm:block"><p class="text-label-bold text-on-surface">管理员</p><p class="text-[10px] text-text-secondary uppercase tracking-widest">Sentinel Admin</p></div><img alt="Profile" class="w-9 h-9 rounded-full object-cover ring-2 ring-primary-container/20" src="https://lh3.googleusercontent.com/aida/AEtjO1XDseG4OF4Zezi0h_U2xXd8laUboQSujHwGCEmiP2anHeUQpa4nYchSbHjdYCBNUSJp9u0C4t1w5f5PVUZHAEKzKl7mOAZq4QZltgkqt8K0_ty6MpcKeKgALRSNUrM-pXXO8qfAoxKGN0C4-0QH2O3WOTJszfhiGufOkHclOnmiqf0xWeCdwf9zcjWf6ukc3M1cNrZCt02qYLapi-jbnUgUUZJCqbL4UJ2AD7oNEvjGvywUCWbMak5X-w"/></div></div></div></header><main class="w-full pt-[72px] min-h-screen"><div class="flex flex-col w-full p-container-margin min-h-screen relative overflow-hidden bg-background">
+<!-- Ambient Background Decoration -->
+<div class="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] bg-primary-fixed-dim/30 rounded-full blur-[120px] pointer-events-none z-0"></div>
+<div class="absolute bottom-[-20%] left-[-10%] w-[50%] h-[50%] bg-secondary-fixed-dim/20 rounded-full blur-[100px] pointer-events-none z-0"></div>
+<div class="relative z-10 w-full max-w-[1440px] mx-auto flex flex-col gap-gutter">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-4">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-text-primary tracking-tight">控制台</h1>
+<p class="font-body-md text-body-md text-text-secondary mt-1">系统全局运行状态与数据概览</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-6 py-2 bg-surface text-text-primary font-body-sm text-body-sm rounded-full shadow-sm hover:shadow-md transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+                    过去 7 天
+                </button>
+<button class="px-6 py-2 bg-gradient-to-br from-primary-container to-secondary-container text-on-primary-container font-body-sm text-body-sm rounded-full shadow-md hover:shadow-lg transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                    导出报告
+                </button>
+</div>
+</div>
+<!-- KPI Grid (Bento Row 1) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- KPI 1 -->
+<div class="bg-surface rounded-3xl p-bento-padding shadow-[0px_12px_48px_rgba(14,165,233,0.08)] flex flex-col justify-between group hover:-translate-y-1 transition-transform duration-300">
+<div class="flex justify-between items-start mb-6">
+<span class="font-label-bold text-label-bold text-text-secondary uppercase tracking-wider">累计处理数据</span>
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary-fixed">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dataset</span>
+</div>
+</div>
+<div>
+<div class="font-display-xl text-display-xl text-text-primary mb-2">14.2M</div>
+<div class="flex items-center gap-2">
+<span class="px-2 py-1 bg-success/10 text-success font-label-bold text-[10px] rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">trending_up</span> +12.5%
+                        </span>
+<span class="font-body-sm text-body-sm text-text-secondary">较上周</span>
+</div>
+</div>
+</div>
+<!-- KPI 2 -->
+<div class="bg-surface rounded-3xl p-bento-padding shadow-[0px_12px_48px_rgba(14,165,233,0.08)] flex flex-col justify-between group hover:-translate-y-1 transition-transform duration-300">
+<div class="flex justify-between items-start mb-6">
+<span class="font-label-bold text-label-bold text-text-secondary uppercase tracking-wider">活跃检测模型</span>
+<div class="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">model_training</span>
+</div>
+</div>
+<div>
+<div class="font-display-xl text-display-xl text-text-primary mb-2">8</div>
+<div class="flex items-center gap-2">
+<span class="px-2 py-1 bg-surface-container text-text-secondary font-label-bold text-[10px] rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">check_circle</span> 正常运行
+                        </span>
+<span class="font-body-sm text-body-sm text-text-secondary">部署于 12 个节点</span>
+</div>
+</div>
+</div>
+<!-- KPI 3 -->
+<div class="relative overflow-hidden bg-primary rounded-3xl p-bento-padding shadow-[0px_12px_48px_rgba(14,165,233,0.2)] flex flex-col justify-between group hover:-translate-y-1 transition-transform duration-300">
+<!-- Decorative pattern -->
+<svg class="absolute top-0 right-0 w-32 h-32 opacity-20 text-on-primary" fill="currentColor" viewbox="0 0 100 100">
+<circle cx="90" cy="10" r="40"></circle>
+<circle cx="80" cy="20" r="30"></circle>
+</svg>
+<div class="relative z-10 flex justify-between items-start mb-6">
+<span class="font-label-bold text-label-bold text-primary-fixed-dim uppercase tracking-wider">系统平均准确率</span>
+<div class="w-10 h-10 rounded-full bg-on-primary/20 backdrop-blur flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">radar</span>
+</div>
+</div>
+<div class="relative z-10">
+<div class="font-display-xl text-display-xl text-on-primary mb-2">97.8<span class="text-3xl">%</span></div>
+<div class="w-full bg-on-primary/20 h-1.5 rounded-full overflow-hidden mt-4">
+<div class="bg-on-primary h-full w-[97.8%] rounded-full shadow-[0_0_10px_rgba(255,255,255,0.5)]"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Content (Bento Row 2) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Chart Section (8 cols) -->
+<div class="lg:col-span-8 bg-surface rounded-3xl p-bento-padding shadow-[0px_12px_48px_rgba(14,165,233,0.08)] flex flex-col">
+<div class="flex justify-between items-center mb-8">
+<div>
+<h2 class="font-headline-md text-headline-md text-text-primary">异常检测趋势</h2>
+<p class="font-body-sm text-body-sm text-text-secondary mt-1">过去 24 小时疲劳与分心事件统计</p>
+</div>
+<div class="flex gap-2">
+<div class="flex items-center gap-2 font-body-sm text-body-sm text-text-secondary">
+<div class="w-3 h-3 rounded-full bg-primary-container"></div> 疲劳驾驶
+                        </div>
+<div class="flex items-center gap-2 font-body-sm text-body-sm text-text-secondary ml-4">
+<div class="w-3 h-3 rounded-full bg-warning"></div> 分心行为
+                        </div>
+</div>
+</div>
+<!-- Mock Area Chart using SVG -->
+<div class="w-full flex-grow min-h-[300px] relative">
+<svg class="w-full h-full text-primary-container" preserveaspectratio="none" viewbox="0 0 800 300">
+<defs>
+<lineargradient id="areaGradient" x1="0%" x2="0%" y1="0%" y2="100%">
+<stop offset="0%" stop-color="currentColor" stop-opacity="0.2"></stop>
+<stop offset="100%" stop-color="currentColor" stop-opacity="0.0"></stop>
+</lineargradient>
+<lineargradient id="areaGradient2" x1="0%" x2="0%" y1="0%" y2="100%">
+<stop offset="0%" stop-color="#f59e0b" stop-opacity="0.15"></stop>
+<stop offset="100%" stop-color="#f59e0b" stop-opacity="0.0"></stop>
+</lineargradient>
+</defs>
+<!-- Grid lines -->
+<line stroke="#e2e8f0" stroke-dasharray="4" stroke-width="1" x1="0" x2="800" y1="50" y2="50"></line>
+<line stroke="#e2e8f0" stroke-dasharray="4" stroke-width="1" x1="0" x2="800" y1="150" y2="150"></line>
+<line stroke="#e2e8f0" stroke-dasharray="4" stroke-width="1" x1="0" x2="800" y1="250" y2="250"></line>
+<!-- Warning Series (Distraction) -->
+<path d="M0,250 L0,200 C50,180 100,220 150,190 C200,160 250,170 300,140 C350,110 400,150 450,130 C500,110 550,180 600,160 C650,140 700,120 750,150 L800,140 L800,250 Z" fill="url(#areaGradient2)"></path>
+<path d="M0,200 C50,180 100,220 150,190 C200,160 250,170 300,140 C350,110 400,150 450,130 C500,110 550,180 600,160 C650,140 700,120 750,150 L800,140" fill="none" stroke="#f59e0b" stroke-width="2"></path>
+<!-- Primary Series (Fatigue) -->
+<path d="M0,250 L0,150 C50,140 100,100 150,120 C200,140 250,80 300,90 C350,100 400,60 450,70 C500,80 550,40 600,50 C650,60 700,30 750,40 L800,20 L800,250 Z" fill="url(#areaGradient)"></path>
+<path d="M0,150 C50,140 100,100 150,120 C200,140 250,80 300,90 C350,100 400,60 450,70 C500,80 550,40 600,50 C650,60 700,30 750,40 L800,20" fill="none" stroke="currentColor" stroke-width="3"></path>
+<!-- Data Points -->
+<circle cx="300" cy="90" fill="#ffffff" r="4" stroke="currentColor" stroke-width="2"></circle>
+<circle cx="600" cy="50" fill="#ffffff" r="4" stroke="currentColor" stroke-width="2"></circle>
+<circle cx="800" cy="20" fill="#ffffff" r="4" stroke="currentColor" stroke-width="2"></circle>
+</svg>
+<!-- X Axis Labels -->
+<div class="absolute bottom-[-10px] w-full flex justify-between font-label-bold text-[10px] text-text-secondary px-2">
+<span>00:00</span>
+<span>04:00</span>
+<span>08:00</span>
+<span>12:00</span>
+<span>16:00</span>
+<span>20:00</span>
+<span>24:00</span>
+</div>
+</div>
+</div>
+<!-- Node Status (4 cols) -->
+<div class="lg:col-span-4 bg-surface rounded-3xl p-bento-padding shadow-[0px_12px_48px_rgba(14,165,233,0.08)] flex flex-col">
+<div class="flex justify-between items-center mb-6">
+<h2 class="font-headline-md text-headline-md text-text-primary">节点状态</h2>
+<button class="text-primary hover:text-surface-tint transition-colors"><span class="material-symbols-outlined">more_horiz</span></button>
+</div>
+<div class="flex flex-col gap-4 flex-grow">
+<!-- Node Item -->
+<div class="flex items-center gap-4 p-3 rounded-2xl hover:bg-surface-container-low transition-colors group cursor-pointer">
+<div class="w-12 h-12 rounded-xl bg-success/10 text-success flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined">dns</span>
+</div>
+<div class="flex-grow min-w-0">
+<div class="flex justify-between items-center mb-1">
+<span class="font-body-md text-body-md text-text-primary font-medium truncate">华东-边缘节点-01</span>
+<span class="px-2 py-0.5 bg-success/10 text-success font-label-bold text-[10px] rounded-full">在线</span>
+</div>
+<div class="flex justify-between items-center font-body-sm text-[12px] text-text-secondary">
+<span>负载: 42%</span>
+<span>2ms 延迟</span>
+</div>
+</div>
+</div>
+<!-- Node Item -->
+<div class="flex items-center gap-4 p-3 rounded-2xl hover:bg-surface-container-low transition-colors group cursor-pointer">
+<div class="w-12 h-12 rounded-xl bg-success/10 text-success flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined">dns</span>
+</div>
+<div class="flex-grow min-w-0">
+<div class="flex justify-between items-center mb-1">
+<span class="font-body-md text-body-md text-text-primary font-medium truncate">华南-边缘节点-03</span>
+<span class="px-2 py-0.5 bg-success/10 text-success font-label-bold text-[10px] rounded-full">在线</span>
+</div>
+<div class="flex justify-between items-center font-body-sm text-[12px] text-text-secondary">
+<span>负载: 68%</span>
+<span>5ms 延迟</span>
+</div>
+</div>
+</div>
+<!-- Node Item -->
+<div class="flex items-center gap-4 p-3 rounded-2xl bg-warning/5 hover:bg-warning/10 transition-colors group cursor-pointer">
+<div class="w-12 h-12 rounded-xl bg-warning/20 text-warning flex items-center justify-center shrink-0 relative">
+<span class="material-symbols-outlined animate-pulse">warning</span>
+<div class="absolute -top-1 -right-1 w-3 h-3 bg-warning rounded-full border-2 border-surface"></div>
+</div>
+<div class="flex-grow min-w-0">
+<div class="flex justify-between items-center mb-1">
+<span class="font-body-md text-body-md text-text-primary font-medium truncate">华北-中心节点-02</span>
+<span class="px-2 py-0.5 bg-warning/10 text-warning font-label-bold text-[10px] rounded-full">高负载</span>
+</div>
+<div class="flex justify-between items-center font-body-sm text-[12px] text-warning">
+<span>负载: 94%</span>
+<span>45ms 延迟</span>
+</div>
+</div>
+</div>
+</div>
+<button class="w-full mt-4 py-3 border border-border-subtle rounded-xl text-text-secondary font-body-sm hover:bg-surface-container-low hover:text-primary transition-all flex justify-center items-center gap-2">
+                    查看所有节点
+                    <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Recent Alerts (Bento Row 3) -->
+<div class="bg-surface rounded-3xl p-bento-padding shadow-[0px_12px_48px_rgba(14,165,233,0.08)]">
+<div class="flex justify-between items-center mb-6">
+<div>
+<h2 class="font-headline-md text-headline-md text-text-primary flex items-center gap-2">
+                        近期严重告警
+                        <span class="bg-danger/10 text-danger px-2 py-1 rounded-full text-label-bold text-[12px]">3 条未读</span>
+</h2>
+</div>
+<button class="text-primary hover:text-surface-tint font-body-sm text-body-sm font-medium transition-colors">标记全部已读</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+<!-- Alert Card 1 -->
+<div class="p-4 rounded-2xl bg-error-container/30 border border-error-container hover:bg-error-container/50 transition-colors flex gap-4">
+<div class="w-[60px] h-[60px] rounded-lg overflow-hidden shrink-0 relative bg-surface-container">
+<img class="w-full h-full object-cover mix-blend-multiply opacity-80" data-alt="A blurry, low-light image inside a vehicle cabin at night, showing a driver with eyes closed, illuminated by faint dashboard lights, high tech overlay aesthetics, red border, highly detailed, dramatic shadow." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSqE_5iV7-at0j_IVTLsVErkTdYaCBD-L427JI03_Qv1XSx2TrmAFi0iWTZ8qsAoWewkbFIXEqkG4JPwnySTycXg1E4t6DtYthrgP8pbnGys7E1wSCQNCJu9etvZG5CvF2IAUgVEWDAGb2DJkTPtH6JWBmiFXHJY2VMHkrsm-JO5sfUW_996HwSJdJ3cPvA_twbCHx_Pvex60K3xyGKAdH-pj5FN86lyN1FG9AqxzOXTkKNpAoH6-_"/>
+<div class="absolute inset-0 bg-danger/20 mix-blend-overlay"></div>
+</div>
+<div class="flex flex-col justify-center">
+<div class="flex items-center gap-2 mb-1">
+<span class="w-2 h-2 rounded-full bg-danger"></span>
+<span class="font-label-bold text-[11px] text-danger uppercase tracking-wider">三级闭眼告警</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface font-medium">车辆粤B·A8832</span>
+<span class="font-body-sm text-[12px] text-text-secondary mt-1">今天 14:23 · 持续 3.2s</span>
+</div>
+</div>
+<!-- Alert Card 2 -->
+<div class="p-4 rounded-2xl bg-surface-container-low border border-border-subtle hover:bg-surface-container transition-colors flex gap-4">
+<div class="w-[60px] h-[60px] rounded-lg overflow-hidden shrink-0 relative bg-surface-container">
+<img class="w-full h-full object-cover opacity-90" data-alt="A daytime shot inside a truck cabin, driver looking down at a mobile phone, bright sunlight casting strong shadows, professional surveillance camera angle, sharp focus." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpKynWpzqHzrIsERl5AlljRUGbP2xf-l2NgTN62lG3yh6dbNfrMlW45aO4bfs9sIw0SZajjADVSnl3h1KYUyRnxgJt6TMDgQQlXgYAK_8rBvDukRtqvV_s8_d9vZXNVioEmLDR0QJvoY_YAAokgYVWdFGMIBCOs-loyr2CXp6ERbv2uAzkh-_VLMa0Wtem_gLcS-TcI5XHRa2LFkZ7J-vcVeFcyHvJ_g5NYkWukztvofjJAb4yDQqu"/>
+</div>
+<div class="flex flex-col justify-center">
+<div class="flex items-center gap-2 mb-1">
+<span class="w-2 h-2 rounded-full bg-warning"></span>
+<span class="font-label-bold text-[11px] text-warning uppercase tracking-wider">手机使用告警</span>
+</div>
+<span class="font-body-sm text-body-sm text-text-primary font-medium">车辆京A·00012</span>
+<span class="font-body-sm text-[12px] text-text-secondary mt-1">今天 11:45 · 识别置信度 94%</span>
+</div>
+</div>
+<!-- Alert Card 3 -->
+<div class="p-4 rounded-2xl bg-surface-container-low border border-border-subtle hover:bg-surface-container transition-colors flex gap-4">
+<div class="w-[60px] h-[60px] rounded-lg overflow-hidden shrink-0 bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-text-secondary text-[24px]">videocam_off</span>
+</div>
+<div class="flex flex-col justify-center">
+<div class="flex items-center gap-2 mb-1">
+<span class="w-2 h-2 rounded-full bg-outline"></span>
+<span class="font-label-bold text-[11px] text-text-secondary uppercase tracking-wider">视频流中断</span>
+</div>
+<span class="font-body-sm text-body-sm text-text-primary font-medium">节点 华北-02 通道 4</span>
+<span class="font-body-sm text-[12px] text-text-secondary mt-1">今天 09:12 · 网络连接超时</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></main><footer class="w-full bg-surface-container-low py-gutter mt-gutter"><div class="px-container-margin flex flex-col md:flex-row justify-between items-center gap-4 text-body-sm text-text-secondary"><div class="flex items-center gap-2"><img alt="Logo" class="h-5 opacity-50 grayscale hover:grayscale-0 transition-all" src="https://lh3.googleusercontent.com/aida/AEtjO1Wxt3i9JaedquRjnzMvgLAt5Z0shJf_pmDwlaIixZbCKYEaEJu0HWrI4IxmFF02JmI4TNbKo0UXWi_0BOeOfu2qf0g9cpam5xWib99i5FcDw9cRHV0urm1ZFT-8_E3-H26l5ImSqCo8NRgX87PCNowzvn6hf9IQXEQjrsTBR1WrU8hhSaFzS9U4Ms2JEv01FaTS-USftLlSerFh6qBYVacJJD3pv1NcwlNVZInpaCS2lZKiwecCbWcEig"/><span>© 2024 Vision Sentinel. 司机驾驶状态监测系统.</span></div><div class="flex gap-6"><a class="hover:text-primary transition-colors" href="#">隐私政策</a><a class="hover:text-primary transition-colors" href="#">服务条款</a><a class="hover:text-primary transition-colors" href="#">技术支持</a></div></div></footer></body></html>

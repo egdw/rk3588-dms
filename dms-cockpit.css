@@ -1,0 +1,3743 @@
+/* Final live-console theme overrides. Loaded after the shared application styles. */
+body:has(.app-page[data-page="live-detection"].active) .topnav {
+  border: 1px solid rgba(139, 126, 255, 0.22);
+  border-radius: 5px;
+  background: rgba(19, 16, 57, 0.9);
+  box-shadow: inset 0 0 20px rgba(91, 69, 229, 0.08);
+}
+
+body:has(.app-page[data-page="live-detection"].active) .topnav a {
+  color: #9294b8;
+}
+
+body:has(.app-page[data-page="live-detection"].active) .topnav a:hover {
+  background: rgba(131, 114, 255, 0.12);
+  color: #dedbff;
+}
+
+body:has(.app-page[data-page="live-detection"].active) .topnav a.active {
+  background: rgba(91, 72, 202, 0.26);
+  color: #d6d0ff;
+}
+
+.app-page[data-page="live-detection"] .dms-system-state b,
+.app-page[data-page="live-detection"] .dms-status-item b {
+  color: #c9c7e7;
+}
+
+.app-page[data-page="live-detection"] .dms-status-item.active b {
+  color: #dce8ff;
+}
+
+.app-page[data-page="live-detection"] .dms-status-item.alert b {
+  color: #ffafc1;
+}
+
+.app-page[data-page="live-detection"] .live-sidebar {
+  grid-template-rows:
+    minmax(148px, 1.1fr)
+    minmax(118px, 0.8fr)
+    minmax(132px, 0.9fr)
+    minmax(130px, 1fr);
+  gap: 10px;
+  overflow: hidden;
+  padding: 0;
+}
+
+.app-page[data-page="live-detection"] .live-sidebar > .bento-card,
+.app-page[data-page="live-detection"] .annotation-panel,
+.app-page[data-page="live-detection"] .timeline-card {
+  min-width: 0;
+  min-height: 0;
+  height: auto;
+  border: 1px solid rgba(139, 126, 255, 0.3);
+  border-radius: 5px;
+  background:
+    linear-gradient(135deg, rgba(73, 50, 167, 0.14), transparent 44%),
+    rgba(17, 15, 51, 0.96);
+  color: #f2f3ff;
+  box-shadow:
+    inset 0 1px 0 rgba(193, 187, 255, 0.05),
+    inset 0 0 24px rgba(83, 61, 194, 0.08),
+    0 8px 24px rgba(0, 0, 0, 0.2);
+  padding: 12px;
+}
+
+.app-page[data-page="live-detection"] .dms-driver-card,
+.app-page[data-page="live-detection"] .gauge-card {
+  min-height: 0;
+  height: auto;
+  padding: 12px;
+}
+
+.app-page[data-page="live-detection"] .dms-driver-card .dms-card-title {
+  min-height: 0;
+}
+
+.app-page[data-page="live-detection"] .dms-card-title {
+  min-width: 0;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  gap: 9px;
+}
+
+.app-page[data-page="live-detection"] .dms-card-title.compact,
+.app-page[data-page="live-detection"] .gauge-card > .dms-card-title {
+  grid-template-columns: 34px minmax(0, 1fr);
+}
+
+.app-page[data-page="live-detection"] .dms-card-title > .material-symbols-outlined,
+.app-page[data-page="live-detection"] .dms-card-title.compact > .material-symbols-outlined {
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(82, 215, 255, 0.32);
+  border-radius: 50%;
+  background: rgba(57, 44, 148, 0.34);
+  color: #52d7ff;
+  font-size: 18px;
+  box-shadow: inset 0 0 12px rgba(82, 215, 255, 0.08);
+}
+
+.app-page[data-page="live-detection"] .dms-card-title b {
+  color: #edeefe;
+  font-size: 12px;
+}
+
+.app-page[data-page="live-detection"] .dms-card-title small {
+  color: #7e80a7;
+  font-size: 8px;
+}
+
+.app-page[data-page="live-detection"] .dms-card-title > i {
+  border-color: rgba(102, 216, 255, 0.42);
+  background: rgba(53, 198, 255, 0.12);
+  color: #66d8ff;
+}
+
+.app-page[data-page="live-detection"] .dms-driver-profile {
+  grid-template-columns: 70px minmax(0, 1fr);
+  gap: 10px;
+  min-height: 82px;
+  margin: 8px 0 0;
+  border: 1px solid rgba(139, 126, 255, 0.18);
+  border-radius: 4px;
+  background: rgba(11, 10, 37, 0.74);
+  padding: 8px;
+}
+
+.app-page[data-page="live-detection"] .dms-face-map {
+  width: 62px;
+  height: 62px;
+  border-color: rgba(82, 215, 255, 0.34);
+  border-radius: 3px;
+  background: #0d1030;
+  color: #9a93ff;
+  box-shadow: inset 0 0 18px rgba(82, 215, 255, 0.08);
+}
+
+.app-page[data-page="live-detection"] .dms-face-map i {
+  background: #52d7ff;
+  box-shadow: 0 0 7px rgba(82, 215, 255, 0.82);
+}
+
+.app-page[data-page="live-detection"] .dms-driver-profile > div:last-child span {
+  color: #77799f;
+}
+
+.app-page[data-page="live-detection"] .dms-driver-profile > div:last-child strong {
+  color: #52d7ff;
+  font-size: 20px;
+}
+
+.app-page[data-page="live-detection"] .dms-driver-profile > div:last-child small {
+  color: #8e90b3;
+}
+
+.app-page[data-page="live-detection"] .gauge-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 104px;
+  grid-template-rows: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 8px 10px;
+  text-align: left;
+}
+
+.app-page[data-page="live-detection"] .gauge-card > .dms-card-title {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.app-page[data-page="live-detection"] .monitor-reading {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  align-content: center;
+  justify-items: end;
+  gap: 4px;
+  border: 1px solid rgba(139, 126, 255, 0.3);
+  border-radius: 3px;
+  background: rgba(43, 31, 118, 0.36);
+  padding: 8px;
+}
+
+.app-page[data-page="live-detection"] .monitor-value {
+  display: flex;
+  width: 100%;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 5px;
+}
+
+.app-page[data-page="live-detection"] .monitor-value > span {
+  color: #f3f1ff;
+  font-size: 36px;
+  font-weight: 780;
+  line-height: 0.9;
+  text-shadow: 0 0 18px rgba(131, 114, 255, 0.34);
+}
+
+.app-page[data-page="live-detection"] .monitor-value > small,
+.app-page[data-page="live-detection"] .monitor-reading > p {
+  color: #9698bb;
+  font-size: 8px;
+}
+
+.app-page[data-page="live-detection"] .monitor-reading > p {
+  background: transparent;
+  padding: 0;
+  text-align: right;
+}
+
+.app-page[data-page="live-detection"] .gauge-card .mini-stats,
+.app-page[data-page="live-detection"] .gauge-card .gauge-bars {
+  grid-column: 1;
+  grid-row: 2;
+  align-self: end;
+  margin: 0 !important;
+  border-top: 1px solid rgba(139, 126, 255, 0.16);
+  padding-top: 7px;
+}
+
+.app-page[data-page="live-detection"] .mini-stats {
+  gap: 5px;
+}
+
+.app-page[data-page="live-detection"] .mini-stats span {
+  min-width: 0;
+  gap: 2px;
+  border: 1px solid rgba(139, 126, 255, 0.16);
+  border-radius: 3px;
+  background: rgba(10, 9, 34, 0.76);
+  padding: 6px;
+  box-shadow: none;
+}
+
+.app-page[data-page="live-detection"] .mini-stats small,
+.app-page[data-page="live-detection"] .gauge-bars label {
+  color: #777a9f;
+  font-size: 8px;
+}
+
+.app-page[data-page="live-detection"] .mini-stats b,
+.app-page[data-page="live-detection"] .gauge-bars b {
+  color: #d9daee;
+  font-size: 10px;
+}
+
+.app-page[data-page="live-detection"] .gauge-bars {
+  gap: 6px;
+}
+
+.app-page[data-page="live-detection"] .gauge-bars label {
+  gap: 4px 7px;
+}
+
+.app-page[data-page="live-detection"] .gauge-bars i {
+  height: 4px;
+  background: #2a255d;
+}
+
+.app-page[data-page="live-detection"] .gauge-bars em {
+  background: #8372ff;
+  box-shadow: 0 0 8px rgba(131, 114, 255, 0.52);
+}
+
+.app-page[data-page="live-detection"] .gauge-bars em.ok {
+  background: #66d8ff;
+  box-shadow: 0 0 8px rgba(102, 216, 255, 0.46);
+}
+
+.app-page[data-page="live-detection"] .monitor-reading.alarm {
+  border-color: rgba(255, 85, 127, 0.72);
+  background: rgba(128, 24, 58, 0.4);
+  box-shadow: inset 3px 0 0 #ff4f79, 0 0 18px rgba(255, 79, 121, 0.14);
+}
+
+.app-page[data-page="live-detection"] .monitor-reading.alarm .monitor-value > span {
+  color: #ff7696;
+  font-size: 39px;
+}
+
+.app-page[data-page="live-detection"] .monitor-reading.alarm .monitor-value > small,
+.app-page[data-page="live-detection"] .monitor-reading.alarm > p {
+  color: #ff9fb5;
+}
+
+.app-page[data-page="live-detection"] .inference-result-card {
+  min-height: 0;
+  overflow: auto;
+  padding: 12px;
+}
+
+.app-page[data-page="live-detection"] .inference-result-card .section-heading h2,
+.app-page[data-page="live-detection"] .timeline-card .section-heading h2,
+.app-page[data-page="live-detection"] .annotation-panel .section-heading h2 {
+  color: #e8e8f8;
+}
+
+.app-page[data-page="live-detection"] .inference-result-card .section-heading p,
+.app-page[data-page="live-detection"] .timeline-card .section-heading p,
+.app-page[data-page="live-detection"] .annotation-panel .section-heading p {
+  color: #777a9f;
+}
+
+.app-page[data-page="live-detection"] .pill {
+  border-color: rgba(139, 126, 255, 0.28);
+  background: rgba(62, 47, 147, 0.3);
+  color: #bcb8e9;
+}
+
+.app-page[data-page="live-detection"] .inference-result-row,
+.app-page[data-page="live-detection"] .empty-inference {
+  border-color: rgba(139, 126, 255, 0.16);
+  background: rgba(10, 9, 34, 0.76);
+  color: #8588ab;
+}
+
+.app-page[data-page="live-detection"] .inference-result-row b,
+.app-page[data-page="live-detection"] .inference-result-row strong {
+  color: #dcdcef;
+}
+
+@media (max-width: 900px) {
+  .app-page[data-page="live-detection"] .live-sidebar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: none;
+    overflow: visible;
+  }
+
+  .app-page[data-page="live-detection"] .live-sidebar > .bento-card {
+    min-height: 160px;
+  }
+}
+
+@media (max-width: 680px) {
+  body:has(.app-page[data-page="live-detection"].active) .app-shell {
+    padding-top: 129px;
+  }
+
+  body:has(.app-page[data-page="live-detection"].active) .topnav {
+    border-inline: 0;
+    border-radius: 0;
+    background: rgba(10, 9, 32, 0.96);
+  }
+
+  .app-page[data-page="live-detection"] .dms-status-strip {
+    scrollbar-width: none;
+  }
+
+  .app-page[data-page="live-detection"] .dms-status-strip::-webkit-scrollbar {
+    display: none;
+  }
+
+  .app-page[data-page="live-detection"] .live-sidebar {
+    grid-template-columns: 1fr;
+  }
+
+  .app-page[data-page="live-detection"] .gauge-card {
+    grid-template-columns: minmax(0, 1fr) 118px;
+  }
+}
+
+/* Image-one layout lock: left telemetry tower plus full camera viewport. */
+body:has(.app-page[data-page="live-detection"].active) .topbar {
+  display: none !important;
+}
+
+body:has(.app-page[data-page="live-detection"].active) .app-shell {
+  width: 100%;
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0 !important;
+}
+
+.app-page[data-page="live-detection"].active {
+  display: block !important;
+  width: 100%;
+  max-width: none;
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  padding: 10px;
+}
+
+.app-page[data-page="live-detection"] .live-heading {
+  display: none !important;
+}
+
+.app-page[data-page="live-detection"] .live-layout {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  grid-template-areas: "monitor main";
+  grid-template-columns: clamp(302px, 25vw, 380px) minmax(0, 1fr);
+  gap: 10px;
+}
+
+.app-page[data-page="live-detection"] .live-main {
+  grid-area: main;
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 112px minmax(0, 1fr);
+  gap: 10px;
+}
+
+.app-page[data-page="live-detection"] .live-sidebar {
+  grid-area: monitor;
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 74px 146px 96px 126px minmax(180px, 1fr);
+  gap: 8px;
+  overflow: hidden;
+}
+
+.app-page[data-page="live-detection"] .dms-left-head {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 112px minmax(0, 1fr);
+  align-items: center;
+  gap: 5px;
+  overflow: hidden;
+  border: 1px solid rgba(139, 126, 255, 0.4);
+  border-radius: 4px;
+  background: linear-gradient(180deg, rgba(48, 31, 130, 0.9), rgba(18, 14, 58, 0.96));
+  padding: 7px;
+  box-shadow: inset 0 0 24px rgba(95, 75, 228, 0.14);
+}
+
+.app-page[data-page="live-detection"] .dms-console-brand {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 32px minmax(0, 1fr);
+  align-items: center;
+  gap: 6px;
+}
+
+.app-page[data-page="live-detection"] .dms-console-brand > span {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 1px solid rgba(211, 224, 100, 0.54);
+  border-radius: 50%;
+  background: rgba(169, 183, 56, 0.15);
+  color: #d9ec72;
+  font-size: 18px;
+  box-shadow: 0 0 12px rgba(217, 236, 114, 0.18);
+}
+
+.app-page[data-page="live-detection"] .dms-console-brand b,
+.app-page[data-page="live-detection"] .dms-console-brand small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-page[data-page="live-detection"] .dms-console-brand b {
+  color: #f2f1ff;
+  font-size: 10px;
+}
+
+.app-page[data-page="live-detection"] .dms-console-brand small {
+  color: #7e80a6;
+  font-size: 6px;
+  margin-top: 2px;
+}
+
+.app-page[data-page="live-detection"] .dms-left-head .live-system-telemetry {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2px;
+  overflow: hidden;
+}
+
+.app-page[data-page="live-detection"] .dms-left-head .live-system-telemetry > span {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 1fr;
+  grid-template-rows: 20px auto auto;
+  justify-items: center;
+  gap: 1px;
+  border-left: 1px solid rgba(139, 126, 255, 0.2);
+  padding: 1px 2px;
+  text-align: center;
+}
+
+.app-page[data-page="live-detection"] .dms-left-head .live-system-telemetry .latency-metric {
+  display: none;
+}
+
+.app-page[data-page="live-detection"] .dms-left-head .live-system-telemetry i.material-symbols-outlined {
+  grid-column: 1;
+  grid-row: 1;
+  width: 20px;
+  height: 20px;
+  border: 0;
+  background: transparent;
+  color: #aaa2ff;
+  font-size: 16px;
+}
+
+.app-page[data-page="live-detection"] .dms-left-head .live-system-telemetry i.material-symbols-outlined.online {
+  background: transparent;
+  color: #66d8ff;
+}
+
+.app-page[data-page="live-detection"] .dms-left-head .live-system-telemetry small {
+  color: #777aa1;
+  font-size: 6px;
+}
+
+.app-page[data-page="live-detection"] .dms-left-head .live-system-telemetry b {
+  color: #d8d7ec;
+  font-size: 7px;
+}
+
+.app-page[data-page="live-detection"] .live-sidebar > .gauge-card,
+.app-page[data-page="live-detection"] .live-sidebar > .inference-result-card {
+  display: none !important;
+}
+
+.app-page[data-page="live-detection"] .live-analytics {
+  display: contents;
+}
+
+.app-page[data-page="live-detection"] .live-sidebar > .dms-driver-card,
+.app-page[data-page="live-detection"] .live-sidebar .dms-telemetry-card {
+  min-width: 0;
+  min-height: 0;
+  height: auto;
+  border: 1px solid rgba(139, 126, 255, 0.36);
+  border-radius: 4px;
+  background:
+    linear-gradient(135deg, rgba(75, 52, 175, 0.15), transparent 48%),
+    rgba(17, 15, 51, 0.97);
+  padding: 10px;
+  box-shadow: inset 0 0 24px rgba(83, 61, 194, 0.09);
+}
+
+.app-page[data-page="live-detection"] .dms-driver-profile {
+  grid-template-columns: 76px minmax(0, 1fr);
+  min-height: 86px;
+  margin-top: 9px;
+  padding: 7px;
+}
+
+.app-page[data-page="live-detection"] .dms-face-map {
+  width: 64px;
+  height: 68px;
+}
+
+.app-page[data-page="live-detection"] .head-location-card {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.app-page[data-page="live-detection"] .coordinate-grid {
+  align-self: end;
+  margin-top: 7px;
+}
+
+.app-page[data-page="live-detection"] .coordinate-grid > span {
+  padding: 5px 3px;
+}
+
+.app-page[data-page="live-detection"] .head-rotation-card {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.app-page[data-page="live-detection"] .rotation-console {
+  align-self: center;
+  grid-template-columns: 64px minmax(0, 1fr);
+  margin-top: 5px;
+}
+
+.app-page[data-page="live-detection"] .pose-orbit {
+  width: 58px;
+  height: 58px;
+}
+
+.app-page[data-page="live-detection"] .pose-orbit > span {
+  font-size: 26px;
+}
+
+.app-page[data-page="live-detection"] .gaze-card {
+  display: grid;
+  min-height: 0;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 7px;
+}
+
+.app-page[data-page="live-detection"] .eye-preview-grid {
+  min-height: 0;
+}
+
+.app-page[data-page="live-detection"] .eye-preview-grid figure {
+  grid-template-rows: minmax(52px, 1fr) auto 24px;
+}
+
+.app-page[data-page="live-detection"] .eye-wave {
+  height: 24px;
+}
+
+.app-page[data-page="live-detection"] .dms-status-strip {
+  grid-column: 1;
+  grid-row: 1;
+  min-height: 112px;
+  grid-template-columns: minmax(88px, 0.8fr) repeat(8, minmax(62px, 1fr)) minmax(132px, 1.1fr);
+  border-color: rgba(139, 126, 255, 0.42);
+  background: linear-gradient(180deg, rgba(47, 31, 128, 0.92), rgba(17, 14, 53, 0.97));
+}
+
+.app-page[data-page="live-detection"] .dms-system-state,
+.app-page[data-page="live-detection"] .dms-status-item {
+  min-height: 110px;
+  gap: 7px;
+}
+
+.app-page[data-page="live-detection"] .dms-system-state .material-symbols-outlined,
+.app-page[data-page="live-detection"] .dms-status-item .material-symbols-outlined {
+  width: 42px;
+  height: 42px;
+  font-size: 24px;
+}
+
+.app-page[data-page="live-detection"] .dms-system-state b,
+.app-page[data-page="live-detection"] .dms-status-item b {
+  font-size: 10px;
+}
+
+.app-page[data-page="live-detection"] .inference-stage {
+  --dms-camera-object-fit: cover;
+  grid-column: 1;
+  grid-row: 2;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  border-color: rgba(139, 126, 255, 0.4);
+  border-radius: 4px;
+}
+
+.app-page[data-page="live-detection"] .annotation-panel,
+.app-page[data-page="live-detection"] .timeline-card,
+.app-page[data-page="live-detection"] .feed-chip,
+.app-page[data-page="live-detection"] .model-switcher {
+  display: none !important;
+}
+
+.app-page[data-page="live-detection"] #cameraVideo.active,
+.app-page[data-page="live-detection"] #detectionCanvas.active {
+  object-fit: var(--dms-camera-object-fit, cover);
+}
+
+.app-page[data-page="live-detection"] .dms-camera-meta {
+  right: 12px;
+  bottom: 12px;
+  left: auto;
+  border-color: rgba(139, 126, 255, 0.46);
+  background: rgba(18, 14, 57, 0.9);
+  color: #d1cff2;
+}
+
+@media (max-width: 1100px) {
+  .app-page[data-page="live-detection"] .live-layout {
+    grid-template-columns: 292px minmax(0, 1fr);
+  }
+
+  .app-page[data-page="live-detection"] .dms-status-strip {
+    grid-template-columns: 82px repeat(8, 58px) 126px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .app-page[data-page="live-detection"] .dms-status-strip::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  body:has(.app-page[data-page="live-detection"].active) {
+    overflow-y: auto;
+  }
+
+  body:has(.app-page[data-page="live-detection"].active) .app-shell {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+    padding: 0 !important;
+  }
+
+  .app-page[data-page="live-detection"].active {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+    padding: 8px;
+  }
+
+  .app-page[data-page="live-detection"] .live-layout {
+    height: auto;
+    grid-template-areas:
+      "main"
+      "monitor";
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .app-page[data-page="live-detection"] .live-main {
+    grid-template-rows: 100px minmax(480px, 68vh);
+  }
+
+  .app-page[data-page="live-detection"] .live-sidebar {
+    grid-template-rows: 78px 150px 100px 130px minmax(300px, auto);
+    overflow: visible;
+  }
+
+  .app-page[data-page="live-detection"] .dms-status-strip {
+    min-height: 100px;
+  }
+
+  .app-page[data-page="live-detection"] .dms-system-state,
+  .app-page[data-page="live-detection"] .dms-status-item {
+    min-height: 98px;
+  }
+
+  .app-page[data-page="live-detection"] .dms-left-head {
+    grid-template-columns: 116px minmax(0, 1fr);
+  }
+}
+
+/* Top instrumentation and right-side face telemetry. */
+.app-page[data-page="live-detection"].active {
+  grid-template-areas:
+    "heading"
+    "workspace";
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 58px minmax(0, 1fr);
+  gap: 10px;
+}
+
+.app-page[data-page="live-detection"] .live-heading {
+  display: flex !important;
+  min-width: 0;
+  min-height: 58px;
+  align-items: center;
+  margin: 0;
+  border: 1px solid rgba(139, 126, 255, 0.3);
+  border-radius: 5px;
+  background: linear-gradient(180deg, rgba(39, 28, 105, 0.82), rgba(15, 13, 48, 0.94));
+  padding: 6px 10px;
+  box-shadow: inset 0 0 24px rgba(93, 73, 220, 0.1);
+}
+
+.app-page[data-page="live-detection"] .live-heading > div:first-child {
+  min-width: 190px;
+}
+
+.app-page[data-page="live-detection"] .live-heading h1 {
+  color: #f2f3ff;
+  font-size: 16px;
+  font-weight: 680;
+}
+
+.app-page[data-page="live-detection"] .live-heading > div:first-child > p:last-child {
+  display: none;
+}
+
+.app-page[data-page="live-detection"] .live-heading .online-line {
+  color: #66d8ff;
+  font-size: 7px;
+  letter-spacing: 0.08em;
+  margin-bottom: 3px;
+}
+
+.app-page[data-page="live-detection"] .live-system-telemetry {
+  display: flex;
+  min-width: 0;
+  align-items: stretch;
+  justify-content: flex-end;
+  gap: 4px;
+  overflow: hidden;
+}
+
+.app-page[data-page="live-detection"] .live-system-telemetry > span {
+  display: grid;
+  min-width: 112px;
+  grid-template-columns: 32px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  align-items: center;
+  gap: 1px 7px;
+  border-left: 1px solid rgba(139, 126, 255, 0.24);
+  padding: 3px 8px;
+}
+
+.app-page[data-page="live-detection"] .live-system-telemetry i.material-symbols-outlined {
+  grid-column: 1;
+  grid-row: 1 / 3;
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 1px solid rgba(139, 126, 255, 0.3);
+  border-radius: 50%;
+  background: rgba(62, 48, 151, 0.32);
+  color: #aaa2ff;
+  font-size: 16px;
+  box-shadow: none;
+}
+
+.app-page[data-page="live-detection"] .live-system-telemetry i.material-symbols-outlined.online {
+  background: rgba(53, 198, 255, 0.16);
+  color: #66d8ff;
+}
+
+.app-page[data-page="live-detection"] .live-system-telemetry small,
+.app-page[data-page="live-detection"] .live-system-telemetry b {
+  display: block;
+  overflow: hidden;
+  line-height: 1.12;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-page[data-page="live-detection"] .live-system-telemetry small {
+  color: #797ca3;
+  font-size: 7px;
+}
+
+.app-page[data-page="live-detection"] .live-system-telemetry b {
+  color: #e1e1f3;
+  font-size: 10px;
+}
+
+.app-page[data-page="live-detection"] .live-layout {
+  grid-template-columns: clamp(238px, 18vw, 284px) minmax(430px, 1fr) clamp(244px, 19vw, 304px);
+  grid-template-areas: "monitor main analytics";
+  gap: 10px;
+}
+
+.app-page[data-page="live-detection"] .live-main {
+  grid-area: main;
+}
+
+.app-page[data-page="live-detection"] .live-sidebar {
+  grid-area: monitor;
+}
+
+.app-page[data-page="live-detection"] .live-analytics {
+  grid-area: analytics;
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  grid-template-rows: 126px 164px minmax(250px, 1fr);
+  gap: 10px;
+  overflow: hidden;
+}
+
+.app-page[data-page="live-detection"] .dms-status-strip {
+  grid-template-columns: minmax(76px, 0.8fr) repeat(8, minmax(48px, 1fr)) minmax(118px, 1.15fr);
+}
+
+.app-page[data-page="live-detection"] .live-sidebar {
+  grid-template-rows: minmax(132px, 1fr) minmax(112px, 0.82fr) minmax(126px, 0.92fr) minmax(118px, 1fr);
+}
+
+.app-page[data-page="live-detection"] .dms-telemetry-card {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid rgba(139, 126, 255, 0.3);
+  border-radius: 5px;
+  background:
+    linear-gradient(135deg, rgba(75, 52, 175, 0.14), transparent 46%),
+    rgba(17, 15, 51, 0.96);
+  color: #f1f1ff;
+  padding: 10px;
+  box-shadow: inset 0 0 24px rgba(83, 61, 194, 0.08), 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.app-page[data-page="live-detection"] .telemetry-card-title {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.app-page[data-page="live-detection"] .telemetry-card-title > .material-symbols-outlined {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 1px solid rgba(82, 215, 255, 0.3);
+  border-radius: 50%;
+  background: rgba(57, 44, 148, 0.34);
+  color: #52d7ff;
+  font-size: 16px;
+}
+
+.app-page[data-page="live-detection"] .telemetry-card-title b,
+.app-page[data-page="live-detection"] .telemetry-card-title small {
+  display: block;
+}
+
+.app-page[data-page="live-detection"] .telemetry-card-title b {
+  color: #edeefe;
+  font-size: 11px;
+}
+
+.app-page[data-page="live-detection"] .telemetry-card-title small {
+  overflow: hidden;
+  color: #7d80a7;
+  font-size: 7px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-page[data-page="live-detection"] .telemetry-card-title em {
+  border: 1px solid rgba(102, 216, 255, 0.3);
+  border-radius: 3px;
+  background: rgba(53, 198, 255, 0.1);
+  color: #66d8ff;
+  font-size: 7px;
+  font-style: normal;
+  padding: 4px 6px;
+  white-space: nowrap;
+}
+
+.app-page[data-page="live-detection"] .coordinate-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+  margin-top: 9px;
+}
+
+.app-page[data-page="live-detection"] .coordinate-grid > span {
+  min-width: 0;
+  border: 1px solid rgba(139, 126, 255, 0.16);
+  border-radius: 3px;
+  background: rgba(10, 9, 34, 0.76);
+  padding: 7px 5px;
+  text-align: center;
+}
+
+.app-page[data-page="live-detection"] .coordinate-grid small,
+.app-page[data-page="live-detection"] .coordinate-grid b {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-page[data-page="live-detection"] .coordinate-grid small {
+  color: #74779e;
+  font-size: 7px;
+}
+
+.app-page[data-page="live-detection"] .coordinate-grid b {
+  color: #a8eaff;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  margin-top: 4px;
+}
+
+.app-page[data-page="live-detection"] .rotation-console {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  align-items: center;
+  gap: 9px;
+  margin-top: 9px;
+}
+
+.app-page[data-page="live-detection"] .pose-orbit {
+  position: relative;
+  display: grid;
+  width: 66px;
+  height: 66px;
+  place-items: center;
+  border: 1px solid rgba(139, 126, 255, 0.5);
+  border-radius: 50%;
+  background: rgba(25, 20, 73, 0.72);
+  box-shadow: inset 0 0 18px rgba(87, 67, 210, 0.18), 0 0 16px rgba(82, 215, 255, 0.08);
+}
+
+.app-page[data-page="live-detection"] .pose-orbit::before,
+.app-page[data-page="live-detection"] .pose-orbit::after {
+  content: "";
+  position: absolute;
+  background: rgba(82, 215, 255, 0.23);
+}
+
+.app-page[data-page="live-detection"] .pose-orbit::before {
+  width: 48px;
+  height: 1px;
+}
+
+.app-page[data-page="live-detection"] .pose-orbit::after {
+  width: 1px;
+  height: 48px;
+}
+
+.app-page[data-page="live-detection"] .pose-orbit > span {
+  position: relative;
+  z-index: 1;
+  color: #b1aaff;
+  font-size: 30px;
+  transition: transform 180ms ease;
+}
+
+.app-page[data-page="live-detection"] .pose-orbit i {
+  position: absolute;
+  top: 4px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #52d7ff;
+  box-shadow: 0 0 8px rgba(82, 215, 255, 0.75);
+}
+
+.app-page[data-page="live-detection"] .rotation-values {
+  display: grid;
+  gap: 4px;
+}
+
+.app-page[data-page="live-detection"] .rotation-values > span {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  border-bottom: 1px solid rgba(139, 126, 255, 0.12);
+  padding: 3px 0;
+}
+
+.app-page[data-page="live-detection"] .rotation-values small {
+  overflow: hidden;
+  color: #73769b;
+  font-size: 7px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-page[data-page="live-detection"] .rotation-values b {
+  color: #e5e4f7;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+}
+
+.app-page[data-page="live-detection"] .gaze-card {
+  display: grid;
+  min-height: 0;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 9px;
+}
+
+.app-page[data-page="live-detection"] .eye-preview-grid {
+  display: grid;
+  min-height: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.app-page[data-page="live-detection"] .eye-preview-grid figure {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  grid-template-rows: minmax(70px, 1fr) auto 28px;
+  overflow: hidden;
+  margin: 0;
+  border: 1px solid rgba(139, 126, 255, 0.2);
+  border-radius: 3px;
+  background: rgba(9, 8, 30, 0.82);
+}
+
+.app-page[data-page="live-detection"] .eye-preview-grid figure > div {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(139, 126, 255, 0.16);
+  background:
+    linear-gradient(rgba(102, 91, 213, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(102, 91, 213, 0.08) 1px, transparent 1px),
+    #0b0b29;
+  background-size: 14px 14px;
+}
+
+.app-page[data-page="live-detection"] .eye-preview-grid canvas {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.app-page[data-page="live-detection"] .eye-preview-grid figure > div > span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 0;
+  color: rgba(149, 140, 255, 0.42);
+  font-size: 30px;
+  transform: translate(-50%, -50%);
+}
+
+.app-page[data-page="live-detection"] .eye-preview-grid figcaption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+  padding: 5px 6px;
+}
+
+.app-page[data-page="live-detection"] .eye-preview-grid figcaption small {
+  color: #777a9f;
+  font-size: 6px;
+}
+
+.app-page[data-page="live-detection"] .eye-preview-grid figcaption b {
+  color: #66d8ff;
+  font-size: 7px;
+}
+
+.app-page[data-page="live-detection"] .eye-wave {
+  display: flex;
+  height: 28px;
+  align-items: flex-end;
+  gap: 2px;
+  overflow: hidden;
+  border-top: 1px solid rgba(139, 126, 255, 0.12);
+  padding: 4px 5px;
+}
+
+.app-page[data-page="live-detection"] .eye-wave em {
+  flex: 1;
+  min-width: 2px;
+  border-radius: 1px 1px 0 0;
+  background: #8372ff;
+  opacity: 0.72;
+}
+
+.app-page[data-page="live-detection"] .eye-wave em:nth-child(1),
+.app-page[data-page="live-detection"] .eye-wave em:nth-child(6) { height: 32%; }
+.app-page[data-page="live-detection"] .eye-wave em:nth-child(2),
+.app-page[data-page="live-detection"] .eye-wave em:nth-child(5) { height: 58%; }
+.app-page[data-page="live-detection"] .eye-wave em:nth-child(3) { height: 82%; }
+.app-page[data-page="live-detection"] .eye-wave em:nth-child(4) { height: 68%; }
+
+.app-page[data-page="live-detection"] .eye-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 70px;
+  align-items: center;
+  gap: 8px;
+}
+
+.app-page[data-page="live-detection"] .eye-summary span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.app-page[data-page="live-detection"] .eye-summary small {
+  color: #777a9f;
+  font-size: 7px;
+}
+
+.app-page[data-page="live-detection"] .eye-summary b {
+  color: #e4e3f5;
+  font-size: 8px;
+}
+
+.app-page[data-page="live-detection"] .eye-summary > i {
+  display: block;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: #2a255d;
+}
+
+.app-page[data-page="live-detection"] .eye-summary > i em {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #66d8ff;
+  box-shadow: 0 0 8px rgba(102, 216, 255, 0.48);
+  transition: width 180ms ease;
+}
+
+@media (max-width: 1120px) {
+  .app-page[data-page="live-detection"] .live-layout {
+    grid-template-columns: 224px minmax(400px, 1fr) 228px;
+  }
+
+  .app-page[data-page="live-detection"] .live-system-telemetry > span {
+    min-width: 96px;
+    padding-inline: 5px;
+  }
+
+  .app-page[data-page="live-detection"] .dms-status-strip {
+    grid-template-columns: 70px repeat(8, minmax(42px, 1fr)) 110px;
+  }
+}
+
+@media (max-width: 900px) {
+  .app-page[data-page="live-detection"].active {
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .app-page[data-page="live-detection"] .live-heading {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 9px;
+  }
+
+  .app-page[data-page="live-detection"] .live-system-telemetry {
+    justify-content: flex-start;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .app-page[data-page="live-detection"] .live-system-telemetry::-webkit-scrollbar {
+    display: none;
+  }
+
+  .app-page[data-page="live-detection"] .live-layout {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "main"
+      "monitor"
+      "analytics";
+  }
+
+  .app-page[data-page="live-detection"] .live-analytics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto auto;
+    overflow: visible;
+  }
+
+  .app-page[data-page="live-detection"] .gaze-card {
+    grid-column: 1 / -1;
+    min-height: 300px;
+  }
+}
+
+@media (max-width: 680px) {
+  .app-page[data-page="live-detection"] .live-heading {
+    min-height: 112px;
+  }
+
+  .app-page[data-page="live-detection"] .live-system-telemetry > span {
+    min-width: 108px;
+  }
+
+  .app-page[data-page="live-detection"] .live-analytics {
+    grid-template-columns: 1fr;
+  }
+
+  .app-page[data-page="live-detection"] .gaze-card {
+    grid-column: 1;
+    min-height: 320px;
+  }
+}
+
+/* Final DMS viewport contract. Keep this block last so legacy responsive rules
+   cannot pull the live console back into the admin dashboard geometry. */
+body:has(#live-detection.active) {
+  overflow: hidden;
+}
+
+body:has(#live-detection.active) .topbar {
+  display: none !important;
+}
+
+body:has(#live-detection.active) .app-shell {
+  width: 100% !important;
+  height: 100vh !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+
+#live-detection.app-page.active {
+  display: block !important;
+  width: 100% !important;
+  max-width: none !important;
+  height: 100vh !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  padding: 10px !important;
+}
+
+#live-detection .live-heading {
+  display: none !important;
+}
+
+#live-detection .live-layout {
+  display: grid !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  grid-template-areas: "monitor main" !important;
+  grid-template-columns: clamp(302px, 25vw, 380px) minmax(0, 1fr) !important;
+  grid-template-rows: minmax(0, 1fr) !important;
+  gap: 10px !important;
+  overflow: hidden !important;
+}
+
+#live-detection .live-main {
+  grid-area: main !important;
+  display: grid !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: 112px minmax(0, 1fr) !important;
+  gap: 10px !important;
+  overflow: hidden !important;
+}
+
+#live-detection .live-sidebar {
+  grid-area: monitor !important;
+  display: grid !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: 74px 146px 96px 126px minmax(180px, 1fr) !important;
+  gap: 8px !important;
+  overflow: hidden !important;
+}
+
+#live-detection .dms-left-head,
+#live-detection .live-sidebar > .dms-driver-card,
+#live-detection .live-sidebar .dms-telemetry-card {
+  width: auto !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+}
+
+#live-detection .live-sidebar > .gauge-card,
+#live-detection .live-sidebar > .inference-result-card {
+  display: none !important;
+}
+
+#live-detection .live-analytics {
+  display: contents !important;
+}
+
+#live-detection .dms-status-strip {
+  display: grid !important;
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 112px !important;
+  grid-template-columns: minmax(88px, .8fr) repeat(8, minmax(62px, 1fr)) minmax(132px, 1.1fr) !important;
+  overflow: hidden !important;
+}
+
+#live-detection .inference-stage {
+  display: block !important;
+  grid-column: 1 !important;
+  grid-row: 2 !important;
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+
+#live-detection .detection-placeholder {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  z-index: 4 !important;
+  display: grid !important;
+  width: min(360px, calc(100% - 48px)) !important;
+  min-width: 0 !important;
+  max-width: 360px !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+#live-detection .detection-placeholder[hidden] {
+  display: none !important;
+}
+
+#live-detection .annotation-panel,
+#live-detection .timeline-card,
+#live-detection .feed-chip,
+#live-detection .model-switcher {
+  display: none !important;
+}
+
+@media (max-width: 1100px) and (min-width: 761px) {
+  #live-detection .live-layout {
+    grid-template-columns: 292px minmax(0, 1fr) !important;
+  }
+
+  #live-detection .dms-status-strip {
+    grid-template-columns: 82px repeat(8, 58px) 126px !important;
+    overflow-x: auto !important;
+  }
+}
+
+@media (max-width: 760px) {
+  body:has(#live-detection.active) {
+    overflow-y: auto;
+  }
+
+  body:has(#live-detection.active) .app-shell {
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow: visible !important;
+  }
+
+  #live-detection.app-page.active {
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow: visible !important;
+    padding: 8px !important;
+  }
+
+  #live-detection .live-layout {
+    height: auto !important;
+    grid-template-areas: "main" "monitor" !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: auto auto !important;
+    overflow: visible !important;
+  }
+
+  #live-detection .live-main {
+    grid-template-rows: 100px minmax(480px, 68vh) !important;
+  }
+
+  #live-detection .live-sidebar {
+    grid-template-rows: 78px 150px 100px 130px minmax(300px, auto) !important;
+    overflow: visible !important;
+  }
+
+  #live-detection .dms-status-strip {
+    min-height: 100px !important;
+    grid-template-columns: 82px repeat(8, 58px) 126px !important;
+    overflow-x: auto !important;
+  }
+}
+
+/* Final face/gaze rail contract. */
+@media (min-width: 761px) {
+  #live-detection .live-layout {
+    grid-template-areas: "monitor main" !important;
+    grid-template-columns: clamp(330px, 25vw, 410px) minmax(0, 1fr) !important;
+  }
+
+  #live-detection .live-sidebar.dms-detail-sidebar {
+    display: block !important;
+    align-self: start !important;
+    height: auto !important;
+    max-height: 100% !important;
+    min-height: min(calc(100vh - 20px), 540px) !important;
+    overflow: hidden auto !important;
+    padding: 0 !important;
+  }
+
+  #live-detection .dms-inspection-console {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 100% !important;
+    min-height: min(calc(100vh - 20px), 540px) !important;
+  }
+}
+
+@media (max-width: 1100px) and (min-width: 761px) {
+  #live-detection .live-layout {
+    grid-template-columns: 330px minmax(0, 1fr) !important;
+  }
+}
+
+@media (max-width: 760px) {
+  #live-detection .live-sidebar.dms-detail-sidebar {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  #live-detection .dms-inspection-console {
+    height: auto !important;
+    overflow: visible !important;
+  }
+}
+
+#live-detection #cameraVideo.active,
+#live-detection #detectionCanvas.active {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: var(--dms-camera-object-fit, cover) !important;
+}
+
+/* Left FACE & GAZE console styled to match the supplied reference. */
+@media (min-width: 761px) {
+  #live-detection .live-layout {
+    grid-template-columns: minmax(520px, 560px) minmax(0, 1fr) !important;
+  }
+}
+
+@media (max-width: 1100px) and (min-width: 761px) {
+  #live-detection .live-layout {
+    grid-template-columns: 460px minmax(0, 1fr) !important;
+  }
+}
+
+#live-detection .live-sidebar.dms-detail-sidebar {
+  background: transparent !important;
+  scrollbar-color: rgba(56, 189, 248, 0.45) rgba(7, 12, 32, 0.9) !important;
+}
+
+#live-detection .dms-inspection-console {
+  --console-bg: #070b1b;
+  --console-card: #090f22;
+  --console-card-soft: #11182a;
+  --console-value: #201d55;
+  --console-line: rgba(59, 130, 246, 0.22);
+  --console-blue: #35c6ff;
+  --console-red: #ff4651;
+  --console-green: #8fb7ff;
+  display: grid !important;
+  grid-template-rows: auto auto auto auto minmax(220px, auto) !important;
+  gap: 14px !important;
+  overflow: visible !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #e8eefc !important;
+  box-shadow: none !important;
+}
+
+#live-detection .dms-inspection-header,
+#live-detection .dms-console-section {
+  overflow: hidden !important;
+  border: 1px solid var(--console-line) !important;
+  border-radius: 10px !important;
+  background:
+    linear-gradient(180deg, rgba(25, 36, 76, 0.72), rgba(7, 11, 27, 0.96)),
+    var(--console-card) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(111, 145, 255, 0.04),
+    inset 0 0 36px rgba(23, 42, 105, 0.36),
+    0 0 18px rgba(5, 12, 34, 0.28) !important;
+}
+
+#live-detection .dms-inspection-header {
+  min-height: 142px !important;
+  grid-template-columns: minmax(0, 1fr) 76px !important;
+  align-items: center !important;
+  gap: 18px !important;
+  border-top: 3px solid var(--console-blue) !important;
+  padding: 22px 24px !important;
+}
+
+#live-detection .dms-console-brand {
+  display: grid !important;
+  min-width: 0 !important;
+  grid-template-columns: 58px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 20px !important;
+}
+
+#live-detection .dms-console-brand > .material-symbols-outlined {
+  width: 58px !important;
+  height: 58px !important;
+  border: 1px solid var(--console-blue) !important;
+  border-radius: 50% !important;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(53, 198, 255, 0.18), transparent 44%),
+    rgba(13, 33, 56, 0.78) !important;
+  color: var(--console-blue) !important;
+  font-size: 31px !important;
+  box-shadow: 0 0 24px rgba(53, 198, 255, 0.18) !important;
+}
+
+#live-detection .dms-console-brand b {
+  color: #f4f7ff !important;
+  font-size: 24px !important;
+  font-weight: 900 !important;
+  line-height: 1.18 !important;
+}
+
+#live-detection .dms-console-brand small {
+  margin-top: 6px !important;
+  color: rgba(207, 216, 238, 0.72) !important;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+}
+
+#live-detection .dms-console-status {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 12px !important;
+  justify-items: end !important;
+}
+
+#live-detection .dms-console-status > span {
+  display: flex !important;
+  min-width: 0 !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+  color: rgba(210, 219, 238, 0.74) !important;
+}
+
+#live-detection .dms-console-status > span:nth-child(3) {
+  display: none !important;
+}
+
+#live-detection .dms-console-status small {
+  display: none !important;
+}
+
+#live-detection .dms-console-status i {
+  color: rgba(210, 219, 238, 0.76) !important;
+  font-size: 22px !important;
+}
+
+#live-detection .dms-console-status b {
+  color: rgba(224, 231, 246, 0.78) !important;
+  font-size: 18px !important;
+  font-weight: 800 !important;
+}
+
+#live-detection .dms-console-section {
+  min-width: 0 !important;
+  border-bottom: 1px solid var(--console-line) !important;
+  padding: 22px !important;
+}
+
+#live-detection .driver-overview {
+  min-height: 292px !important;
+}
+
+#live-detection .driver-overview-head,
+#live-detection .console-section-title {
+  display: flex !important;
+  min-width: 0 !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+}
+
+#live-detection .driver-overview-head > div,
+#live-detection .console-section-title {
+  color: var(--console-blue) !important;
+}
+
+#live-detection .driver-overview-head > div {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+#live-detection .driver-overview-head .material-symbols-outlined,
+#live-detection .console-section-title .material-symbols-outlined {
+  color: currentColor !important;
+  font-size: 28px !important;
+}
+
+#live-detection .driver-overview-head b,
+#live-detection .console-section-title b {
+  color: currentColor !important;
+  font-size: 24px !important;
+  font-weight: 900 !important;
+}
+
+#live-detection .driver-overview-head > i,
+#live-detection .console-section-title em {
+  flex: 0 0 auto !important;
+  max-width: 160px !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(73, 92, 128, 0.82) !important;
+  border-radius: 7px !important;
+  background: rgba(42, 52, 76, 0.9) !important;
+  color: rgba(232, 238, 252, 0.76) !important;
+  padding: 7px 12px !important;
+  font-size: 18px !important;
+  font-style: normal !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+#live-detection .driver-overview-head > i:not(.alarm) {
+  border-color: rgba(102, 216, 255, 0.36) !important;
+  background: rgba(18, 42, 86, 0.78) !important;
+  color: #cfe6ff !important;
+}
+
+#live-detection .driver-overview-head > i.alarm {
+  border-color: rgba(255, 70, 81, 0.58) !important;
+  background: rgba(104, 21, 39, 0.74) !important;
+  color: #ff9098 !important;
+}
+
+#live-detection .driver-overview-body {
+  display: block !important;
+  margin-top: 16px !important;
+}
+
+#live-detection .driver-face-preview {
+  display: none !important;
+}
+
+#live-detection .driver-attribute-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+}
+
+#live-detection .driver-attribute-grid > span {
+  min-height: 88px !important;
+  align-content: center !important;
+  border: 1px solid rgba(67, 83, 118, 0.32) !important;
+  border-radius: 7px !important;
+  background: var(--console-card-soft) !important;
+  padding: 14px !important;
+}
+
+#live-detection .driver-attribute-grid small {
+  color: rgba(166, 178, 205, 0.66) !important;
+  font-size: 18px !important;
+  font-weight: 900 !important;
+}
+
+#live-detection .driver-attribute-grid b {
+  margin-top: 12px !important;
+  color: #f4f7ff !important;
+  font-size: 22px !important;
+  font-weight: 900 !important;
+}
+
+#live-detection .driver-attribute-grid > span:nth-child(4) b {
+  color: var(--console-blue) !important;
+}
+
+#live-detection .head-console-section {
+  min-height: 144px !important;
+}
+
+#live-detection .head-rotation-console-section {
+  min-height: 152px !important;
+}
+
+#live-detection .console-section-title em {
+  color: rgba(232, 238, 252, 0.7) !important;
+}
+
+#live-detection .location-values,
+#live-detection .rotation-values,
+#live-detection .gaze-values {
+  display: grid !important;
+  min-width: 0 !important;
+  gap: 8px !important;
+  margin-top: 18px !important;
+}
+
+#live-detection .location-values {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+#live-detection .rotation-values {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+#live-detection .gaze-values {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+#live-detection .console-value-grid > span {
+  min-width: 0 !important;
+  min-height: 50px !important;
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 8px !important;
+  border: 1px solid rgba(58, 71, 136, 0.32) !important;
+  border-radius: 6px !important;
+  background: var(--console-value) !important;
+  padding: 9px 12px !important;
+  text-align: right !important;
+}
+
+#live-detection .console-value-grid small {
+  color: rgba(197, 207, 233, 0.66) !important;
+  font-size: 18px !important;
+  font-weight: 900 !important;
+}
+
+#live-detection .console-value-grid b {
+  overflow: hidden !important;
+  color: var(--console-blue) !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace !important;
+  font-size: 18px !important;
+  font-weight: 900 !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+#live-detection .head-rotation-row {
+  display: grid !important;
+  grid-template-columns: 58px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 14px !important;
+  margin-top: 18px !important;
+}
+
+#live-detection .dms-inspection-console .pose-orbit {
+  width: 58px !important;
+  height: 58px !important;
+  border: 1px solid var(--console-blue) !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  color: var(--console-blue) !important;
+  box-shadow: 0 0 18px rgba(53, 198, 255, 0.16) !important;
+}
+
+#live-detection .dms-inspection-console .pose-orbit::before,
+#live-detection .dms-inspection-console .pose-orbit::after,
+#live-detection .dms-inspection-console .pose-orbit i {
+  display: none !important;
+}
+
+#live-detection .dms-inspection-console .pose-orbit > span {
+  color: var(--console-blue) !important;
+  font-size: 33px !important;
+}
+
+#live-detection .gaze-console-section {
+  min-height: 720px !important;
+}
+
+#live-detection .gaze-title {
+  color: var(--console-red) !important;
+}
+
+#live-detection .gaze-title em {
+  border: 0 !important;
+  background: transparent !important;
+  color: rgba(232, 238, 252, 0.62) !important;
+  padding-right: 0 !important;
+}
+
+#live-detection .eye-monitor-grid {
+  display: grid !important;
+  min-height: 560px !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+  margin-top: 20px !important;
+}
+
+#live-detection .eye-monitor-grid figure {
+  display: grid !important;
+  min-width: 0 !important;
+  min-height: 560px !important;
+  grid-template-rows: auto 1fr auto auto !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  border: 1px solid rgba(67, 83, 118, 0.58) !important;
+  border-radius: 6px !important;
+  background: var(--console-card-soft) !important;
+}
+
+#live-detection .eye-monitor-grid figcaption {
+  display: grid !important;
+  min-height: 76px !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: start !important;
+  gap: 10px !important;
+  padding: 18px 14px 8px !important;
+}
+
+#live-detection .eye-monitor-grid figcaption > span {
+  display: grid !important;
+  min-width: 0 !important;
+  grid-template-columns: 18px minmax(0, 1fr) !important;
+  align-items: start !important;
+  gap: 8px !important;
+  color: var(--console-red) !important;
+}
+
+#live-detection .eye-monitor-grid figcaption .material-symbols-outlined {
+  color: var(--console-red) !important;
+  font-size: 18px !important;
+  line-height: 1.1 !important;
+}
+
+#live-detection .eye-monitor-grid figcaption b {
+  color: var(--console-red) !important;
+  font-size: 18px !important;
+  font-weight: 900 !important;
+  line-height: 1.25 !important;
+  white-space: normal !important;
+}
+
+#live-detection .eye-monitor-grid figcaption em {
+  color: rgba(166, 178, 205, 0.66) !important;
+  font-size: 16px !important;
+  font-style: normal !important;
+  font-weight: 900 !important;
+  line-height: 1.35 !important;
+  white-space: normal !important;
+}
+
+#live-detection .eye-monitor-grid figure > canvas:not(.eye-wave-canvas) {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 300px !important;
+  border: 0 !important;
+  background:
+    linear-gradient(rgba(53, 198, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(53, 198, 255, 0.02) 1px, transparent 1px),
+    #11182a !important;
+  background-size: 22px 22px !important;
+  object-fit: cover !important;
+}
+
+#live-detection .eye-wave-canvas {
+  display: block !important;
+  width: 100% !important;
+  height: 78px !important;
+  border-top: 1px solid rgba(67, 83, 118, 0.4) !important;
+  background: linear-gradient(180deg, rgba(35, 45, 92, 0.48), rgba(26, 33, 70, 0.78)) !important;
+}
+
+#live-detection .eye-metric-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 8px !important;
+  border-top: 0 !important;
+  color: rgba(166, 178, 205, 0.8) !important;
+  padding: 14px !important;
+  font-size: 15px !important;
+  font-weight: 800 !important;
+}
+
+#live-detection .eye-metric-row span {
+  display: flex !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+}
+
+#live-detection .eye-metric-row b {
+  color: rgba(232, 238, 252, 0.7) !important;
+  font-size: 15px !important;
+  font-weight: 900 !important;
+}
+
+#live-detection .eye-summary {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 12px !important;
+  margin-top: 20px !important;
+  border-top: 1px solid rgba(67, 83, 118, 0.54) !important;
+  padding-top: 16px !important;
+}
+
+#live-detection .eye-summary > span {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+}
+
+#live-detection .eye-summary small {
+  color: rgba(166, 178, 205, 0.66) !important;
+  font-size: 16px !important;
+  font-weight: 900 !important;
+}
+
+#live-detection .eye-summary b {
+  color: var(--console-blue) !important;
+  font-size: 18px !important;
+  font-weight: 900 !important;
+}
+
+#live-detection .eye-summary > i {
+  display: none !important;
+}
+
+#live-detection .dms-compatibility-panel {
+  display: none !important;
+}
+
+@media (max-width: 760px) {
+  #live-detection .dms-inspection-console {
+    grid-template-rows: auto auto auto auto minmax(640px, auto) !important;
+  }
+
+  #live-detection .dms-inspection-header {
+    grid-template-columns: minmax(0, 1fr) 70px !important;
+    padding: 20px !important;
+  }
+
+  #live-detection .dms-console-brand {
+    grid-template-columns: 56px minmax(0, 1fr) !important;
+    gap: 16px !important;
+  }
+
+  #live-detection .dms-console-brand b,
+  #live-detection .console-section-title b,
+  #live-detection .driver-overview-head b {
+    font-size: 22px !important;
+  }
+
+  #live-detection .eye-monitor-grid,
+  #live-detection .eye-monitor-grid figure {
+    min-height: 520px !important;
+  }
+}
+
+/* Enlarged left console: prioritize readable telemetry and allow vertical scroll. */
+@media (min-width: 761px) {
+  #live-detection .live-sidebar.dms-detail-sidebar {
+    height: calc(100vh - 20px) !important;
+    min-height: 540px !important;
+    max-height: calc(100vh - 20px) !important;
+    overflow: hidden auto !important;
+    scrollbar-width: thin !important;
+  }
+
+  #live-detection .dms-inspection-console {
+    height: auto !important;
+    max-height: none !important;
+    min-height: 100% !important;
+    grid-template-rows: minmax(144px, auto) minmax(108px, auto) minmax(136px, auto) minmax(118px, auto) auto !important;
+    gap: 10px !important;
+    overflow: visible !important;
+    scrollbar-width: thin !important;
+  }
+
+  #live-detection .live-sidebar.dms-detail-sidebar::-webkit-scrollbar {
+    width: 8px !important;
+    height: 8px !important;
+  }
+
+  #live-detection .dms-inspection-header,
+  #live-detection .dms-console-section {
+    border-radius: 8px !important;
+  }
+
+  #live-detection .dms-inspection-header {
+    min-height: 0 !important;
+    grid-template-columns: minmax(0, 1fr) 82px !important;
+    gap: 14px !important;
+    padding: 13px 18px !important;
+  }
+
+  #live-detection .dms-console-brand {
+    grid-template-columns: 48px minmax(0, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  #live-detection .dms-console-brand > .material-symbols-outlined {
+    width: 48px !important;
+    height: 48px !important;
+    font-size: 27px !important;
+  }
+
+  #live-detection .dms-console-brand b {
+    font-size: 22px !important;
+  }
+
+  #live-detection .dms-console-brand small {
+    margin-top: 4px !important;
+    font-size: 14px !important;
+  }
+
+  #live-detection .dms-console-status {
+    gap: 7px !important;
+  }
+
+  #live-detection .dms-console-status > span {
+    gap: 6px !important;
+  }
+
+  #live-detection .dms-console-status i {
+    font-size: 18px !important;
+  }
+
+  #live-detection .dms-console-status b {
+    font-size: 15px !important;
+  }
+
+  #live-detection .dms-console-section {
+    min-height: 0 !important;
+    padding: 12px 18px !important;
+  }
+
+  #live-detection .driver-overview {
+    min-height: 0 !important;
+  }
+
+  #live-detection .driver-overview-head .material-symbols-outlined,
+  #live-detection .console-section-title .material-symbols-outlined {
+    font-size: 24px !important;
+  }
+
+  #live-detection .driver-overview-head b,
+  #live-detection .console-section-title b {
+    font-size: 22px !important;
+  }
+
+  #live-detection .driver-overview-head > i,
+  #live-detection .console-section-title em {
+    max-width: 136px !important;
+    border-radius: 6px !important;
+    padding: 6px 10px !important;
+    font-size: 15px !important;
+  }
+
+  #live-detection .driver-overview-body {
+    margin-top: 10px !important;
+  }
+
+  #live-detection .driver-attribute-grid {
+    gap: 10px !important;
+  }
+
+  #live-detection .driver-attribute-grid > span {
+    min-height: 50px !important;
+    border-radius: 6px !important;
+    padding: 8px 12px !important;
+  }
+
+  #live-detection .driver-attribute-grid small {
+    font-size: 14px !important;
+  }
+
+  #live-detection .driver-attribute-grid b {
+    margin-top: 4px !important;
+    font-size: 18px !important;
+  }
+
+  #live-detection .head-console-section,
+  #live-detection .head-rotation-console-section,
+  #live-detection .gaze-console-section {
+    min-height: 0 !important;
+  }
+
+  #live-detection .location-values,
+  #live-detection .rotation-values,
+  #live-detection .gaze-values {
+    gap: 8px !important;
+    margin-top: 10px !important;
+  }
+
+  #live-detection .console-value-grid > span {
+    min-height: 42px !important;
+    border-radius: 5px !important;
+    padding: 7px 10px !important;
+  }
+
+  #live-detection .console-value-grid small,
+  #live-detection .console-value-grid b {
+    font-size: 16px !important;
+  }
+
+  #live-detection .head-rotation-row {
+    grid-template-columns: 46px minmax(0, 1fr) !important;
+    gap: 10px !important;
+    margin-top: 10px !important;
+  }
+
+  #live-detection .dms-inspection-console .pose-orbit {
+    width: 46px !important;
+    height: 46px !important;
+  }
+
+  #live-detection .dms-inspection-console .pose-orbit > span {
+    font-size: 28px !important;
+  }
+
+  #live-detection .gaze-console-section {
+    display: grid !important;
+    grid-template-rows: auto auto minmax(0, 1fr) auto !important;
+    overflow: hidden !important;
+  }
+
+  #live-detection .gaze-title em {
+    font-size: 15px !important;
+  }
+
+  #live-detection .eye-monitor-grid {
+    min-height: 0 !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+    margin-top: 11px !important;
+    overflow: hidden !important;
+  }
+
+  #live-detection .eye-monitor-grid figure {
+    min-height: 0 !important;
+    grid-template-rows: 50px minmax(104px, 1fr) 42px auto !important;
+    border-radius: 5px !important;
+  }
+
+  #live-detection .eye-monitor-grid figcaption {
+    min-height: 0 !important;
+    gap: 6px !important;
+    padding: 8px 8px 4px !important;
+  }
+
+  #live-detection .eye-monitor-grid figcaption > span {
+    grid-template-columns: 15px minmax(0, 1fr) !important;
+    gap: 5px !important;
+  }
+
+  #live-detection .eye-monitor-grid figcaption .material-symbols-outlined {
+    font-size: 17px !important;
+  }
+
+  #live-detection .eye-monitor-grid figcaption b {
+    font-size: 15px !important;
+  }
+
+  #live-detection .eye-monitor-grid figcaption em {
+    font-size: 13px !important;
+  }
+
+  #live-detection .eye-monitor-grid figure > canvas:not(.eye-wave-canvas) {
+    min-height: 0 !important;
+  }
+
+  #live-detection .eye-wave-canvas {
+    height: 42px !important;
+  }
+
+  #live-detection .eye-metric-row {
+    gap: 4px !important;
+    padding: 8px 10px !important;
+    font-size: 13px !important;
+  }
+
+  #live-detection .eye-metric-row b {
+    font-size: 13px !important;
+  }
+
+  #live-detection .eye-summary {
+    gap: 8px !important;
+    margin-top: 10px !important;
+    padding-top: 10px !important;
+  }
+
+  #live-detection .eye-summary small {
+    font-size: 14px !important;
+  }
+
+  #live-detection .eye-summary b {
+    font-size: 16px !important;
+  }
+
+}
+
+#live-detection .eye-monitor-grid figure:not(.has-eye-data) {
+  grid-template-rows: auto !important;
+  min-height: 0 !important;
+}
+
+#live-detection .eye-monitor-grid figure:not(.has-eye-data) canvas,
+#live-detection .eye-monitor-grid figure:not(.has-eye-data) .eye-metric-row {
+  display: none !important;
+}
+
+#live-detection .gaze-console-section:not(:has(.has-eye-data)) {
+  grid-template-rows: auto auto auto auto !important;
+}
+
+#live-detection .gaze-console-section:not(:has(.has-eye-data)) .eye-monitor-grid,
+#live-detection .gaze-console-section:not(:has(.has-eye-data)) .eye-summary {
+  display: none !important;
+}
+
+#live-detection .eye-monitor-grid figure.has-eye-data {
+  grid-template-rows: auto auto 42px auto !important;
+}
+
+#live-detection .eye-monitor-grid figure.has-eye-data > canvas:not(.eye-wave-canvas) {
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  aspect-ratio: 240 / 104 !important;
+  object-fit: contain !important;
+}
+
+#live-detection .eye-monitor-grid figure.has-eye-data .eye-wave-canvas {
+  width: 100% !important;
+  height: 42px !important;
+}
+
+/* Final compact status-strip override: remove vertical slack and keep icon rings circular. */
+#live-detection .live-main {
+  grid-template-rows: clamp(118px, 13vh, 136px) minmax(0, 1fr) !important;
+}
+
+#live-detection .dms-status-strip {
+  height: 100% !important;
+  min-height: 0 !important;
+  grid-template-columns: minmax(110px, 0.75fr) repeat(5, minmax(105px, 1fr)) minmax(160px, 0.95fr) !important;
+  align-items: stretch !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+}
+
+#live-detection .dms-system-state,
+#live-detection .dms-status-item {
+  height: 100% !important;
+  min-height: 0 !important;
+  justify-content: center !important;
+  align-content: center !important;
+  gap: 7px !important;
+  padding: 7px 12px !important;
+}
+
+#live-detection .dms-system-state .material-symbols-outlined,
+#live-detection .dms-status-item .material-symbols-outlined {
+  box-sizing: border-box !important;
+  flex: 0 0 auto !important;
+  display: grid !important;
+  width: 66px !important;
+  height: 66px !important;
+  aspect-ratio: 1 / 1 !important;
+  place-items: center !important;
+  border: 2px solid rgba(120, 132, 255, 0.56) !important;
+  border-radius: 999px !important;
+  background: rgba(103, 91, 255, 0.2) !important;
+  font-size: 34px !important;
+  line-height: 1 !important;
+}
+
+#live-detection .dms-system-state b,
+#live-detection .dms-status-item b {
+  max-width: 100% !important;
+  overflow: hidden !important;
+  color: #e8e9ff !important;
+  font-size: 14px !important;
+  font-weight: 850 !important;
+  line-height: 1.15 !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+#live-detection .dms-system-state small,
+#live-detection .dms-status-item small {
+  max-width: 100% !important;
+  overflow: hidden !important;
+  color: #aeb2df !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  line-height: 1.15 !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+#live-detection .dms-control-actions {
+  height: 100% !important;
+  min-height: 0 !important;
+  align-items: center !important;
+  padding: 12px 8px !important;
+}
+
+#live-detection .dms-control-actions .primary-action,
+#live-detection .dms-control-actions .danger-action {
+  width: 100% !important;
+  min-height: 58px !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  padding: 0 8px !important;
+  font-size: 13px !important;
+  font-weight: 850 !important;
+}
+
+#live-detection .dms-control-actions .material-symbols-outlined {
+  font-size: 25px !important;
+}
+
+@media (max-width: 1300px) and (min-width: 901px) {
+  #live-detection .live-main {
+    grid-template-rows: 112px minmax(0, 1fr) !important;
+  }
+
+  #live-detection .dms-status-strip {
+    grid-template-columns: 100px repeat(5, minmax(92px, 1fr)) 150px !important;
+  }
+
+  #live-detection .dms-system-state .material-symbols-outlined,
+  #live-detection .dms-status-item .material-symbols-outlined {
+    width: 58px !important;
+    height: 58px !important;
+    aspect-ratio: 1 / 1 !important;
+    font-size: 30px !important;
+  }
+
+  #live-detection .dms-system-state b,
+  #live-detection .dms-status-item b {
+    font-size: 14px !important;
+  }
+}
+
+@media (max-width: 900px) {
+  #live-detection .live-main {
+    grid-template-rows: 108px minmax(320px, 54vh) auto auto !important;
+  }
+
+  #live-detection .dms-status-strip {
+    grid-template-columns: 108px repeat(5, 112px) 172px !important;
+  }
+}
+
+/* Overall live-console zoom: 0.25 smaller than the previous 1.0 scale. */
+body:has(#live-detection.active) {
+  --dms-ui-scale: 0.75;
+}
+
+#live-detection.app-page.active {
+  width: 133.333333% !important;
+  height: 133.333333vh !important;
+  transform: scale(var(--dms-ui-scale)) !important;
+  transform-origin: 0 0 !important;
+  margin: 0 !important;
+}
+
+/* Keep the live face cutout visible in the Face Crop section. */
+#live-detection .face-crop-console-section .driver-face-preview {
+  display: grid !important;
+  width: 100% !important;
+  min-height: 168px !important;
+  height: auto !important;
+  aspect-ratio: auto !important;
+  place-items: center !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(102, 216, 255, 0.42) !important;
+  border-radius: 8px !important;
+  background: #040716 !important;
+}
+
+#live-detection .face-crop-console-section .driver-face-preview canvas {
+  display: none !important;
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 4 / 5 !important;
+  object-fit: contain !important;
+}
+
+#live-detection .face-crop-console-section .driver-face-preview canvas.has-frame {
+  display: block !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+#live-detection .face-crop-console-section .driver-face-preview:has(canvas.has-frame) {
+  min-height: 0 !important;
+}
+
+#live-detection .face-crop-console-section .driver-face-preview:has(canvas.has-frame) > .material-symbols-outlined {
+  display: none !important;
+}
+*** End of File
+
+/* 20260904 EOF top status final: compact height, bigger icons, strict horizontal centering. */
+@media (min-width: 761px) {
+  #live-detection .live-main {
+    grid-template-rows: clamp(78px, 8.1vh, 92px) minmax(0, 1fr) !important;
+  }
+
+  #live-detection .dms-status-strip {
+    grid-template-columns: minmax(220px, 1fr) repeat(5, minmax(220px, 1fr)) minmax(170px, 0.82fr) !important;
+  }
+}
+
+#live-detection .dms-status-strip {
+  display: grid !important;
+  align-items: stretch !important;
+  justify-items: stretch !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+}
+
+#live-detection .dms-system-state,
+#live-detection .dms-status-item {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 2px !important;
+  min-width: 0 !important;
+  padding: 10px 12px !important;
+  text-align: center !important;
+}
+
+#live-detection .dms-system-state .material-symbols-outlined,
+#live-detection .dms-status-item .material-symbols-outlined {
+  display: grid !important;
+  place-items: center !important;
+  flex: 0 0 55px !important;
+  width: 55px !important;
+  height: 55px !important;
+  margin-inline: auto !important;
+  font-size: 30px !important;
+  line-height: 1 !important;
+  transform: none !important;
+}
+
+#live-detection .dms-system-state b,
+#live-detection .dms-status-item b {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-inline: auto !important;
+  font-size: 28px !important;
+  line-height: 1 !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+  transform: none !important;
+}
+
+#live-detection .dms-system-state small,
+#live-detection .dms-status-item small {
+  display: none !important;
+}
+
+/* 20260904 status strip final: 25% shorter, larger icons, horizontally centered text. */
+@media (min-width: 761px) {
+  #live-detection .live-main {
+    grid-template-rows: clamp(78px, 8.1vh, 92px) minmax(0, 1fr) !important;
+  }
+
+  #live-detection .dms-status-strip {
+    grid-template-columns: minmax(220px, 1fr) repeat(5, minmax(220px, 1fr)) minmax(170px, 0.82fr) !important;
+  }
+}
+
+#live-detection .dms-status-strip {
+  display: grid !important;
+  align-items: stretch !important;
+  justify-items: stretch !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+}
+
+#live-detection .dms-system-state,
+#live-detection .dms-status-item {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 2px !important;
+  min-width: 0 !important;
+  padding: 10px 12px !important;
+  text-align: center !important;
+}
+
+#live-detection .dms-system-state .material-symbols-outlined,
+#live-detection .dms-status-item .material-symbols-outlined {
+  display: grid !important;
+  place-items: center !important;
+  flex: 0 0 55px !important;
+  width: 55px !important;
+  height: 55px !important;
+  margin-inline: auto !important;
+  font-size: 30px !important;
+  line-height: 1 !important;
+  transform: none !important;
+}
+
+#live-detection .dms-system-state b,
+#live-detection .dms-status-item b {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-inline: auto !important;
+  font-size: 28px !important;
+  line-height: 1 !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+  transform: none !important;
+}
+
+#live-detection .dms-system-state small,
+#live-detection .dms-status-item small {
+  display: none !important;
+}
+
+/* Absolute final UI alignment: center the top state strip and keep left tiles readable. */
+@media (min-width: 761px) {
+  #live-detection .live-main {
+    grid-template-rows: clamp(78px, 8.1vh, 92px) minmax(0, 1fr) !important;
+  }
+
+  #live-detection .dms-status-strip {
+    grid-template-columns: minmax(230px, 1fr) repeat(5, minmax(230px, 1fr)) minmax(180px, 0.82fr) !important;
+  }
+}
+
+#live-detection .dms-status-strip {
+  display: grid !important;
+  justify-items: stretch !important;
+  align-items: stretch !important;
+}
+
+#live-detection .dms-system-state,
+#live-detection .dms-status-item {
+  display: grid !important;
+  grid-template-rows: auto auto !important;
+  place-items: center !important;
+  align-content: center !important;
+  justify-items: center !important;
+  justify-content: center !important;
+  gap: 2px !important;
+  padding: 4px 16px !important;
+  text-align: center !important;
+  overflow: hidden !important;
+}
+
+#live-detection .dms-system-state .material-symbols-outlined,
+#live-detection .dms-status-item .material-symbols-outlined {
+  justify-self: center !important;
+  align-self: center !important;
+  width: 55px !important;
+  height: 55px !important;
+  font-size: 30px !important;
+  transform: none !important;
+}
+
+#live-detection .dms-system-state b,
+#live-detection .dms-status-item b {
+  display: block !important;
+  justify-self: center !important;
+  align-self: center !important;
+  width: max-content !important;
+  max-width: 100% !important;
+  font-size: 28px !important;
+  line-height: 1 !important;
+  text-align: center !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+  transform: none !important;
+}
+
+#live-detection .dms-system-state small,
+#live-detection .dms-status-item small {
+  display: none !important;
+}
+
+#live-detection .head-console-section .console-value-grid small,
+#live-detection .gaze-console-section .console-value-grid small {
+  font-size: 16px !important;
+}
+
+#live-detection .head-console-section .console-value-grid b,
+#live-detection .gaze-console-section .console-value-grid b {
+  font-size: 24px !important;
+}
+
+#live-detection .driver-overview-head b,
+#live-detection .console-section-title b {
+  font-size: 24px !important;
+}
+
+#live-detection .driver-overview-head > i,
+#live-detection .console-section-title em {
+  font-size: 18px !important;
+}
+
+/* Current final calibration: left text half-size, top strip 30% shorter, centered content. */
+@media (min-width: 761px) {
+  #live-detection .live-layout {
+    grid-template-columns: clamp(430px, 28vw, 520px) minmax(0, 1fr) !important;
+  }
+
+  #live-detection .live-main {
+    grid-template-rows: clamp(104px, 10.8vh, 122px) minmax(0, 1fr) !important;
+  }
+
+  #live-detection .dms-inspection-console {
+    grid-template-rows:
+      minmax(112px, 0.82fr)
+      minmax(84px, 0.54fr)
+      minmax(92px, 0.58fr)
+      minmax(300px, 2fr)
+      minmax(292px, 1.86fr) !important;
+  }
+}
+
+#live-detection .dms-status-strip {
+  align-items: stretch !important;
+}
+
+#live-detection .dms-system-state,
+#live-detection .dms-status-item {
+  display: grid !important;
+  grid-template-rows: auto auto !important;
+  place-items: center !important;
+  align-content: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  padding: 8px 12px !important;
+  text-align: center !important;
+}
+
+#live-detection .dms-system-state .material-symbols-outlined,
+#live-detection .dms-status-item .material-symbols-outlined {
+  width: 44px !important;
+  height: 44px !important;
+  font-size: 24px !important;
+  transform: none !important;
+}
+
+#live-detection .dms-system-state b,
+#live-detection .dms-status-item b {
+  font-size: 32px !important;
+  line-height: 1 !important;
+  max-width: 100% !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+  transform: none !important;
+}
+
+#live-detection .dms-system-state small,
+#live-detection .dms-status-item small {
+  font-size: 12px !important;
+  line-height: 1 !important;
+  transform: none !important;
+}
+
+#live-detection .dms-control-actions {
+  align-items: center !important;
+  padding: 10px 8px !important;
+}
+
+#live-detection .dms-control-actions .primary-action,
+#live-detection .dms-control-actions .danger-action {
+  min-height: 48px !important;
+  font-size: 14px !important;
+}
+
+#live-detection .dms-inspection-console {
+  --left-rail-text-scale: 1 !important;
+  gap: 9px !important;
+}
+
+#live-detection .driver-overview {
+  padding: 12px 14px !important;
+}
+
+#live-detection .driver-overview-head,
+#live-detection .console-section-title {
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  column-gap: 10px !important;
+}
+
+#live-detection .driver-overview-head b,
+#live-detection .console-section-title b {
+  font-size: 24px !important;
+  line-height: 1.06 !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+}
+
+#live-detection .driver-overview-head > i,
+#live-detection .console-section-title em {
+  max-width: 44% !important;
+  min-width: 0 !important;
+  padding: 6px 10px !important;
+  font-size: 18px !important;
+  line-height: 1 !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+}
+
+#live-detection .driver-attribute-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+}
+
+#live-detection .driver-attribute-grid > span,
+#live-detection .console-value-grid > span {
+  min-height: 42px !important;
+  padding: 6px 9px !important;
+  overflow: hidden !important;
+}
+
+#live-detection .driver-attribute-grid small,
+#live-detection .console-value-grid small,
+#live-detection .eye-metric-row,
+#live-detection .eye-summary small,
+#live-detection .eye-monitor-grid figcaption em {
+  font-size: 14px !important;
+  line-height: 1.06 !important;
+}
+
+#live-detection .driver-attribute-grid b,
+#live-detection .console-value-grid b,
+#live-detection .eye-metric-row b,
+#live-detection .eye-summary b,
+#live-detection .eye-monitor-grid figcaption b {
+  font-size: 18px !important;
+  line-height: 1.06 !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+}
+
+#live-detection .head-console-section,
+#live-detection .head-rotation-console-section,
+#live-detection .gaze-console-section,
+#live-detection .face-crop-console-section {
+  padding: 11px 14px !important;
+}
+
+#live-detection .head-console-section .location-values,
+#live-detection .head-rotation-console-section .head-rotation-row,
+#live-detection .gaze-values {
+  margin-top: 7px !important;
+}
+
+#live-detection .eye-monitor-grid {
+  gap: 8px !important;
+  margin-top: 7px !important;
+}
+
+#live-detection .eye-monitor-grid figcaption {
+  min-height: 34px !important;
+  padding: 5px 8px 3px !important;
+}
+
+#live-detection .eye-metric-row {
+  padding: 6px 9px !important;
+}
+
+#live-detection .eye-summary {
+  min-height: 34px !important;
+}
+
+#live-detection .face-crop-console-section .driver-face-preview,
+#live-detection .face-crop-console-section .driver-face-preview:has(canvas.has-frame),
+#live-detection .face-crop-console-section .driver-face-preview canvas,
+#live-detection .face-crop-console-section .driver-face-preview canvas.has-frame {
+  min-height: 280px !important;
+}
+
+/* Fine tune numeric tiles: make head position and gaze values easier to read. */
+#live-detection .head-console-section .console-value-grid small,
+#live-detection .gaze-console-section .console-value-grid small {
+  font-size: 16px !important;
+}
+
+#live-detection .head-console-section .console-value-grid b,
+#live-detection .gaze-console-section .console-value-grid b {
+  font-size: 24px !important;
+}
+
+/* Final balance pass: keep enlarged text readable without distorting the live layout. */
+@media (min-width: 761px) {
+  #live-detection .live-layout {
+    grid-template-columns: clamp(540px, 31vw, 640px) minmax(0, 1fr) !important;
+  }
+
+  #live-detection .dms-inspection-console {
+    grid-template-rows:
+      minmax(128px, 0.82fr)
+      minmax(96px, 0.52fr)
+      minmax(104px, 0.58fr)
+      minmax(336px, 2.06fr)
+      minmax(310px, 1.82fr) !important;
+  }
+}
+
+#live-detection .dms-inspection-console {
+  --left-rail-text-scale: 1.45;
+}
+
+#live-detection .driver-overview-head {
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: start !important;
+}
+
+#live-detection .driver-overview-head b,
+#live-detection .console-section-title b {
+  font-size: clamp(30px, calc(22px * var(--left-rail-text-scale)), 36px) !important;
+  line-height: 1.05 !important;
+  white-space: normal !important;
+}
+
+#live-detection .driver-overview-head > i,
+#live-detection .console-section-title em {
+  max-width: 180px !important;
+  font-size: clamp(21px, calc(15px * var(--left-rail-text-scale)), 26px) !important;
+  line-height: 1.05 !important;
+  white-space: nowrap !important;
+}
+
+#live-detection .driver-attribute-grid {
+  gap: 10px !important;
+}
+
+#live-detection .driver-attribute-grid small,
+#live-detection .console-value-grid small,
+#live-detection .eye-metric-row,
+#live-detection .eye-summary small,
+#live-detection .eye-monitor-grid figcaption em {
+  font-size: clamp(18px, calc(12px * var(--left-rail-text-scale)), 22px) !important;
+  line-height: 1.08 !important;
+}
+
+#live-detection .driver-attribute-grid b,
+#live-detection .console-value-grid b,
+#live-detection .eye-metric-row b,
+#live-detection .eye-summary b,
+#live-detection .eye-monitor-grid figcaption b {
+  font-size: clamp(23px, calc(16px * var(--left-rail-text-scale)), 29px) !important;
+  line-height: 1.06 !important;
+}
+
+#live-detection .driver-attribute-grid > span,
+#live-detection .console-value-grid > span {
+  min-height: 54px !important;
+  padding: 7px 12px !important;
+}
+
+#live-detection .head-console-section,
+#live-detection .head-rotation-console-section,
+#live-detection .gaze-console-section,
+#live-detection .face-crop-console-section {
+  padding-inline: 18px !important;
+}
+
+#live-detection .eye-monitor-grid figcaption {
+  min-height: 46px !important;
+  padding: 7px 10px 4px !important;
+}
+
+#live-detection .eye-metric-row {
+  padding: 7px 12px !important;
+}
+
+#live-detection .face-crop-console-section .driver-face-preview,
+#live-detection .face-crop-console-section .driver-face-preview:has(canvas.has-frame),
+#live-detection .face-crop-console-section .driver-face-preview canvas,
+#live-detection .face-crop-console-section .driver-face-preview canvas.has-frame {
+  min-height: 285px !important;
+}
+
+#live-detection .dms-system-state,
+#live-detection .dms-status-item {
+  align-content: start !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  padding: 8px 12px 5px !important;
+}
+
+#live-detection .dms-system-state .material-symbols-outlined,
+#live-detection .dms-status-item .material-symbols-outlined {
+  width: 62px !important;
+  height: 62px !important;
+  font-size: 31px !important;
+  transform: translateY(-8px) !important;
+}
+
+#live-detection .dms-system-state b,
+#live-detection .dms-status-item b {
+  font-size: 20px !important;
+  line-height: 1.05 !important;
+  transform: translateY(-8px) !important;
+}
+
+#live-detection .dms-system-state small,
+#live-detection .dms-status-item small {
+  font-size: 14px !important;
+  line-height: 1.05 !important;
+  transform: translateY(-8px) !important;
+}
+
+#live-detection .dms-control-actions .primary-action,
+#live-detection .dms-control-actions .danger-action {
+  font-size: 16px !important;
+}
+
+/* Final readability pass: larger top strip, complete left-panel labels. */
+@media (min-width: 761px) {
+  #live-detection .live-layout {
+    grid-template-columns: clamp(560px, 32vw, 680px) minmax(0, 1fr) !important;
+  }
+
+  #live-detection .live-main {
+    grid-template-rows: clamp(128px, 14vh, 150px) minmax(0, 1fr) !important;
+  }
+}
+
+#live-detection .dms-system-state,
+#live-detection .dms-status-item {
+  gap: 4px !important;
+  padding: 6px 12px 4px !important;
+}
+
+#live-detection .dms-system-state .material-symbols-outlined,
+#live-detection .dms-status-item .material-symbols-outlined {
+  width: 58px !important;
+  height: 58px !important;
+  font-size: 29px !important;
+  transform: translateY(-10px) !important;
+}
+
+#live-detection .dms-system-state b,
+#live-detection .dms-status-item b {
+  font-size: 28px !important;
+  line-height: 1.04 !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+  transform: translateY(-8px) !important;
+}
+
+#live-detection .dms-system-state small,
+#live-detection .dms-status-item small {
+  font-size: 14px !important;
+  transform: translateY(-8px) !important;
+}
+
+#live-detection .dms-inspection-console {
+  --left-rail-text-scale: 1.18;
+}
+
+#live-detection .driver-overview-head,
+#live-detection .console-section-title {
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  column-gap: 14px !important;
+}
+
+#live-detection .driver-overview-head b,
+#live-detection .console-section-title b {
+  font-size: clamp(28px, calc(22px * var(--left-rail-text-scale)), 34px) !important;
+  line-height: 1.03 !important;
+  overflow-wrap: normal !important;
+  white-space: nowrap !important;
+}
+
+#live-detection .driver-overview-head > i,
+#live-detection .console-section-title em {
+  max-width: none !important;
+  min-width: max-content !important;
+  padding-inline: 12px !important;
+  font-size: clamp(18px, calc(14px * var(--left-rail-text-scale)), 22px) !important;
+  line-height: 1.05 !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+}
+
+#live-detection .driver-attribute-grid small,
+#live-detection .console-value-grid small,
+#live-detection .eye-metric-row,
+#live-detection .eye-summary small,
+#live-detection .eye-monitor-grid figcaption em {
+  font-size: clamp(16px, calc(12px * var(--left-rail-text-scale)), 19px) !important;
+  line-height: 1.05 !important;
+}
+
+#live-detection .driver-attribute-grid b,
+#live-detection .console-value-grid b,
+#live-detection .eye-metric-row b,
+#live-detection .eye-summary b,
+#live-detection .eye-monitor-grid figcaption b {
+  font-size: clamp(20px, calc(16px * var(--left-rail-text-scale)), 25px) !important;
+  line-height: 1.05 !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+
+#live-detection .driver-attribute-grid > span,
+#live-detection .console-value-grid > span {
+  min-height: 50px !important;
+  padding: 6px 10px !important;
+}
+
+#live-detection .driver-attribute-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+#live-detection .eye-monitor-grid {
+  gap: 8px !important;
+}
+
+#live-detection .eye-monitor-grid figcaption {
+  min-height: 42px !important;
+}
+
+#live-detection .eye-metric-row {
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: 8px !important;
+}
+
+#live-detection .face-crop-title em {
+  min-width: max-content !important;
+}
+
+/* Precision pass: top strip larger, left detail rail smaller and stable. */
+@media (min-width: 761px) {
+  #live-detection .live-layout {
+    grid-template-columns: clamp(500px, 29vw, 600px) minmax(0, 1fr) !important;
+  }
+
+  #live-detection .live-main {
+    grid-template-rows: clamp(150px, 15.5vh, 174px) minmax(0, 1fr) !important;
+  }
+
+  #live-detection .dms-inspection-console {
+    grid-template-rows:
+      minmax(132px, 0.84fr)
+      minmax(100px, 0.58fr)
+      minmax(108px, 0.62fr)
+      minmax(340px, 2.08fr)
+      minmax(318px, 1.9fr) !important;
+  }
+}
+
+#live-detection .dms-system-state,
+#live-detection .dms-status-item {
+  align-content: start !important;
+  justify-content: center !important;
+  gap: 2px !important;
+  padding: 4px 12px 6px !important;
+}
+
+#live-detection .dms-system-state .material-symbols-outlined,
+#live-detection .dms-status-item .material-symbols-outlined {
+  width: 60px !important;
+  height: 60px !important;
+  font-size: 30px !important;
+  transform: translateY(-4px) !important;
+}
+
+#live-detection .dms-system-state b,
+#live-detection .dms-status-item b {
+  font-size: 42px !important;
+  line-height: 1 !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+  transform: translateY(-2px) !important;
+}
+
+#live-detection .dms-system-state small,
+#live-detection .dms-status-item small {
+  font-size: 15px !important;
+  line-height: 1.05 !important;
+  transform: translateY(-2px) !important;
+}
+
+#live-detection .dms-inspection-console {
+  --left-rail-text-scale: 1;
+}
+
+#live-detection .driver-overview {
+  padding: 16px 18px !important;
+}
+
+#live-detection .driver-overview-head,
+#live-detection .console-section-title {
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  column-gap: 10px !important;
+}
+
+#live-detection .driver-overview-head b,
+#live-detection .console-section-title b {
+  font-size: clamp(26px, 2.2vw, 34px) !important;
+  line-height: 1.02 !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+}
+
+#live-detection .driver-overview-head > i,
+#live-detection .console-section-title em {
+  min-width: 0 !important;
+  max-width: 42% !important;
+  padding: 8px 12px !important;
+  font-size: clamp(16px, 1.6vw, 22px) !important;
+  line-height: 1 !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+}
+
+#live-detection .driver-attribute-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 9px !important;
+}
+
+#live-detection .driver-attribute-grid > span,
+#live-detection .console-value-grid > span {
+  min-height: 48px !important;
+  padding: 7px 10px !important;
+  overflow: hidden !important;
+}
+
+#live-detection .driver-attribute-grid small,
+#live-detection .console-value-grid small,
+#live-detection .eye-metric-row,
+#live-detection .eye-summary small,
+#live-detection .eye-monitor-grid figcaption em {
+  font-size: clamp(13px, 1.18vw, 17px) !important;
+  line-height: 1.05 !important;
+}
+
+#live-detection .driver-attribute-grid b,
+#live-detection .console-value-grid b,
+#live-detection .eye-metric-row b,
+#live-detection .eye-summary b,
+#live-detection .eye-monitor-grid figcaption b {
+  font-size: clamp(17px, 1.45vw, 22px) !important;
+  line-height: 1.05 !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+}
+
+#live-detection .head-console-section,
+#live-detection .head-rotation-console-section,
+#live-detection .gaze-console-section,
+#live-detection .face-crop-console-section {
+  padding: 14px 18px !important;
+}
+
+#live-detection .head-console-section .location-values,
+#live-detection .head-rotation-console-section .head-rotation-row,
+#live-detection .gaze-values {
+  margin-top: 8px !important;
+}
+
+#live-detection .eye-monitor-grid {
+  gap: 8px !important;
+  margin-top: 8px !important;
+}
+
+#live-detection .eye-monitor-grid figcaption {
+  min-height: 38px !important;
+  padding: 6px 9px 3px !important;
+}
+
+#live-detection .eye-metric-row {
+  padding: 7px 10px !important;
+}
+
+#live-detection .eye-summary {
+  min-height: 36px !important;
+}
+
+#live-detection .face-crop-console-section .driver-face-preview,
+#live-detection .face-crop-console-section .driver-face-preview:has(canvas.has-frame),
+#live-detection .face-crop-console-section .driver-face-preview canvas,
+#live-detection .face-crop-console-section .driver-face-preview canvas.has-frame {
+  min-height: 300px !important;
+}
+
+/* Final request: remove left-rail decorative icons and enlarge inspection text without stretching video imagery. */
+#live-detection .driver-overview-head .material-symbols-outlined,
+#live-detection .console-section-title > .material-symbols-outlined,
+#live-detection .dms-inspection-console .pose-orbit,
+#live-detection .eye-monitor-grid figcaption .material-symbols-outlined,
+#live-detection .face-crop-console-section .driver-face-preview > .material-symbols-outlined {
+  display: none !important;
+}
+
+#live-detection .driver-overview-head > div,
+#live-detection .console-section-title,
+#live-detection .eye-monitor-grid figcaption > span {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+#live-detection .head-rotation-row {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+#live-detection .dms-inspection-console {
+  --left-rail-text-scale: 2;
+}
+
+#live-detection .driver-overview-head b,
+#live-detection .console-section-title b {
+  font-size: calc(24px * var(--left-rail-text-scale)) !important;
+  line-height: 1.05 !important;
+}
+
+#live-detection .driver-overview-head > i,
+#live-detection .console-section-title em {
+  font-size: calc(18px * var(--left-rail-text-scale)) !important;
+  line-height: 1.1 !important;
+}
+
+#live-detection .driver-attribute-grid small,
+#live-detection .console-value-grid small,
+#live-detection .eye-metric-row,
+#live-detection .eye-summary small,
+#live-detection .eye-monitor-grid figcaption em {
+  font-size: calc(14px * var(--left-rail-text-scale)) !important;
+  line-height: 1.08 !important;
+}
+
+#live-detection .driver-attribute-grid b,
+#live-detection .console-value-grid b,
+#live-detection .eye-metric-row b,
+#live-detection .eye-summary b,
+#live-detection .eye-monitor-grid figcaption b {
+  font-size: calc(18px * var(--left-rail-text-scale)) !important;
+  line-height: 1.08 !important;
+}
+
+#live-detection .driver-overview-head,
+#live-detection .console-section-title {
+  gap: 12px !important;
+}
+
+#live-detection .driver-attribute-grid > span,
+#live-detection .console-value-grid > span {
+  min-height: 56px !important;
+  padding: 8px 12px !important;
+}
+
+#live-detection .eye-monitor-grid figure,
+#live-detection .eye-monitor-grid figure:not(.has-eye-data),
+#live-detection .eye-monitor-grid figure.has-eye-data {
+  grid-template-rows: auto minmax(76px, 1fr) 34px auto !important;
+}
+
+#live-detection .eye-monitor-grid figcaption {
+  min-height: 54px !important;
+}
+
+#live-detection .dms-inspection-console canvas {
+  object-fit: cover !important;
+}
+
+/* Requested proportions: compact head panels, taller face crop preview. */
+#live-detection .head-console-section,
+#live-detection .head-rotation-console-section {
+  padding-block: 10px !important;
+}
+
+#live-detection .head-console-section .console-section-title,
+#live-detection .head-rotation-console-section .console-section-title {
+  min-height: 0 !important;
+}
+
+#live-detection .head-console-section .location-values,
+#live-detection .head-rotation-console-section .head-rotation-row {
+  margin-top: 6px !important;
+}
+
+#live-detection .head-console-section .console-value-grid > span,
+#live-detection .head-rotation-console-section .console-value-grid > span {
+  min-height: 34px !important;
+  padding-block: 5px !important;
+}
+
+#live-detection .face-crop-console-section {
+  padding-block: 14px !important;
+}
+
+#live-detection .face-crop-console-section .driver-face-preview,
+#live-detection .face-crop-console-section .driver-face-preview:has(canvas.has-frame),
+#live-detection .face-crop-console-section .driver-face-preview canvas,
+#live-detection .face-crop-console-section .driver-face-preview canvas.has-frame {
+  min-height: 260px !important;
+}
+
+#live-detection .dms-inspection-console {
+  align-content: start !important;
+}
+
+#live-detection .face-crop-console-section {
+  display: grid !important;
+  min-height: 0 !important;
+  align-content: start !important;
+  gap: 10px !important;
+}
+
+/* Final sidebar height fix: stack inspection blocks by their content instead of stretching the last row. */
+#live-detection .live-sidebar.dms-detail-sidebar {
+  align-self: start !important;
+}
+
+#live-detection .dms-inspection-console {
+  height: max-content !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  grid-template-rows: repeat(5, max-content) !important;
+  align-content: start !important;
+}
+
+#live-detection .face-crop-console-section {
+  height: max-content !important;
+}
+
+/* Grayscale camera mode: only the captured video/crop imagery is desaturated. */
+#live-detection #cameraVideo,
+#live-detection #samplePreviewVideo,
+#live-detection #samplePreviewImage,
+#live-detection .face-crop-console-section .driver-face-preview canvas,
+#live-detection .key-region-item canvas {
+  filter: grayscale(1) contrast(1.08) brightness(1.02) !important;
+}
+
+/* Stable left inspection rail: reserve every panel in standby and live states. */
+@media (min-width: 761px) {
+  #live-detection .live-layout {
+    grid-template-columns: clamp(430px, 28vw, 500px) minmax(0, 1fr) !important;
+    align-items: stretch !important;
+  }
+
+  #live-detection .live-sidebar.dms-detail-sidebar {
+    height: calc((100dvh - 18px) / var(--dms-ui-scale, 1)) !important;
+    max-height: none !important;
+    overflow: hidden !important;
+  }
+
+  #live-detection .dms-inspection-console {
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    grid-template-rows:
+      minmax(118px, 0.86fr)
+      minmax(88px, 0.58fr)
+      minmax(96px, 0.62fr)
+      minmax(312px, 2.14fr)
+      minmax(300px, 1.96fr) !important;
+    gap: 10px !important;
+    overflow: hidden auto !important;
+    padding-right: 4px !important;
+  }
+}
+
+#live-detection .dms-console-section {
+  min-height: 0 !important;
+}
+
+#live-detection .driver-overview {
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) !important;
+}
+
+#live-detection .driver-overview-body {
+  min-height: 0 !important;
+}
+
+#live-detection .driver-attribute-grid {
+  height: 100% !important;
+  align-content: stretch !important;
+}
+
+#live-detection .driver-attribute-grid > span {
+  min-height: 0 !important;
+}
+
+#live-detection .head-console-section,
+#live-detection .head-rotation-console-section {
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) !important;
+  align-content: stretch !important;
+}
+
+#live-detection .location-values,
+#live-detection .head-rotation-row,
+#live-detection .gaze-values {
+  align-self: stretch !important;
+}
+
+#live-detection .gaze-console-section,
+#live-detection .gaze-console-section:not(:has(.has-eye-data)) {
+  display: grid !important;
+  grid-template-rows: auto auto minmax(0, 1fr) auto !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+#live-detection .gaze-console-section:not(:has(.has-eye-data)) .eye-monitor-grid,
+#live-detection .gaze-console-section:not(:has(.has-eye-data)) .eye-summary {
+  display: grid !important;
+}
+
+#live-detection .eye-monitor-grid,
+#live-detection .eye-monitor-grid:not(:has(.has-eye-data)) {
+  display: grid !important;
+  min-height: 0 !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-auto-rows: minmax(0, 1fr) !important;
+  overflow: hidden !important;
+}
+
+#live-detection .eye-monitor-grid figure,
+#live-detection .eye-monitor-grid figure:not(.has-eye-data),
+#live-detection .eye-monitor-grid figure.has-eye-data {
+  display: grid !important;
+  min-height: 0 !important;
+  grid-template-rows: auto minmax(76px, 1fr) 34px auto !important;
+}
+
+#live-detection .eye-monitor-grid figure canvas,
+#live-detection .eye-monitor-grid figure:not(.has-eye-data) canvas,
+#live-detection .eye-monitor-grid figure:not(.has-eye-data) .eye-metric-row {
+  display: block !important;
+}
+
+#live-detection .eye-monitor-grid figure > canvas:not(.eye-wave-canvas),
+#live-detection .eye-monitor-grid figure.has-eye-data > canvas:not(.eye-wave-canvas) {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 76px !important;
+  aspect-ratio: auto !important;
+  object-fit: cover !important;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(53, 198, 255, 0.12), transparent 18%),
+    #050817 !important;
+}
+
+#live-detection .eye-wave-canvas,
+#live-detection .eye-monitor-grid figure.has-eye-data .eye-wave-canvas {
+  width: 100% !important;
+  height: 34px !important;
+  background: #081024 !important;
+}
+
+#live-detection .eye-summary {
+  min-height: 40px !important;
+}
+
+#live-detection .face-crop-console-section {
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) !important;
+  min-height: 0 !important;
+  height: auto !important;
+  overflow: hidden !important;
+}
+
+#live-detection .face-crop-console-section .driver-face-preview,
+#live-detection .face-crop-console-section .driver-face-preview:has(canvas.has-frame) {
+  display: grid !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  aspect-ratio: auto !important;
+}
+
+#live-detection .face-crop-console-section .driver-face-preview canvas,
+#live-detection .face-crop-console-section .driver-face-preview canvas.has-frame {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  aspect-ratio: auto !important;
+  object-fit: cover !important;
+  background: #050817 !important;
+}
+
+#live-detection .face-crop-console-section .driver-face-preview > .material-symbols-outlined {
+  display: grid !important;
+  opacity: 0.72 !important;
+}
+
+#live-detection .face-crop-console-section .driver-face-preview:has(canvas.has-frame) > .material-symbols-outlined {
+  display: none !important;
+}
+
+/* 20260904 TRUE EOF status strip final: compact height, larger icons, strict horizontal centering. */
+@media (min-width: 761px) {
+  #live-detection .live-main {
+    grid-template-rows: clamp(105px, 11.5vh, 130px) minmax(0, 1fr) !important;
+  }
+
+  #live-detection .dms-status-strip {
+    grid-template-columns: minmax(220px, 1fr) repeat(5, minmax(220px, 1fr)) minmax(170px, 0.82fr) !important;
+  }
+}
+
+#live-detection .dms-status-strip {
+  display: grid !important;
+  align-items: stretch !important;
+  justify-items: stretch !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+}
+
+#live-detection .dms-system-state,
+#live-detection .dms-status-item {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 2px !important;
+  min-width: 0 !important;
+  padding: 10px 12px !important;
+  text-align: center !important;
+}
+
+#live-detection .dms-system-state .material-symbols-outlined,
+#live-detection .dms-status-item .material-symbols-outlined {
+  display: grid !important;
+  place-items: center !important;
+  flex: 0 0 55px !important;
+  width: 55px !important;
+  height: 55px !important;
+  margin-inline: auto !important;
+  font-size: 30px !important;
+  line-height: 1 !important;
+  transform: none !important;
+}
+
+#live-detection .dms-system-state b,
+#live-detection .dms-status-item b {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-inline: auto !important;
+  font-size: 28px !important;
+  line-height: 1 !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+  transform: none !important;
+}
+
+#live-detection .dms-system-state small,
+#live-detection .dms-status-item small {
+  display: none !important;
+}
+
+
+/* ===== Replay import modal (click driverMonitorStatus) ===== */
+#driverMonitorStatus.replay-import-trigger {
+  cursor: pointer;
+}
+.replay-import-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(4, 8, 20, 0.72);
+  backdrop-filter: blur(4px);
+}
+.replay-import-modal[hidden] { display: none; }
+.replay-import-card {
+  width: min(92vw, 460px);
+  background: linear-gradient(160deg, #101a33 0%, #0b1220 100%);
+  border: 1px solid rgba(96, 165, 250, 0.35);
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 30px 80px rgba(2, 6, 23, 0.85);
+  color: #dbeafe;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.replay-import-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.replay-import-head h3 {
+  margin: 0;
+  font-size: 17px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.replay-import-close {
+  background: none;
+  border: none;
+  color: #93c5fd;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+.replay-import-drop {
+  border: 1.5px dashed rgba(96, 165, 250, 0.5);
+  border-radius: 12px;
+  padding: 26px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  transition: border-color 0.15s, background 0.15s;
+}
+.replay-import-drop.dragover {
+  border-color: #70d7ff;
+  background: rgba(96, 165, 250, 0.12);
+}
+.replay-import-drop .material-symbols-outlined { font-size: 40px; color: #70d7ff; }
+.replay-import-drop p { margin: 0; font-size: 14px; color: #93c5fd; }
+.replay-import-drop small { color: #64748b; font-size: 12px; }
+.replay-import-pick { cursor: pointer; }
+.replay-import-pick input[type="file"] { display: none; }
+.replay-import-info {
+  background: rgba(96, 165, 250, 0.1);
+  border: 1px solid rgba(96, 165, 250, 0.3);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.8;
+  color: #dbeafe;
+}
+.replay-import-info.error {
+  background: rgba(255, 70, 81, 0.12);
+  border-color: rgba(255, 70, 81, 0.45);
+  color: #fecaca;
+}
+.replay-import-play { justify-content: center; display: flex; align-items: center; gap: 8px; }

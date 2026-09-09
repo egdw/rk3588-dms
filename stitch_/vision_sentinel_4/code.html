@@ -1,0 +1,233 @@
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"background":"#f8fafc","tertiary-container":"#de8712","on-surface":"#191c1e","secondary-fixed":"#c4e7ff","on-primary-fixed-variant":"#004c6e","secondary":"#00668a","secondary-fixed-dim":"#7bd0ff","primary-fixed-dim":"#89ceff","on-secondary":"#ffffff","surface-container-high":"#e6e8ea","surface-bright":"#f7f9fb","on-error-container":"#93000a","on-secondary-fixed-variant":"#004c69","primary-container":"#0ea5e9","on-background":"#191c1e","surface-dim":"#d8dadc","secondary-container":"#40c2fd","surface-tint":"#006591","tertiary-fixed-dim":"#ffb86e","surface":"#ffffff","primary":"#006591","on-tertiary":"#ffffff","outline":"#6e7881","border-subtle":"#e2e8f0","on-secondary-container":"#004d6a","on-error":"#ffffff","surface-container":"#eceef0","warning":"#f59e0b","on-tertiary-fixed":"#2c1600","outline-variant":"#bec8d2","text-secondary":"#475569","danger":"#ef4444","tertiary":"#8a5100","on-primary-container":"#003751","on-surface-variant":"#3e4850","primary-fixed":"#c9e6ff","error-container":"#ffdad6","surface-container-highest":"#e0e3e5","on-tertiary-container":"#4d2b00","on-tertiary-fixed-variant":"#693c00","on-secondary-fixed":"#001e2c","inverse-primary":"#89ceff","tertiary-fixed":"#ffdcbd","on-primary-fixed":"#001e2f","text-primary":"#082f49","success":"#22c55e","on-primary":"#ffffff","error":"#ba1a1a","inverse-surface":"#2d3133","surface-container-low":"#f2f4f6","inverse-on-surface":"#eff1f3","surface-variant":"#e0e3e5"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"gutter":"1.5rem","component-gap":"0.75rem","bento-padding":"2rem","container-margin":"2.5rem"},"fontFamily":{"body-md":["Geist"],"label-bold":["Geist"],"display-xl":["Geist"],"body-sm":["Geist"],"headline-md":["Geist"],"headline-lg":["Geist"],"headline-lg-mobile":["Geist"]},"fontSize":{"body-md":["16px",{"lineHeight":"1.6","fontWeight":"400"}],"label-bold":["12px",{"lineHeight":"1","letterSpacing":"0.05em","fontWeight":"700"}],"display-xl":["56px",{"lineHeight":"1","letterSpacing":"-0.03em","fontWeight":"300"}],"body-sm":["14px",{"lineHeight":"1.5","fontWeight":"400"}],"headline-md":["24px",{"lineHeight":"1.3","fontWeight":"500"}],"headline-lg":["32px",{"lineHeight":"1.2","letterSpacing":"-0.02em","fontWeight":"600"}],"headline-lg-mobile":["24px",{"lineHeight":"1.2","fontWeight":"600"}]}}}}</script><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet"/></head><body class="bg-background font-body-md text-on-background"><header class="fixed top-0 w-full z-50 bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(14,165,233,0.06)]"><div class="h-[72px] w-full px-container-margin flex items-center justify-between"><div class="flex items-center gap-4"><img alt="Vision Sentinel" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1Wxt3i9JaedquRjnzMvgLAt5Z0shJf_pmDwlaIixZbCKYEaEJu0HWrI4IxmFF02JmI4TNbKo0UXWi_0BOeOfu2qf0g9cpam5xWib99i5FcDw9cRHV0urm1ZFT-8_E3-H26l5ImSqCo8NRgX87PCNowzvn6hf9IQXEQjrsTBR1WrU8hhSaFzS9U4Ms2JEv01FaTS-USftLlSerFh6qBYVacJJD3pv1NcwlNVZInpaCS2lZKiwecCbWcEig"/><span class="font-headline-md text-text-primary tracking-tight">Vision Sentinel</span></div><nav class="hidden lg:flex items-center gap-component-gap" data-active-classes="bg-primary-container/10 text-primary font-bold"><a class="px-4 py-2 rounded-full text-body-sm text-on-surface-variant hover:text-primary transition-all" data-path="dashboard" href="#">控制台</a><a class="px-4 py-2 rounded-full text-body-sm text-on-surface-variant hover:text-primary transition-all" data-path="dataset" href="#">数据集管理</a><a aria-current="page" class="px-4 py-2 rounded-full transition-all bg-primary-container/10 text-primary font-bold" data-path="live-detection" href="#">实时检测演示</a><a class="px-4 py-2 rounded-full text-body-sm text-on-surface-variant hover:text-primary transition-all" data-path="settings" href="#">系统设置</a></nav><div class="flex items-center gap-4"><button class="p-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-colors"><span class="material-symbols-outlined">notifications</span></button><div class="flex items-center gap-3 pl-4 border-l border-border-subtle"><div class="text-right hidden sm:block"><p class="text-label-bold text-on-surface">管理员</p><p class="text-[10px] text-text-secondary uppercase tracking-widest">Sentinel Admin</p></div><img alt="Profile" class="w-9 h-9 rounded-full object-cover ring-2 ring-primary-container/20" src="https://lh3.googleusercontent.com/aida/AEtjO1XDseG4OF4Zezi0h_U2xXd8laUboQSujHwGCEmiP2anHeUQpa4nYchSbHjdYCBNUSJp9u0C4t1w5f5PVUZHAEKzKl7mOAZq4QZltgkqt8K0_ty6MpcKeKgALRSNUrM-pXXO8qfAoxKGN0C4-0QH2O3WOTJszfhiGufOkHclOnmiqf0xWeCdwf9zcjWf6ukc3M1cNrZCt02qYLapi-jbnUgUUZJCqbL4UJ2AD7oNEvjGvywUCWbMak5X-w"/></div></div></div></header><main class="w-full pt-[72px] min-h-screen"><div class="flex flex-col w-full min-h-[calc(100vh-72px)] bg-background">
+<!-- Header Area -->
+<div class="px-container-margin py-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<div class="flex items-center gap-3 mb-2">
+<span class="flex h-3 w-3 rounded-full bg-success relative">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
+</span>
+<span class="text-label-bold font-label-bold text-success uppercase tracking-widest">System Online</span>
+</div>
+<h1 class="text-display-xl font-display-xl text-on-background tracking-tight mb-2">实时检测</h1>
+<p class="text-body-md font-body-md text-text-secondary max-w-2xl">
+                多模态驾驶员状态监控，低延迟 AI 边缘计算实时推断。当前节点: <strong>VS-Node-A1</strong>
+</p>
+</div>
+<div class="flex items-center gap-4">
+<button class="px-6 py-3 rounded-full bg-surface shadow-md hover:shadow-lg transition-all flex items-center gap-2 group">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">tune</span>
+<span class="text-body-sm font-body-sm text-on-surface">校准模型</span>
+</button>
+<button class="px-6 py-3 rounded-full bg-gradient-to-r from-primary-container to-secondary-container text-on-primary-container shadow-lg shadow-primary-container/20 hover:shadow-xl hover:shadow-primary-container/30 transition-all font-body-md font-medium flex items-center gap-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">videocam</span>
+<span>切换摄像头</span>
+</button>
+</div>
+</div>
+<!-- Main Grid Content -->
+<div class="px-container-margin pb-container-margin flex flex-col lg:flex-row gap-gutter">
+<!-- Primary Feed Area -->
+<div class="flex-grow flex flex-col gap-gutter">
+<!-- Video Feed Container -->
+<div class="relative w-full rounded-[2rem] bg-surface-container overflow-hidden shadow-2xl shadow-primary-container/5" style="aspect-ratio: 16/9;">
+<!-- Feed Placeholder Image -->
+<div class="absolute inset-0 bg-cover bg-center w-full h-full" data-alt="A highly realistic, wide-angle dashcam view from inside a modern vehicle cabin, looking at the driver. The driver is a professional wearing a light blue shirt. Bright daylight. Superimposed over this image should be futuristic UI elements: a glowing light blue bounding box around the driver's face, thin connecting lines, and small text labels floating nearby. The overall aesthetic is clean, professional, high-fidelity tech, using a light color palette (whites, soft blues, grays)." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCVPGJ7KHm2RUI16syjBjeI0th6Y2-Y2rlNscoXmTf0NBnPQIBZKUjyJOka8vGSlhVMxk4FW2A6tbQ-8do471Efe11J6eC03W9y9pxLhDH492uQDK0MNfMTVyLh-1ngs4oOFCJn_VnAGHBuH-KUJum8BHdJ8PF8cSqxTJ3As_BnzWfHawZwHzoS-i4CbRqS1ES-epKK0TrjJTLU3HzD78QZ4HHmIr_E29vgK8j1JaGCVsIaaVHBSIvS')"></div>
+<!-- Video Overlay UI -->
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-highest/80 via-transparent to-transparent pointer-events-none"></div>
+<!-- Top Left Feed Info -->
+<div class="absolute top-6 left-6 flex flex-col gap-2">
+<div class="bg-surface/90 backdrop-blur-md px-4 py-2 rounded-full shadow-sm flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-[18px]">camera</span>
+<span class="text-label-bold font-label-bold text-on-surface uppercase tracking-wide">Cam 01 - Interior</span>
+<span class="w-px h-3 bg-outline-variant"></span>
+<span class="text-label-bold font-label-bold text-text-secondary">30 FPS</span>
+</div>
+</div>
+<!-- Top Right AI Status -->
+<div class="absolute top-6 right-6">
+<div class="bg-primary/90 backdrop-blur-md px-4 py-2 rounded-full shadow-md flex items-center gap-2 text-on-primary">
+<span class="material-symbols-outlined text-[18px]">memory</span>
+<span class="text-label-bold font-label-bold uppercase tracking-wide">AI Active</span>
+<span class="text-label-bold font-label-bold opacity-80">| 12ms ping</span>
+</div>
+</div>
+<!-- Simulated Bounding Box Overlay (CSS rendered) -->
+<div class="absolute top-1/2 left-[45%] -translate-x-1/2 -translate-y-1/2 w-48 h-64 border-2 border-primary-container rounded-xl shadow-[0_0_15px_rgba(14,165,233,0.3)] animate-pulse hidden md:block">
+<!-- Target corners -->
+<div class="absolute -top-1 -left-1 w-3 h-3 border-t-2 border-l-2 border-primary-container"></div>
+<div class="absolute -top-1 -right-1 w-3 h-3 border-t-2 border-r-2 border-primary-container"></div>
+<div class="absolute -bottom-1 -left-1 w-3 h-3 border-b-2 border-l-2 border-primary-container"></div>
+<div class="absolute -bottom-1 -right-1 w-3 h-3 border-b-2 border-r-2 border-primary-container"></div>
+<!-- Floating Label -->
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-surface/90 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-md whitespace-nowrap flex flex-col items-center">
+<span class="text-label-bold font-label-bold text-primary">ID: DRV-774</span>
+<span class="text-[10px] font-body-sm text-text-secondary">CONF: 98.4%</span>
+</div>
+</div>
+<!-- Bottom overlay telemetry -->
+<div class="absolute bottom-6 left-6 right-6 flex justify-between items-end">
+<div class="flex gap-4">
+<div class="bg-surface/95 backdrop-blur-md px-5 py-3 rounded-2xl shadow-lg flex flex-col gap-1 min-w-[120px]">
+<span class="text-label-bold font-label-bold text-text-secondary">头部姿态 (PITCH)</span>
+<div class="flex items-baseline gap-1">
+<span class="text-headline-md font-headline-md text-on-surface">-4.2</span>
+<span class="text-body-sm text-outline">deg</span>
+</div>
+</div>
+<div class="bg-surface/95 backdrop-blur-md px-5 py-3 rounded-2xl shadow-lg flex flex-col gap-1 min-w-[120px] hidden sm:flex">
+<span class="text-label-bold font-label-bold text-text-secondary">眨眼频率 (PER)</span>
+<div class="flex items-baseline gap-1">
+<span class="text-headline-md font-headline-md text-on-surface">12</span>
+<span class="text-body-sm text-outline">/min</span>
+</div>
+</div>
+</div>
+<!-- Scanline effect overlay -->
+<div class="absolute inset-0 pointer-events-none mix-blend-overlay opacity-10 bg-[linear-gradient(to_bottom,transparent_50%,#000_50%)] bg-[length:100%_4px]"></div>
+</div>
+</div>
+<!-- Event Timeline -->
+<div class="bg-surface rounded-3xl p-bento-padding shadow-xl shadow-primary-container/5 flex-grow">
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-headline-md font-headline-md text-on-surface">事件时间线</h2>
+<span class="px-3 py-1 bg-surface-container-high rounded-full text-label-bold font-label-bold text-text-secondary">实时记录</span>
+</div>
+<div class="relative pl-6 space-y-8 before:absolute before:inset-y-0 before:left-2.5 before:w-px before:bg-border-subtle h-[300px] overflow-y-auto pr-4" style="scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;">
+<!-- Event Item Warning -->
+<div class="relative">
+<div class="absolute -left-[29px] mt-1.5 w-3 h-3 rounded-full bg-warning shadow-[0_0_8px_rgba(245,158,11,0.5)]"></div>
+<div class="flex items-start justify-between gap-4">
+<div>
+<h3 class="text-body-md font-headline-md text-on-surface mb-1">视线偏移 (Gaze Deviation)</h3>
+<p class="text-body-sm font-body-sm text-text-secondary">检测到驾驶员视线离开正前方超过 2.5 秒。</p>
+</div>
+<span class="text-label-bold font-label-bold text-outline whitespace-nowrap">14:02:18</span>
+</div>
+</div>
+<!-- Event Item Normal -->
+<div class="relative opacity-60 hover:opacity-100 transition-opacity">
+<div class="absolute -left-[29px] mt-1.5 w-3 h-3 rounded-full bg-success shadow-[0_0_8px_rgba(34,197,94,0.3)]"></div>
+<div class="flex items-start justify-between gap-4">
+<div>
+<h3 class="text-body-md font-headline-md text-on-surface mb-1">姿态恢复 (Posture Normalized)</h3>
+<p class="text-body-sm font-body-sm text-text-secondary">头部姿态回到安全阈值范围内。</p>
+</div>
+<span class="text-label-bold font-label-bold text-outline whitespace-nowrap">14:00:45</span>
+</div>
+</div>
+<!-- Event Item Danger -->
+<div class="relative">
+<div class="absolute -left-[29px] mt-1.5 w-3 h-3 rounded-full bg-danger shadow-[0_0_12px_rgba(239,68,68,0.6)] animate-pulse"></div>
+<div class="flex items-start justify-between gap-4">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<h3 class="text-body-md font-headline-md text-danger">深度闭眼 (Micro-sleep Detected)</h3>
+<span class="px-2 py-0.5 rounded text-[10px] font-label-bold bg-danger/10 text-danger">高风险</span>
+</div>
+<p class="text-body-sm font-body-sm text-text-secondary">闭眼时长超过 1500ms，系统已触发物理警告。</p>
+</div>
+<span class="text-label-bold font-label-bold text-outline whitespace-nowrap">13:58:12</span>
+</div>
+</div>
+<!-- Event Item Normal -->
+<div class="relative opacity-60">
+<div class="absolute -left-[29px] mt-1.5 w-3 h-3 rounded-full bg-outline-variant"></div>
+<div class="flex items-start justify-between gap-4">
+<div>
+<h3 class="text-body-md font-headline-md text-on-surface mb-1">系统初始化 (System Init)</h3>
+<p class="text-body-sm font-body-sm text-text-secondary">视觉哨兵模块启动，传感器校准完成。</p>
+</div>
+<span class="text-label-bold font-label-bold text-outline whitespace-nowrap">13:45:00</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Sidebar: Metrics -->
+<div class="w-full lg:w-[400px] flex flex-col gap-gutter shrink-0">
+<!-- Gauge Card 1: Fatigue -->
+<div class="bg-surface rounded-3xl p-bento-padding shadow-xl shadow-primary-container/5 relative overflow-hidden group">
+<div class="absolute -top-24 -right-24 w-64 h-64 bg-warning/5 rounded-full blur-3xl group-hover:bg-warning/10 transition-colors duration-700"></div>
+<div class="relative z-10">
+<h3 class="text-label-bold font-label-bold text-text-secondary uppercase mb-6 tracking-wider">疲劳指数 (Fatigue Index)</h3>
+<div class="flex flex-col items-center justify-center">
+<!-- Custom CSS Gauge -->
+<div class="relative w-48 h-24 overflow-hidden mb-2">
+<div class="absolute top-0 left-0 w-48 h-48 rounded-full border-[16px] border-surface-container-high box-border"></div>
+<!-- Filled arc representing 35% (approx 63deg rotation starting from -180) -->
+<div class="absolute top-0 left-0 w-48 h-48 rounded-full border-[16px] border-transparent border-t-warning border-r-warning border-l-warning box-border origin-center -rotate-[145deg] transition-transform duration-1000 ease-out" style="transform: rotate(-135deg);"></div>
+<div class="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center">
+<span class="text-display-xl font-display-xl text-on-surface tracking-tighter">35</span>
+</div>
+</div>
+<span class="text-body-sm font-body-sm text-warning font-medium bg-warning/10 px-3 py-1 rounded-full mt-2">轻度疲劳 (Mild)</span>
+</div>
+<div class="mt-8 grid grid-cols-2 gap-4">
+<div class="bg-surface-container-lowest p-3 rounded-2xl border border-border-subtle/50 shadow-sm">
+<span class="text-[10px] font-label-bold text-outline block mb-1">PERCLOS</span>
+<span class="text-body-md font-headline-md text-on-surface block">12.4%</span>
+</div>
+<div class="bg-surface-container-lowest p-3 rounded-2xl border border-border-subtle/50 shadow-sm">
+<span class="text-[10px] font-label-bold text-outline block mb-1">YAWN FREQ</span>
+<span class="text-body-md font-headline-md text-on-surface block">2/hr</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Gauge Card 2: Attention -->
+<div class="bg-surface rounded-3xl p-bento-padding shadow-xl shadow-primary-container/5 relative overflow-hidden group">
+<div class="absolute -bottom-24 -left-24 w-64 h-64 bg-primary-container/5 rounded-full blur-3xl group-hover:bg-primary-container/10 transition-colors duration-700"></div>
+<div class="relative z-10">
+<h3 class="text-label-bold font-label-bold text-text-secondary uppercase mb-6 tracking-wider">专注度得分 (Attention Score)</h3>
+<div class="flex flex-col items-center justify-center">
+<!-- Custom CSS Gauge -->
+<div class="relative w-48 h-24 overflow-hidden mb-2">
+<div class="absolute top-0 left-0 w-48 h-48 rounded-full border-[16px] border-surface-container-high box-border"></div>
+<!-- Filled arc representing 82% -->
+<div class="absolute top-0 left-0 w-48 h-48 rounded-full border-[16px] border-transparent border-t-primary-container border-r-primary-container border-l-primary-container box-border origin-center transition-transform duration-1000 ease-out" style="transform: rotate(-30deg);"></div>
+<div class="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center">
+<span class="text-display-xl font-display-xl text-primary tracking-tighter">82</span>
+</div>
+</div>
+<span class="text-body-sm font-body-sm text-primary font-medium bg-primary-container/10 px-3 py-1 rounded-full mt-2">专注 (Focused)</span>
+</div>
+<div class="mt-8 space-y-4">
+<div>
+<div class="flex justify-between text-[10px] font-label-bold text-text-secondary mb-2">
+<span>注视前方比率 (FGR)</span>
+<span>88%</span>
+</div>
+<div class="w-full bg-surface-container-high rounded-full h-1.5 overflow-hidden">
+<div class="bg-primary h-1.5 rounded-full w-[88%] shadow-[0_0_8px_rgba(14,165,233,0.5)]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-[10px] font-label-bold text-text-secondary mb-2">
+<span>手部脱把检测 (HOD)</span>
+<span>正常</span>
+</div>
+<div class="w-full bg-surface-container-high rounded-full h-1.5 overflow-hidden">
+<div class="bg-success h-1.5 rounded-full w-full opacity-80"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Mini Map / Location Context -->
+<div class="bg-surface rounded-3xl p-4 shadow-xl shadow-primary-container/5 relative overflow-hidden flex-grow flex flex-col min-h-[200px]">
+<div class="flex items-center gap-2 mb-3 z-10 relative">
+<span class="material-symbols-outlined text-primary text-[18px]">share_location</span>
+<span class="text-label-bold font-label-bold text-on-surface">当前路段环境</span>
+</div>
+<div class="w-full flex-grow rounded-2xl bg-cover bg-center overflow-hidden relative shadow-inner" data-location="Highway, Suburbs, Daylight" style="background-image: url('https://www.gstatic.com/labs-code/stitch/stitch-placeholder-300x300.svg')">
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-highest/60 to-transparent"></div>
+<div class="absolute bottom-3 left-3">
+<span class="text-[10px] font-label-bold text-on-surface bg-surface/80 backdrop-blur px-2 py-1 rounded uppercase tracking-wider">Speed: 78 km/h</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></main><footer class="w-full bg-surface-container-low py-gutter mt-gutter"><div class="px-container-margin flex flex-col md:flex-row justify-between items-center gap-4 text-body-sm text-text-secondary"><div class="flex items-center gap-2"><img alt="Logo" class="h-5 opacity-50 grayscale hover:grayscale-0 transition-all" src="https://lh3.googleusercontent.com/aida/AEtjO1Wxt3i9JaedquRjnzMvgLAt5Z0shJf_pmDwlaIixZbCKYEaEJu0HWrI4IxmFF02JmI4TNbKo0UXWi_0BOeOfu2qf0g9cpam5xWib99i5FcDw9cRHV0urm1ZFT-8_E3-H26l5ImSqCo8NRgX87PCNowzvn6hf9IQXEQjrsTBR1WrU8hhSaFzS9U4Ms2JEv01FaTS-USftLlSerFh6qBYVacJJD3pv1NcwlNVZInpaCS2lZKiwecCbWcEig"/><span>© 2024 Vision Sentinel. 司机驾驶状态监测系统.</span></div><div class="flex gap-6"><a class="hover:text-primary transition-colors" href="#">隐私政策</a><a class="hover:text-primary transition-colors" href="#">服务条款</a><a class="hover:text-primary transition-colors" href="#">技术支持</a></div></div></footer></body></html>

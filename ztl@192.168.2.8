@@ -1,0 +1,504 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""DMS deployment workflow SIMULATION for an SSH terminal (Python 3.6+).
+
+No third-party packages are needed. This file does NOT access a camera,
+load a real model, install packages, open ports, or run an actual benchmark.
+All progress, task outcomes, and state samples are scheduled visual examples.
+
+Run:  python3 dms_deploy_demo.py
+Stop: Ctrl+C
+"""
+
+import argparse
+import json
+import math
+import os
+import re
+import shutil
+import signal
+import sys
+import time
+import unicodedata
+from datetime import datetime, timezone
+
+ANSI_RE = re.compile(r"\x1b\[[0-?]*[ -/]*[@-~]")
+RESET = "\033[0m"
+COLORS = {
+    "cyan": "\033[1;36m", "blue": "\033[1;34m",
+    "green": "\033[1;32m", "yellow": "\033[1;33m",
+    "white": "\033[1;37m", "dim": "\033[2m",
+}
+
+# Times below use a 30-second reference timeline. --duration scales every task.
+# Names describe GENERIC visual steps, not the user's actual model architecture.
+PHASES = [
+    ("环境检查", "ENVIRONMENT", 0.0, 4.0),
+    ("模型准备", "MODEL PREP", 4.0, 9.0),
+    ("推理初始化", "RUNTIME", 9.0, 14.0),
+    ("模型装载", "LOAD MODULES", 14.0, 21.0),
+    ("推理自检", "SELF TEST", 21.0, 26.0),
+    ("服务就绪", "READY CHECK", 26.0, 30.0),
+]
+
+# phase, Chinese name, English name, start, finish, Chinese result, English result
+TASKS = [
+    (0, "运行环境检查", "Runtime environment", 0.0, 2.2,
+     "运行环境检查流程完成", "Environment check sequence complete"),
+    (0, "部署参数读取", "Deployment settings", 0.4, 3.2,
+     "部署参数读取流程完成", "Deployment settings sequence complete"),
+    (0, "模型清单校验", "Model manifest check", 1.2, 4.0,
+     "模型清单校验流程完成", "Model manifest check sequence complete"),
+    (1, "DMS 主模型准备", "DMS model preparation", 4.0, 8.7,
+     "DMS 主模型准备流程完成", "DMS model preparation sequence complete"),
+    (1, "疲劳检测资源准备", "Fatigue resources", 4.4, 8.8,
+     "疲劳检测资源准备完成", "Fatigue resource preparation complete"),
+    (1, "手机检测资源准备", "Phone-use resources", 4.8, 8.9,
+     "手机使用检测资源准备完成", "Phone-use resource preparation complete"),
+    (1, "状态判定规则配置", "State rule settings", 5.2, 9.0,
+     "正常 / 闭眼 / 低头 / 打电话规则已配置", "Normal / eyes closed / head down / phone rules configured"),
+    (2, "推理会话初始化", "Inference session", 9.0, 11.0,
+     "推理会话初始化流程完成", "Inference session initialization complete"),
+    (2, "输入预处理配置", "Input preprocessing", 11.0, 13.0,
+     "输入尺寸与预处理配置完成", "Input shape and preprocessing configured"),
+    (2, "推理计算图优化", "Graph optimization", 9.5, 13.5,
+     "计算图优化流程完成", "Graph optimization sequence complete"),
+    (2, "张量缓冲区规划", "Tensor buffer plan", 11.5, 14.0,
+     "张量缓冲区规划流程完成", "Tensor buffer planning complete"),
+    (3, "人脸检测模块装载", "Face detection module", 14.0, 17.0,
+     "人脸检测模块装载流程完成", "Face detection module load complete"),
+    (3, "头部姿态模块装载", "Head pose module", 14.5, 18.2,
+     "头部姿态模块装载流程完成", "Head pose module load complete"),
+    (3, "闭眼识别模块装载", "Eye closure module", 15.0, 19.0,
+     "闭眼识别模块装载流程完成", "Eye closure module load complete"),
+    (3, "手机使用模块装载", "Phone use module", 15.5, 19.6,
+     "手机使用模块装载流程完成", "Phone use module load complete"),
+    (3, "分心检测模块装载", "Distraction module", 16.0, 20.0,
+     "分心检测模块装载流程完成", "Distraction module load complete"),
+    (3, "多状态融合配置", "State fusion settings", 20.0, 21.0,
+     "多状态融合配置流程完成", "State fusion configuration complete"),
+    (4, "视频输入流程检查", "Video input sequence", 21.0, 22.0,
+     "视频输入流程检查完成；未访问摄像头", "Video input sequence checked; no camera accessed"),
+    (4, "推理预热流程", "Inference warm-up", 22.0, 24.2,
+     "推理预热流程展示完成；未运行真实推理", "Warm-up visualization complete; no real inference"),
+    (4, "状态分类样例回放", "State sample replay", 24.2, 25.4,
+     "四类预设状态样例回放完成", "Four predefined state samples replayed"),
+    (4, "状态输出格式检查", "State output format", 25.4, 26.0,
+     "状态输出格式检查流程完成", "State output format sequence complete"),
+    (5, "告警联动流程检查", "Alert flow check", 26.0, 27.3,
+     "告警联动流程展示完成；未发送告警", "Alert flow visualization complete; no alert sent"),
+    (5, "部署配置汇总", "Deployment summary", 26.0, 28.4,
+     "部署配置汇总流程完成", "Deployment configuration summary complete"),
+    (5, "服务就绪检查", "Readiness check", 28.4, 30.0,
+     "全部部署流程模拟完成；未启动真实服务", "All simulated steps complete; no real service started"),
+]
+
+SAMPLES = [
+    (24.35, "正常驾驶", "normal"),
+    (24.65, "闭眼状态", "eyes_closed"),
+    (24.95, "低头分心", "head_down"),
+    (25.25, "打电话状态", "phone_call"),
+]
+
+
+def clamp(value):
+    return max(0.0, min(1.0, value))
+
+
+def char_width(ch):
+    if unicodedata.combining(ch):
+        return 0
+    return 2 if unicodedata.east_asian_width(ch) in ("W", "F") else 1
+
+
+def cell_width(text):
+    return sum(char_width(ch) for ch in ANSI_RE.sub("", text))
+
+
+def crop(text, cells):
+    """Crop in terminal cells, preserving whole ANSI escapes and CJK letters."""
+    cells = max(0, cells)
+    result, used, pos = [], 0, 0
+    while pos < len(text):
+        match = ANSI_RE.match(text, pos)
+        if match:
+            result.append(match.group())
+            pos = match.end()
+            continue
+        ch = text[pos]
+        size = char_width(ch)
+        if used + size > cells:
+            break
+        result.append(ch)
+        used += size
+        pos += 1
+    if "\033[" in text:
+        result.append(RESET)
+    return "".join(result)
+
+
+def pad(text, cells):
+    text = crop(text, cells)
+    return text + " " * max(0, cells - cell_width(text))
+
+
+class Task:
+    def __init__(self, number, spec, scale):
+        self.number = number
+        self.phase, self.zh, self.en, begin, end, self.result_zh, self.result_en = spec
+        self.start, self.end = begin * scale, end * scale
+
+    def fraction(self, elapsed):
+        q = clamp((elapsed - self.start) / (self.end - self.start))
+        # Smooth, monotonic progress with small deterministic speed changes.
+        curve = 0.20 + (self.number % 5) * 0.04
+        return clamp(q - curve * math.sin(2.0 * math.pi * q) / (2.0 * math.pi))
+
+    def status(self, elapsed):
+        if elapsed >= self.end:
+            return "done"
+        return "run" if elapsed >= self.start else "wait"
+
+
+class Simulation:
+    def __init__(self, duration):
+        self.duration = duration
+        self.scale = duration / 30.0
+        self.tasks = [Task(i + 1, spec, self.scale) for i, spec in enumerate(TASKS)]
+        self.events = []
+        for task in self.tasks:
+            self.events.append({"time": task.end, "kind": "task", "task": task,
+                                "zh": task.result_zh, "en": task.result_en})
+        for when, zh, en in SAMPLES:
+            self.events.append({"time": when * self.scale, "kind": "sample",
+                                "zh": "预设样例输出：" + zh,
+                                "en": "Predefined sample output: " + en,
+                                "state": en})
+        self.events.sort(key=lambda item: item["time"])
+
+    def snapshot(self, elapsed):
+        elapsed = max(0.0, min(self.duration, elapsed))
+        finished = elapsed >= self.duration
+        views = []
+        for task in self.tasks:
+            # At the endpoint, force 100% to avoid scaling round-off.
+            status = "done" if finished else task.status(elapsed)
+            fraction = 1.0 if finished else task.fraction(elapsed)
+            views.append({"task": task, "status": status, "fraction": fraction})
+        phase = len(PHASES) - 1
+        for i, spec in enumerate(PHASES):
+            if elapsed < spec[3] * self.scale:
+                phase = i
+                break
+        return {
+            "elapsed": elapsed, "finished": finished, "phase": phase,
+            "overall": clamp(elapsed / self.duration), "views": views,
+            "done": sum(v["status"] == "done" for v in views),
+            "active": sum(v["status"] == "run" for v in views),
+            "events": [e for e in self.events if finished or e["time"] <= elapsed],
+        }
+
+
+class Dashboard:
+    def __init__(self, args, model, color):
+        self.args, self.model, self.use_color = args, model, color
+
+    def tr(self, zh, en):
+        return en if self.args.ascii else zh
+
+    def color(self, text, name):
+        return COLORS[name] + text + RESET if self.use_color else text
+
+    def bar(self, fraction, cells, color="cyan"):
+        cells = max(1, cells)
+        filled = min(cells, int(clamp(fraction) * cells))
+        a, b = ("#", "-") if self.args.ascii else ("█", "░")
+        return self.color(a * filled, color) + self.color(b * (cells - filled), "dim")
+
+    def phase_name(self, state):
+        if state["finished"]:
+            return self.tr("部署模拟完成", "SIMULATION COMPLETE")
+        spec = PHASES[state["phase"]]
+        return self.tr(spec[0], spec[1])
+
+    def percent(self, state):
+        return 100.0 if state["finished"] else min(99.9, state["overall"] * 100)
+
+    def task_line(self, view, cells, elapsed):
+        task, status, fraction = view["task"], view["status"], view["fraction"]
+        color = {"wait": "dim", "run": "cyan", "done": "green"}[status]
+        tags = {"wait": self.tr("等待", "WAIT"),
+                "run": self.tr("执行", "RUN "), "done": self.tr("完成", "DONE")}
+        spin = "|/-\\"[int(elapsed * 8) % 4]
+        marker = "+" if status == "done" else (spin if status == "run" else ".")
+        pct = 100 if status == "done" else min(99, int(fraction * 100))
+        name = self.tr(task.zh, task.en)
+        label_cells = min(30 if self.args.ascii else 24, max(8, cells // 3))
+        left = " {} {:02d} {} ".format(marker, task.number, pad(name, label_cells))
+        right = " {:3d}% {}".format(pct, tags[status])
+        bar_cells = max(2, cells - cell_width(left) - cell_width(right) - 2)
+        return crop(self.color(left, color) + "[" + self.bar(fraction, bar_cells, color)
+                    + "]" + self.color(right, color), cells)
+
+    def event_line(self, event, cells):
+        stamp = " +{:05.1f}s [SIM] ".format(event["time"])
+        message = self.tr(event["zh"], event["en"])
+        color = "yellow" if event["kind"] == "sample" else "green"
+        return crop(self.color(stamp + message, color), cells)
+
+    def visible_tasks(self, state, capacity):
+        views = state["views"]
+        if capacity >= len(views):
+            return 0, views
+        pending = [i for i, view in enumerate(views) if view["status"] != "done"]
+        focus = pending[0] if pending else len(views) - 1
+        # Keep completed context above the running tasks; move forwards only.
+        first = min(max(0, focus - 2), len(views) - capacity)
+        return first, views[first:first + capacity]
+
+    def render(self, state, cols, rows):
+        w, height = max(1, cols - 1), max(1, rows - 1)
+        sep = "-" if self.args.ascii else "─"
+        phase = state["phase"]
+        if cols < 60 or rows < 18:
+            active = [v for v in state["views"] if v["status"] == "run"]
+            current = self.tr(active[0]["task"].zh, active[0]["task"].en) if active else self.phase_name(state)
+            lines = [self.color(self.tr("DMS 模型部署模拟 [SIM]", "DMS DEPLOYMENT [SIMULATION]"), "cyan"),
+                     self.tr("仅流程展示，未运行真实部署", "Visual flow only; no real deployment"),
+                     self.phase_name(state),
+                     "[{bar}] {pct:5.1f}%".format(bar=self.bar(state["overall"], max(2, w - 12)), pct=self.percent(state)),
+                     self.tr("步骤", "Steps") + " {}/{} | {:.1f}/{:.0f}s".format(state["done"], len(self.model.tasks), state["elapsed"], self.args.duration),
+                     current,
+                     self.tr("放大窗口可显示多条任务进度", "Enlarge terminal for multiple task bars"),
+                     "Ctrl+C: stop"]
+            return [crop(line, w) for line in lines[:height]]
+
+        lines = [self.color(" " + self.tr("DMS 驾驶员监测系统  /  模型部署模拟", "DMS DRIVER MONITORING  /  DEPLOYMENT SIMULATION"), "cyan"),
+                 self.color(" " + self.tr("SIMULATION | 仅流程展示，不安装依赖、不加载真实模型", "SIMULATION | No installation, camera access, or real model loading"), "yellow"),
+                 self.color(sep * w, "dim")]
+        lines.append(" " + self.tr("部署总进度", "DEPLOYMENT") + "  "
+                     + self.color("{:5.1f}%".format(self.percent(state)), "cyan")
+                     + "   " + self.tr("完成步骤", "STEPS") + " {}/{}".format(state["done"], len(self.model.tasks))
+                     + "   " + self.tr("执行中", "ACTIVE") + " {}".format(state["active"])
+                     + "   {:.1f}/{:.0f}s".format(state["elapsed"], self.args.duration))
+        lines.append(" [" + self.bar(state["overall"], max(2, w - 4), "green" if state["finished"] else "cyan") + "]")
+
+        phases = []
+        for i, spec in enumerate(PHASES):
+            color = "green" if state["finished"] or i < phase else ("cyan" if i == phase else "dim")
+            label = self.tr(spec[0], spec[1])
+            mark = "+" if state["finished"] or i < phase else (">" if i == phase else ".")
+            phases.append(self.color(mark + label, color))
+        trail = "  ".join(phases)
+        if cell_width(trail) <= w - 2:
+            lines.append(" " + trail)
+        else:
+            lines.append(" " + self.tr("当前阶段", "PHASE") + " {}/6  ".format(phase + 1)
+                         + self.color(self.phase_name(state), "cyan"))
+        lines.append(self.color(sep * w, "dim"))
+
+        logs = 3 if rows >= 34 else 1
+        # Footer: separator, phase label, events, separator, instruction.
+        footer_size = 4 + logs
+        capacity = max(1, height - len(lines) - 1 - footer_size)
+        capacity = min(len(self.model.tasks), capacity)
+        first, shown = self.visible_tasks(state, capacity)
+        suffix = self.tr("  随部署阶段自动下移", "  auto-follow") if capacity < len(self.model.tasks) else ""
+        lines.append(self.color(" " + self.tr("部署任务", "DEPLOYMENT TASKS")
+                                + " {:02d}-{:02d}/{}".format(first + 1, first + len(shown), len(self.model.tasks)) + suffix, "white"))
+        lines.extend(self.task_line(v, w, state["elapsed"]) for v in shown)
+        lines.append(self.color(sep * w, "dim"))
+        lines.append(" " + self.tr("当前阶段：", "PHASE: ") + self.color(self.phase_name(state), "green" if state["finished"] else "cyan")
+                     + "  |  " + self.tr("下方为预设模拟记录", "PREDEFINED SIMULATION EVENTS"))
+        recent = state["events"][-logs:]
+        lines.extend(self.event_line(e, w) for e in recent)
+        for _ in range(logs - len(recent)):
+            lines.append(self.color(" " + self.tr("等待模拟任务完成...", "Waiting for simulated steps..."), "dim"))
+        lines.append(self.color(sep * w, "dim"))
+        footer = (self.tr("模拟完成 | 未部署真实模型、未启动真实服务", "SIMULATION COMPLETE | No real model deployed or service started")
+                  if state["finished"] else self.tr("Ctrl+C 停止 | 所有进度与状态为模拟，不代表识别准确率或实测速率", "Ctrl+C: stop | Simulated progress and states; not measured accuracy or speed"))
+        lines.append(self.color(" " + footer, "green" if state["finished"] else "dim"))
+        return [crop(line, w) for line in lines[:height]]
+
+
+class Terminal:
+    """Update changed rows only. Leave the last frame visible and restore cursor."""
+    def __init__(self):
+        self.previous, self.size, self.active = [], None, False
+
+    def start(self):
+        self.active = True
+        sys.stdout.write("\033[?25l\033[2J\033[H")
+        sys.stdout.flush()
+
+    def draw(self, lines, size):
+        chunks = []
+        if size != self.size:
+            chunks.append("\033[2J\033[H")
+            self.previous, self.size = [], size
+        for i, line in enumerate(lines):
+            if i >= len(self.previous) or line != self.previous[i]:
+                chunks.append("\033[{};1H\033[2K{}".format(i + 1, line))
+        for i in range(len(lines), len(self.previous)):
+            chunks.append("\033[{};1H\033[2K".format(i + 1))
+        sys.stdout.write("".join(chunks))
+        sys.stdout.flush()
+        self.previous = lines
+
+    def close(self):
+        if not self.active:
+            return
+        self.active = False
+        try:
+            row = min(len(self.previous) + 1, shutil.get_terminal_size((110, 38)).lines)
+            sys.stdout.write("\033[0m\033[?25h\033[{};1H\033[2K".format(row))
+            sys.stdout.flush()
+        except (BrokenPipeError, OSError):
+            pass
+
+
+def parse_args(argv=None):
+    parser = argparse.ArgumentParser(description="DMS model deployment SIMULATION. No real model or system is modified.")
+    parser.add_argument("--duration", type=float, default=30.0, help="simulation seconds, 1-3600 (default: 30)")
+    parser.add_argument("--fps", type=int, default=12, help="dashboard refresh rate, 1-30 (default: 12)")
+    parser.add_argument("--stream", action="store_true", help="scrolling completed-task bars and current-task updates")
+    parser.add_argument("--plain", action="store_true", help="plain text output without terminal control codes")
+    parser.add_argument("--ascii", action="store_true", help="English labels and ASCII progress bars")
+    parser.add_argument("--no-color", action="store_true", help="disable colors; live positioning remains enabled")
+    parser.add_argument("--report", metavar="PATH", help="optional JSON simulation report; existing files are never overwritten")
+    args = parser.parse_args(argv)
+    if not math.isfinite(args.duration) or not 1 <= args.duration <= 3600:
+        parser.error("--duration must be a finite number from 1 to 3600")
+    if not 1 <= args.fps <= 30:
+        parser.error("--fps must be from 1 to 30")
+    return args
+
+
+def save_report(handle, model, state, exit_code, wall_time):
+    result = {
+        "mode": "simulation",
+        "workflow": "DMS model deployment visualization",
+        "real_deployment_performed": False,
+        "real_inference_performed": False,
+        "camera_accessed": False,
+        "service_started": False,
+        "network_requests": 0,
+        "accuracy": None,
+        "measured_inference_latency_ms": None,
+        "duration_target_seconds": model.duration,
+        "elapsed_wall_seconds": round(wall_time, 3),
+        "simulation_completed": state["finished"] and exit_code == 0,
+        "exit_code": exit_code,
+        "steps_completed": state["done"],
+        "steps_total": len(model.tasks),
+        "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+        "steps": [{"step": v["task"].number, "name": v["task"].zh,
+                   "status": v["status"], "simulated_progress": round(v["fraction"], 4)}
+                  for v in state["views"]],
+        "predefined_sample_states": [e["state"] for e in state["events"] if e["kind"] == "sample"],
+        "note": "All tasks and outputs are scheduled examples, not deployment evidence or benchmark results.",
+    }
+    json.dump(result, handle, ensure_ascii=False, indent=2)
+    handle.write("\n")
+
+
+def main(argv=None):
+    args = parse_args(argv)
+    if not args.ascii:
+        try:
+            "模型█".encode(sys.stdout.encoding or "ascii")
+        except (UnicodeEncodeError, LookupError):
+            if hasattr(sys.stdout, "reconfigure"):
+                sys.stdout.reconfigure(encoding="utf-8")
+            else:
+                args.ascii = True
+    tty = sys.stdout.isatty() and os.environ.get("TERM", "") != "dumb"
+    interactive = tty and not args.stream and not args.plain
+    color = tty and not args.no_color and not args.plain and "NO_COLOR" not in os.environ
+    model = Simulation(args.duration)
+    ui = Dashboard(args, model, color)
+    terminal = Terminal()
+    report_handle = None
+    if args.report:
+        try:
+            report_handle = open(args.report, "x", encoding="utf-8")
+        except (OSError, ValueError) as exc:
+            print("Cannot create report: {}".format(exc), file=sys.stderr)
+            return 2
+
+    start = time.monotonic()
+    state = model.snapshot(0.0)
+    exit_code, event_cursor, last_second = 0, 0, -1
+    old_handlers = {}
+
+    def stop(_signum, _frame):
+        raise KeyboardInterrupt
+
+    try:
+        for name in ("SIGTERM", "SIGHUP"):
+            if hasattr(signal, name):
+                sig = getattr(signal, name)
+                old_handlers[sig] = signal.signal(sig, stop)
+        if interactive:
+            terminal.start()
+        else:
+            print(ui.tr("DMS 模型部署模拟 | SIMULATION | 未运行真实部署", "DMS DEPLOYMENT SIMULATION | NO REAL DEPLOYMENT"), flush=True)
+        while True:
+            elapsed = time.monotonic() - start
+            state = model.snapshot(elapsed)
+            if interactive:
+                size = shutil.get_terminal_size((110, 38))
+                terminal.draw(ui.render(state, size.columns, size.lines), size)
+            else:
+                for event in state["events"][event_cursor:]:
+                    if event["kind"] == "task" and args.stream:
+                        view = {"task": event["task"], "fraction": 1.0, "status": "done"}
+                        print("[SIM] " + ui.task_line(view, 86, state["elapsed"]).lstrip(), flush=True)
+                    else:
+                        print(ui.event_line(event, 140).lstrip(), flush=True)
+                event_cursor = len(state["events"])
+                second = int(elapsed)
+                if second != last_second or state["finished"]:
+                    print("[SIM] {name} [{bar}] {pct:5.1f}% | {done}/{total} | {t:.1f}/{duration:g}s".format(
+                        name=ui.phase_name(state), bar=ui.bar(state["overall"], 24), pct=ui.percent(state),
+                        done=state["done"], total=len(model.tasks), t=state["elapsed"], duration=args.duration), flush=True)
+                    if args.stream:
+                        for view in state["views"]:
+                            if view["status"] == "run":
+                                print("[SIM] " + ui.task_line(view, 86, state["elapsed"]).lstrip(), flush=True)
+                    last_second = second
+            if state["finished"]:
+                break
+            time.sleep(min(1.0 / args.fps, max(0.0, args.duration - elapsed)))
+    except KeyboardInterrupt:
+        exit_code = 130
+        state = model.snapshot(time.monotonic() - start)
+    except (BrokenPipeError, OSError):
+        exit_code = 1
+        state = model.snapshot(time.monotonic() - start)
+    finally:
+        terminal.close()
+        for sig, handler in old_handlers.items():
+            signal.signal(sig, handler)
+        if report_handle:
+            try:
+                save_report(report_handle, model, state, exit_code, time.monotonic() - start)
+            except (OSError, ValueError) as exc:
+                exit_code = 1
+                print("Cannot write simulation report: {}".format(exc), file=sys.stderr)
+            finally:
+                report_handle.close()
+    try:
+        if exit_code == 0:
+            print(ui.color(ui.tr("DMS 部署模拟完成：24/24 步骤。未加载真实模型，未启动真实服务。", "DMS deployment simulation complete: 24/24 steps. No real model loaded or service started."), "green"))
+        elif exit_code == 130:
+            print(ui.tr("DMS 部署模拟已停止，终端已恢复。", "DMS deployment simulation stopped. Terminal restored."))
+        if report_handle:
+            print(ui.tr("模拟报告：", "Simulation report: ") + args.report)
+    except (BrokenPipeError, OSError):
+        pass
+    return exit_code
+
+
+if __name__ == "__main__":
+    sys.exit(main())

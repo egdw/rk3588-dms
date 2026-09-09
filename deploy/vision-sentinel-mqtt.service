@@ -1,0 +1,19 @@
+[Unit]
+Description=Vision Sentinel MQTT manual-control bridge
+After=network.target vision-sentinel.service
+Wants=vision-sentinel.service
+
+[Service]
+Type=simple
+User=ztl
+WorkingDirectory=/home/ztl/code/vision-sentinel
+Environment=VISION_SENTINEL_MQTT_HOST=192.168.2.13
+Environment=VISION_SENTINEL_MQTT_PORT=1883
+Environment=VISION_SENTINEL_MQTT_TOPIC=vision-sentinel/control
+Environment=VISION_SENTINEL_CONTROL_API=https://127.0.0.1:8443/api/manual-control
+ExecStart=/usr/bin/python3 /home/ztl/code/vision-sentinel/backend/mqtt_bridge.py
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

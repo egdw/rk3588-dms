@@ -1,0 +1,150 @@
+{
+  "target_platform": "rk3588",
+
+  "paths": {
+    "project_root_markers": ["package.json", "backend/server.py"],
+    "browser_onnx_dir": "Driver-Monitoring-System/public/static/models",
+    "training_weights": {
+      "soham": "Driver-Monitoring-System/models/soham/best.pt",
+      "chaitanya": "Driver-Monitoring-System/models/chaitanya/best.pt"
+    },
+    "onnx_workdir": "rk3588_dms/models/onnx",
+    "rknn_outdir": "rk3588_dms/models/rknn",
+    "conversion_logs": "logs/rknn",
+    "service_logs": "logs/dms",
+    "test_images": "testdata/dms"
+  },
+
+  "conversion": {
+    "_说明": "RKNN 转换优先使用 best.pt 按 Rockchip 推荐方式重导出的 rknn_source ONNX; 浏览器 ONNX 仅作最后回退。重导出命令: python rk3588_dms/tools/export_onnx_from_pt.py",
+    "chaitanya": {
+      "source": "auto",
+      "onnx_candidates": [
+        "rk3588_dms/models/onnx/rknn_source/chaitanya_best_rknn.onnx",
+        "Driver-Monitoring-System/public/static/models/chaitanya_best.onnx",
+        "rk3588_dms/models/onnx/browser/chaitanya_best.onnx"
+      ],
+      "pt_source": "Driver-Monitoring-System/models/chaitanya/best.pt",
+      "input_size": [640, 640],
+      "quantization": false,
+      "quant_dataset": "rk3588_dms/models/onnx/dataset.txt",
+      "output_name": "chaitanya_best_fp.rknn",
+      "output_name_int8": "chaitanya_best_int8.rknn",
+      "mean_values": [[0, 0, 0]],
+      "std_values": [[255, 255, 255]],
+      "reexport_from_pt": true,
+      "reexport_command": "python rk3588_dms/tools/export_onnx_from_pt.py --pt Driver-Monitoring-System/models/chaitanya/best.pt --out rk3588_dms/models/onnx/rknn_source/chaitanya_best_rknn.onnx --style rknn"
+    },
+    "soham": {
+      "source": "auto",
+      "onnx_candidates": [
+        "rk3588_dms/models/onnx/rknn_source/soham_best_rknn.onnx",
+        "Driver-Monitoring-System/public/static/models/soham_best.onnx"
+      ],
+      "pt_source": "Driver-Monitoring-System/models/soham/best.pt",
+      "input_size": [640, 640],
+      "quantization": false,
+      "output_name": "soham_best_fp.rknn",
+      "output_name_int8": "soham_best_int8.rknn",
+      "mean_values": [[0, 0, 0]],
+      "std_values": [[255, 255, 255]],
+      "reexport_from_pt": true,
+      "reexport_command": "python rk3588_dms/tools/export_onnx_from_pt.py --pt Driver-Monitoring-System/models/soham/best.pt --out rk3588_dms/models/onnx/rknn_source/soham_best_rknn.onnx --style rknn"
+    },
+    "coco": {
+      "source": "auto",
+      "onnx_candidates": [
+        "rk3588_dms/models/onnx/rknn_source/yolov8n_coco_rknn.onnx",
+        "Driver-Monitoring-System/public/static/models/yolov8n_coco.onnx"
+      ],
+      "pt_source": "rk3588_dms/models/onnx/yolov8n.pt",
+      "input_size": [640, 640],
+      "quantization": false,
+      "output_name": "yolov8n_coco_fp.rknn",
+      "output_name_int8": "yolov8n_coco_int8.rknn",
+      "mean_values": [[0, 0, 0]],
+      "std_values": [[255, 255, 255]],
+      "reexport_from_pt": true,
+      "reexport_command": "python rk3588_dms/tools/export_onnx_from_pt.py --pt rk3588_dms/models/onnx/yolov8n.pt --out rk3588_dms/models/onnx/rknn_source/yolov8n_coco_rknn.onnx --style rknn"
+    }
+  },
+
+  "runtime": {
+    "mode": "auto",
+    "npu_core": "auto",
+    "warmup_runs": 2,
+    "log_stats_interval_seconds": 5,
+    "models": {
+      "chaitanya": {
+        "rknn": "rk3588_dms/models/rknn/chaitanya_best_fp.rknn",
+        "classes": ["Cigarette", "Drinking", "Eating", "Phone", "Seatbelt"],
+        "unified_classes": {
+          "Cigarette": "smoking",
+          "Drinking": "drinking",
+          "Eating": "eating",
+          "Phone": "phone",
+          "Seatbelt": "seatbelt"
+        },
+        "input_size": [640, 640],
+        "letterbox_pad_color": [128, 128, 128],
+        "confidence_threshold": 0.25,
+        "iou_threshold": 0.45
+      },
+      "soham": {
+        "rknn": "rk3588_dms/models/rknn/soham_best_fp.rknn",
+        "classes": ["Distracted", "Drinking", "Drowsy", "Eating", "PhoneUse", "SafeDriving", "Seatbelt", "Smoking"],
+        "unified_classes": {
+          "Distracted": "distracted",
+          "Drinking": "drinking",
+          "Drowsy": "drowsy",
+          "Eating": "eating",
+          "PhoneUse": "phone",
+          "SafeDriving": "safe",
+          "Seatbelt": "seatbelt",
+          "Smoking": "smoking"
+        },
+        "input_size": [640, 640],
+        "letterbox_pad_color": [128, 128, 128],
+        "confidence_threshold": 0.25,
+        "iou_threshold": 0.45,
+        "drowsy_model_confidence_threshold": 0.6
+      },
+      "coco": {
+        "rknn": "rk3588_dms/models/rknn/yolov8n_coco_fp.rknn",
+        "classes_file": null,
+        "classes": [
+          "person", "bicycle", "car", "motorcycle", "airplane", "bus", "train", "truck", "boat", "traffic light",
+          "fire hydrant", "stop sign", "parking meter", "bench", "bird", "cat", "dog", "horse", "sheep", "cow",
+          "elephant", "bear", "zebra", "giraffe", "backpack", "umbrella", "handbag", "tie", "suitcase", "frisbee",
+          "skis", "snowboard", "sports ball", "kite", "baseball bat", "baseball glove", "skateboard", "surfboard",
+          "tennis racket", "bottle", "wine glass", "cup", "fork", "knife", "spoon", "bowl", "banana", "apple",
+          "sandwich", "orange", "broccoli", "carrot", "hot dog", "pizza", "donut", "cake", "chair", "couch",
+          "potted plant", "bed", "dining table", "toilet", "tv", "laptop", "mouse", "remote", "keyboard", "cell phone",
+          "microwave", "oven", "toaster", "sink", "refrigerator", "book", "clock", "vase", "scissors", "teddy bear",
+          "hair drier", "toothbrush"
+        ],
+        "input_size": [640, 640],
+        "letterbox_pad_color": [128, 128, 128],
+        "confidence_threshold": 0.25,
+        "phone_confidence_threshold": 0.2,
+        "iou_threshold": 0.45
+      }
+    }
+  },
+
+  "camera": {
+    "device": "/dev/video0",
+    "width": 640,
+    "height": 480,
+    "fps": 30,
+    "backend_future": "mpp/rga 预留: 采集层抽象见 test_camera.py CameraSource"
+
+  },
+
+  "service": {
+    "enabled": false,
+    "ws_path": "/ws/dms/native",
+    "inference_fps_target": 12,
+    "models_enabled": ["chaitanya"]
+  }
+}

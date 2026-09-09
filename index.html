@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vision Sentinel | Driver State Detection Training and Evaluation Platform</title>
+    <meta name="description" content="Driver state detection training and evaluation platform for datasets, annotation, processing, training, analysis, and model export workflows." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet" />
+    <link rel="preload" href="fonts/material-symbols-outlined.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="styles.css?v=20260905-local-icons" />
+    <link rel="stylesheet" href="dms-cockpit.css?v=20260904-landmark-recorder" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#dashboard" aria-label="Vision Sentinel Console">
+        <span class="brand-mark"><span class="material-symbols-outlined">radar</span></span>
+        <strong>Vision Sentinel</strong>
+      </a>
+      <nav class="topnav" aria-label="Page navigation">
+        <a class="active" href="#dashboard" data-page-target="dashboard">Console</a>
+        <a href="#dataset" data-page-target="dataset">Datasets</a>
+        <a href="#live-detection" data-page-target="live-detection">Live Detection</a>
+        <a href="#settings" data-page-target="settings">Settings</a>
+      </nav>
+      <div class="topbar-actions">
+        <button class="icon-btn ghost" type="button" aria-label="Notifications"><span class="material-symbols-outlined">notifications</span></button>
+        <div class="profile"><span><b>Admin</b><small>System Admin</small></span><i>VS</i></div>
+      </div>
+    </header>
+
+    <main class="app-shell">
+      <div class="ambient ambient-a"></div>
+      <div class="ambient ambient-b"></div>
+
+      <section id="dashboard" class="app-page active" data-page="dashboard">
+        <div class="page-heading">
+          <div><h1>Console</h1><p>Global runtime status and driver state model development overview</p></div>
+          <div class="heading-actions">
+            <div class="status-chip" id="backendStatus"><span class="status-dot"></span>Checking backend</div>
+            <button id="createDatasetBtn" class="secondary-action" type="button"><span class="material-symbols-outlined">add_circle</span>Create Dataset</button>
+            <label class="primary-action upload-action"><input id="fileInput" type="file" accept="image/*,video/*" multiple /><span class="material-symbols-outlined">cloud_upload</span>Import Samples</label>
+          </div>
+        </div>
+
+        <div class="kpi-grid">
+          <article class="bento-card kpi-card"><div class="card-top"><span>Total Processed Data</span><i class="icon-pill blue"><span class="material-symbols-outlined">dataset</span></i></div><strong id="totalSamples">0</strong><p><b class="good">+12.5%</b> images, videos, and extracted frames</p></article>
+          <article class="bento-card kpi-card"><div class="card-top"><span>Annotated Samples</span><i class="icon-pill green"><span class="material-symbols-outlined">fact_check</span></i></div><strong id="annotatedSamples">0</strong><p>Image-level classes and detection boxes</p></article>
+          <article class="bento-card kpi-card"><div class="card-top"><span>Trained Models</span><i class="icon-pill orange"><span class="material-symbols-outlined">model_training</span></i></div><strong id="modelCount">0</strong><p>Detection weights, evaluations, and exports</p></article>
+          <article class="bento-card kpi-card primary-kpi"><div class="card-top"><span>Current Job</span><i class="icon-pill light"><span class="material-symbols-outlined">speed</span></i></div><strong id="jobProgress">0%</strong><div class="progress-track"><span id="progressBar"></span></div><p id="jobStatusText">Waiting for job</p></article>
+        </div>
+
+        <div class="dashboard-grid">
+          <article class="bento-card chart-card dashboard-recognition-card wide">
+            <div class="section-heading">
+              <div>
+                <h2>State Recognition and Data Annotation</h2>
+                <p>Driver state classification, detection boxes, and training data loop</p>
+              </div>
+              <div class="annotation-mode-pills"><span>Image Classification</span><span>Detection Boxes</span></div>
+            </div>
+            <div class="recognition-workbench">
+              <div class="recognition-status-grid" aria-label="All driver state recognition classes">
+                <div class="recognition-status-card safe"><span class="material-symbols-outlined">verified_user</span><b>Normal Driving</b><small>safe / normal</small><em>Safe State</em></div>
+                <div class="recognition-status-card danger"><span class="material-symbols-outlined">visibility_off</span><b>Eye Closure</b><small>drowsy</small><em>Eye State</em></div>
+                <div class="recognition-status-card warning"><span class="material-symbols-outlined">face_5</span><b>Head Down</b><small>head_down</small><em>Head Pose</em></div>
+                <div class="recognition-status-card warning"><span class="material-symbols-outlined">visibility</span><b>Gaze Offset</b><small>gaze_off</small><em>Eye Rays</em></div>
+                <div class="recognition-status-card"><span class="material-symbols-outlined">phone_in_talk</span><b>Phone Call</b><small>phone</small><em>Action</em></div>
+              </div>
+              <div class="annotation-dashboard-grid">
+                <section class="annotation-summary-panel">
+                  <div class="annotation-panel-title"><span class="material-symbols-outlined">edit_square</span><div><b>Data Annotation</b><small>Turn recognition results into trainable labels</small></div></div>
+                  <div class="annotation-steps">
+                    <span><b>01</b>Import images/videos</span>
+                    <span><b>02</b>Select state class</span>
+                    <span><b>03</b>Draw detection boxes</span>
+                    <span><b>04</b>Save and review</span>
+                  </div>
+                </section>
+                <section class="annotation-target-panel">
+                  <div class="annotation-panel-title"><span class="material-symbols-outlined">select_check_box</span><div><b>Annotation Targets</b><small>Classification labels and object boxes</small></div></div>
+                  <div class="annotation-target-tags"><span>Normal Driving</span><span>Eye Closure</span><span>Head Down</span><span>Gaze Offset</span><span>Phone Call</span></div>
+                </section>
+                <section class="annotation-progress-panel">
+                  <div><b>Annotation Progress</b><strong id="dashboardAnnotationRate">0%</strong></div>
+                  <div class="progress-track"><span id="dashboardAnnotationBar" style="width:0%"></span></div>
+                  <small>Updates after selecting a dataset and saving annotations</small>
+                </section>
+                <section class="annotation-chart-panel">
+                  <div class="annotation-chart-head"><b>Training Metrics</b><span><i class="dot blue"></i>Accuracy <i class="dot red"></i>Loss</span></div>
+                  <div id="lossChart" class="chart-box"></div>
+                </section>
+              </div>
+            </div>
+          </article>
+          <aside class="bento-card active-dataset-card"><div class="section-heading"><div><h2>Active Dataset</h2><p id="activeDatasetMeta">Start the backend to create datasets and upload samples.</p></div></div><h3 id="activeDatasetName">No dataset selected</h3><div class="dataset-id" id="activeDatasetId">Dataset ID: -</div><div class="node-list"><div class="node-item ok"><i><span class="material-symbols-outlined">dns</span></i><span><b>East Training Node 01</b><small>GPU processing queue idle · online</small></span><em>Online</em></div><div class="node-item warn"><i><span class="material-symbols-outlined">warning</span></i><span><b>North Inference Node 02</b><small>94% load · 45 ms latency</small></span><em>High Load</em></div></div></aside>
+        </div>
+
+      </section>
+
+      <section id="dataset" class="app-page" data-page="dataset">
+        <div class="page-heading"><div><h1>Dataset Management</h1><p>Import, filter, annotate, and review driver monitoring data in one place</p></div><div class="heading-actions"><button id="refreshBtn" class="secondary-action" type="button"><span class="material-symbols-outlined">refresh</span>Refresh Data</button><label class="primary-action upload-action"><input type="file" accept="image/*,video/*" multiple /><span class="material-symbols-outlined">cloud_upload</span>Import Data</label></div></div>
+        <div class="dataset-stats"><article class="bento-card stat-card warning"><span class="material-symbols-outlined">sentiment_dissatisfied</span><b>Eye Closure</b><strong>1,248</strong><p>Fatigue sample pool</p></article><article class="bento-card stat-card danger"><span class="material-symbols-outlined">phone_in_talk</span><b>Phone Call</b><strong>856</strong><p>Calling behavior samples</p></article><article class="bento-card stat-card success"><span class="material-symbols-outlined">check_circle</span><b>Normal Driving</b><strong>15,420</strong><p>Safe-state baseline samples</p></article></div>
+        <div class="dataset-layout"><article class="bento-card"><div class="section-heading"><div><h2>Create or Select Dataset</h2><p>Add source notes for later training traceability</p></div></div><div class="form-grid"><label>Dataset Name<input id="datasetName" type="text" value="Driver State Detection Dataset" /></label><label>Data Source<select id="datasetSource"><option>Cabin Camera</option><option>Dash Camera</option><option>Public Dataset</option><option>Simulator Capture</option></select></label></div><label class="full-label">Dataset Description<textarea id="datasetDescription">Recognizes normal driving, eye closure, head-down distraction, gaze offset, phone calls, and related states.</textarea></label><div id="datasetList" class="dataset-list"></div></article><article class="bento-card"><div class="section-heading"><div><h2>Class Sample Distribution</h2><p>Check class balance before collecting more data or augmenting</p></div><span class="pill">5 State Classes</span></div><div id="classList" class="class-list"></div></article></div>
+        <article class="bento-card sample-gallery-card"><div class="section-heading"><div><h2>Recent Samples</h2><p>Card previews and review status</p></div><button class="text-link" type="button">View All <span class="material-symbols-outlined">arrow_forward</span></button></div><div class="sample-gallery"><div class="sample-card sample-a"><span class="risk warning">Fatigue / 0.89</span><em>Pending Review</em><b>Cabin Sample 04</b><small>Plate: SHA-8932C</small></div><div class="sample-card sample-b"><span class="risk danger">Call / 0.94</span><em class="done">Reviewed</em><b>Cabin Sample 12</b><small>Plate: BJN-558X1</small></div><div class="sample-card sample-c"><span class="risk success">Normal / 0.99</span><em>Pending Review</em><b>Cabin Sample 01</b><small>Plate: GDB-78K99</small></div><div class="sample-card sample-d"><span class="risk warning">Head Down / 0.76</span><em class="done">Reviewed</em><b>Cabin Sample 08</b><small>Plate: ZJA-9921E</small></div></div></article>
+      </section>
+
+      <section id="live-detection" class="app-page" data-page="live-detection">
+        <div class="page-heading live-heading">
+          <div><p class="online-line"><span></span>Driver monitoring system online</p><h1>Live Driver State Detection</h1><p>Local models analyze driving behavior, fatigue risk, and safety status in real time</p></div>
+        </div>
+        <div class="live-layout">
+          <div class="live-main">
+            <div class="dms-status-strip" aria-label="Driver state monitoring items">
+              <div class="dms-system-state"><span class="material-symbols-outlined">sensors</span><b>Monitoring</b><small>Local Inference</small></div>
+              <div class="dms-status-item" data-detection-key="safe"><span class="material-symbols-outlined">verified_user</span><b>Normal</b><small>Safe State</small></div>
+              <div class="dms-status-item" data-detection-key="drowsy"><span class="material-symbols-outlined">visibility_off</span><b>Eye Closure</b><small>Eye State</small></div>
+              <div class="dms-status-item" data-detection-key="head_down"><span class="material-symbols-outlined">face_5</span><b>Head Down</b><small>Head Pose</small></div>
+              <div class="dms-status-item" data-detection-key="gaze_off"><span class="material-symbols-outlined">visibility</span><b>Gaze Offset</b><small>Eye Rays</small></div>
+              <div class="dms-status-item" data-detection-key="phone"><span class="material-symbols-outlined">phone_in_talk</span><b>Phone Call</b><small>Action</small></div>
+              <div class="dms-control-actions">
+                <button id="cameraToggleBtn" class="primary-action" type="button"><span class="material-symbols-outlined">videocam</span><span>Start Camera</span></button>
+                <button id="landmarkRecordBtn" class="secondary-action" type="button" title="Record blue/red/yellow annotations; loop them on annotation-replay.html"><span class="material-symbols-outlined">fiber_manual_record</span><span>Record</span></button>
+              </div>
+            </div>
+            <article id="detectionStage" class="video-feed inference-stage">
+              <img id="samplePreviewImage" class="sample-preview-media" alt="Current annotation sample" />
+              <video id="samplePreviewVideo" class="sample-preview-media" controls playsinline muted></video>
+              <canvas id="detectionCanvas" aria-label="Driver state detection frame"></canvas>
+              <video id="cameraVideo" playsinline muted></video>
+              <canvas id="annotationCanvas" aria-label="Object detection annotation canvas"></canvas>
+              <div id="detectionPlaceholder" class="detection-placeholder"><span class="material-symbols-outlined">center_focus_strong</span><strong>Driver Monitor Standby</strong><p>Start the camera to begin local state analysis</p></div>
+              <div id="inferenceLoading" class="inference-loading" hidden><span></span><b>Loading dual models...</b></div>
+              <div class="feed-chip top-left"><span class="material-symbols-outlined">memory</span><span id="modelRuntimeLabel">Dual models pending</span></div>
+              <div class="feed-chip top-right"><span class="material-symbols-outlined">speed</span><span id="inferenceSpeed">Waiting for input</span></div>
+                <div class="model-switcher"><label>Inference Mode<select id="inferenceModelSelect"><option value="soham" selected>State Detection Model (Smooth)</option><option value="ensemble">Dual Model Fusion (Detailed)</option><option value="chaitanya">Action Object Model</option></select></label><span id="modelSourceStatus" class="model-source-status">Local weights found</span></div>
+              <div class="dms-camera-meta"><span><i></i>Cabin Camera</span><b>Live Feed</b></div>
+              <div class="dms-frame-corner corner-a"></div><div class="dms-frame-corner corner-b"></div><div class="dms-frame-corner corner-c"></div><div class="dms-frame-corner corner-d"></div>
+            </article>
+            <article class="bento-card annotation-panel"><div class="section-heading"><div><h2>Detection Sample Annotation</h2><p id="annotationHint">Select a dataset sample and drag on the frame to draw ground-truth boxes</p></div><span id="sampleCursor" class="pill">Sample 0 / 0</span></div><div class="annotation-actions"><button id="prevFrame" class="secondary-action" type="button"><span class="material-symbols-outlined">skip_previous</span>Previous</button><button id="clearBoxes" class="secondary-action" type="button"><span class="material-symbols-outlined">delete_sweep</span>Clear Boxes</button><button id="saveLabel" class="primary-action" type="button"><span class="material-symbols-outlined">save</span>Save Annotation</button><button id="nextFrame" class="secondary-action" type="button"><span class="material-symbols-outlined">skip_next</span>Next</button></div></article>
+            <article class="bento-card timeline-card"><div class="section-heading"><div><h2>Event Timeline</h2><p>Realtime log of states recognized by the model</p></div><span class="pill">Live Log</span></div><div id="detectionTimeline" class="timeline"><div class="event muted"><b>Model waiting for input</b><p>Detection events will appear here after the camera starts.</p><time>--:--:--</time></div></div></article>
+          </div>
+          <aside class="live-sidebar dms-detail-sidebar" aria-label="Driver face and gaze monitoring">
+            <section class="dms-inspection-console">
+              <section class="dms-console-section driver-overview">
+                <div class="driver-overview-head">
+                  <div><span class="material-symbols-outlined">face_retouching_natural</span><b id="faceIdValue">FACE --</b></div>
+                  <i id="driverMonitorStatus" class="replay-import-trigger" title="点击导入并放映标注录制 JSON">Standby</i>
+                </div>
+                <div class="driver-overview-body">
+                  <div class="driver-attribute-grid">
+                    <span><small>Detection Status</small><b id="driverTargetStatus">Not Detected</b></span>
+                    <span><small>Current Action</small><b id="driverActionValue">Waiting for Input</b></span>
+                    <span><small>Landmarks</small><b id="landmarkCountValue">--</b></span>
+                    <span><small>Model Status</small><b id="modelReadyText">Ready to Load</b></span>
+                  </div>
+                </div>
+              </section>
+
+              <section class="dms-console-section head-console-section">
+                <div class="console-section-title"><span class="material-symbols-outlined">my_location</span><b>Head Position</b><em id="faceVectorStatus">Not Detected</em></div>
+                <div class="console-value-grid location-values">
+                  <span><small>X</small><b id="headXValue">--</b></span><span><small>Y</small><b id="headYValue">--</b></span><span><small>Z</small><b id="headZValue">--</b></span>
+                </div>
+              </section>
+
+              <section class="dms-console-section head-rotation-console-section">
+                <div class="console-section-title rotation-title"><span class="material-symbols-outlined">screen_rotation_alt</span><b>Head Rotation</b><em id="facePoseValue">--</em></div>
+                <div class="head-rotation-row">
+                  <div class="pose-orbit"><span id="headPoseDial" class="material-symbols-outlined">face</span><i></i></div>
+                  <div class="console-value-grid rotation-values"><span><small>PITCH</small><b id="headPitchValue">--°</b></span><span><small>ROLL</small><b id="headRollValue">--°</b></span><span><small>YAW</small><b id="headYawValue">--°</b></span></div>
+                </div>
+              </section>
+
+              <section class="dms-console-section gaze-console-section">
+                <div class="console-section-title gaze-title"><span class="material-symbols-outlined">visibility</span><b>Gaze</b><em id="gazeVectorValue">--</em></div>
+                <div class="console-value-grid gaze-values"><span><small>PITCH</small><b id="gazePitchValue">--°</b></span><span><small>YAW</small><b id="gazeYawValue">--°</b></span></div>
+                <div class="eye-monitor-grid">
+                  <figure>
+                    <figcaption><span><i class="material-symbols-outlined">visibility</i><b>Left Eye</b></span><em id="leftEyeState">Waiting for Input</em></figcaption>
+                    <canvas id="leftEyePreview" width="240" height="104" aria-label="Live left eye crop"></canvas>
+                    <canvas id="leftEyeWave" class="eye-wave-canvas" width="240" height="60" aria-label="Left eye openness waveform"></canvas>
+                    <div class="eye-metric-row"><span>Openness <b id="leftEyeOpenValue">--</b></span><span>Closure Risk <b id="leftBlinkValue">--</b></span></div>
+                  </figure>
+                  <figure>
+                    <figcaption><span><i class="material-symbols-outlined">visibility</i><b>Right Eye</b></span><em id="rightEyeState">Waiting for Input</em></figcaption>
+                    <canvas id="rightEyePreview" width="240" height="104" aria-label="Live right eye crop"></canvas>
+                    <canvas id="rightEyeWave" class="eye-wave-canvas" width="240" height="60" aria-label="Right eye openness waveform"></canvas>
+                    <div class="eye-metric-row"><span>Openness <b id="rightEyeOpenValue">--</b></span><span>Closure Risk <b id="rightBlinkValue">--</b></span></div>
+                  </figure>
+                </div>
+                <div class="eye-summary"><span><small>Overall Eye State</small><b id="eyeVectorValue">--</b></span><i><em id="eyeOpennessBar" style="width:0%"></em></i></div>
+              </section>
+
+              <section class="dms-console-section face-crop-console-section">
+                <div class="console-section-title face-crop-title"><span class="material-symbols-outlined">crop_free</span><b>Face Crop</b><em>Live Cutout</em></div>
+                <div class="driver-face-preview"><canvas id="facePreview" width="360" height="450" aria-label="Live driver face crop"></canvas><span class="material-symbols-outlined">face_6</span><i></i><i></i><i></i><i></i></div>
+              </section>
+
+            </section>
+
+            <div class="dms-compatibility-panel" aria-hidden="true">
+              <span id="topRunTime">00:00</span>
+              <div class="monitor-reading"><span id="fatigueScore">0</span><span id="fatigueLabel"></span></div><span id="drowsyConfidence">0%</span>
+              <div class="monitor-reading"><span id="attentionScore">--</span><span id="attentionLabel"></span></div><span id="safeConfidence">0%</span><i id="safeConfidenceBar"></i>
+              <span id="detectionCount">0 items</span><aside id="keyRegionPanel" hidden><span id="keyRegionCount">0 regions</span><div id="keyRegionList"></div></aside><div id="inferenceResults"></div><select id="labelSelect"></select><div id="sampleList"></div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="settings" class="app-page" data-page="settings">
+        <div class="config-page">
+          <header class="config-hero">
+            <div>
+              <h1>System Configuration</h1>
+              <p>Global parameters and connections</p>
+            </div>
+            <div class="config-actions">
+              <button class="secondary-action" type="button">Discard Changes</button>
+              <button class="primary-action" type="button">Submit to Core</button>
+            </div>
+          </header>
+
+          <div class="config-layout">
+            <aside class="config-aside">
+              <nav class="config-menu" aria-label="System configuration groups">
+                <button class="active" type="button"><span>Detection Thresholds</span><i class="material-symbols-outlined">tune</i></button>
+                <button type="button"><span>Notification Logic</span><i class="material-symbols-outlined">notifications</i></button>
+                <button type="button"><span>API Management</span><i class="material-symbols-outlined">hub</i></button>
+                <button type="button"><span>Safety Protocol</span><i class="material-symbols-outlined">shield</i></button>
+              </nav>
+
+              <section class="diagnostics-panel bento-card">
+                <h2>Diagnostics</h2>
+                <div class="diagnostic-row"><span>Hardware Health</span><b class="ok">Excellent</b><i style="--value: 92%; --color: #10b981"></i></div>
+                <div class="diagnostic-row"><span>Camera Node 01</span><b>144 FPS</b><i style="--value: 86%; --color: #2563eb"></i></div>
+                <div class="diagnostic-row"><span>Network Tx/Rx</span><b class="warn">842 Mbps</b><i class="sparkline"></i></div>
+              </section>
+            </aside>
+
+            <div class="config-main">
+              <section class="config-card bento-card threshold-console">
+                <div class="config-card-head">
+                  <div>
+                    <h2>Detection Thresholds</h2>
+                    <p>Calibrate neural sensitivity for fatigue and distraction signals.</p>
+                  </div>
+                </div>
+                <div class="threshold-console-body">
+                  <label class="console-slider">
+                    <span><b>Fatigue Sensitivity</b><em>0.75</em></span>
+                    <input type="range" value="75" />
+                    <small><i>Conservative</i><i>Aggressive</i></small>
+                  </label>
+                  <label class="console-slider purple">
+                    <span><b>Distraction Timeout</b><em>2500 ms</em></span>
+                    <input type="range" value="50" />
+                    <small><i>500ms</i><i>5000ms</i></small>
+                  </label>
+                  <label class="console-slider red wide">
+                    <span><b>Gaze Offset Angle Limit</b><em>15.4 deg</em></span>
+                    <input type="range" value="32" />
+                    <small><i>Strict (5°)</i><i>Loose (45°)</i></small>
+                  </label>
+                </div>
+              </section>
+
+              <section class="config-card bento-card api-console">
+                <div class="config-card-head">
+                  <div>
+                    <h2>API Management</h2>
+                    <p>Manage external integration keys and endpoint quotas.</p>
+                  </div>
+                  <button class="secondary-action key-action" type="button"><span class="material-symbols-outlined">add</span>Generate Key</button>
+                </div>
+                <div class="api-table">
+                  <div class="api-head"><span>Key Name / Prefix</span><span>Status</span><span>Quota (requests/hour)</span><span>Actions</span></div>
+                  <div class="api-row">
+                    <div><b>prod_telemetry_01</b><small>sk_live_...9f4a</small></div>
+                    <span class="api-status active">Active</span>
+                    <div class="quota"><span><i style="width:42%"></i></span><b>4,210 / 10,000</b></div>
+                    <button class="icon-btn ghost" type="button" aria-label="Manage key"><span class="material-symbols-outlined">more_horiz</span></button>
+                  </div>
+                  <div class="api-row muted">
+                    <div><b>dev_test_02</b><small>sk_test_...2b1c</small></div>
+                    <span class="api-status revoked">Revoked</span>
+                    <div class="quota"><span><i style="width:0%"></i></span><b>0 / 500</b></div>
+                    <button class="icon-btn ghost" type="button" aria-label="Manage key"><span class="material-symbols-outlined">more_horiz</span></button>
+                  </div>
+                </div>
+              </section>
+
+              <section class="config-advanced-grid">
+                <article class="bento-card">
+                  <div class="section-heading"><div><p class="eyebrow">Data Processing</p><h2>Dataset Processing</h2></div><button id="processBtn" class="primary-action" type="button"><span class="material-symbols-outlined">auto_fix_high</span>Start Processing</button></div>
+                  <div class="process-grid"><div><span>Remove Duplicate Images</span><b>Pending</b></div><div><span>Filter Blurry/Dark Frames</span><b>Pending</b></div><div><span>Normalize Image Size</span><b>640 x 640</b></div><div><span>Data Augmentation</span><b>Night/Occlusion/Blur/Angle</b></div></div>
+                  <div class="split-controls"><label><span>Training Set</span><input id="trainSplit" type="range" min="50" max="90" value="70" /><b id="trainSplitLabel">70%</b></label><label><span>Validation Set</span><input id="validSplit" type="range" min="5" max="30" value="20" /><b id="validSplitLabel">20%</b></label><label><span>Test Set</span><input id="testSplit" type="range" min="5" max="30" value="10" /><b id="testSplitLabel">10%</b></label></div>
+                </article>
+                <article class="bento-card">
+                  <div class="section-heading"><div><p class="eyebrow">Model Training</p><h2>Model Selection and Training</h2></div><button id="trainBtn" class="primary-action" type="button"><span class="material-symbols-outlined">model_training</span>Start Training</button></div>
+                  <div class="form-grid compact"><label>Model<select id="modelSelect"><option>Light Detection Model</option><option>Standard Detection Model</option><option>High-Accuracy Detection Model</option></select></label><label>Input Size<input id="imageSizeInput" type="number" value="640" /></label><label>Epochs<input id="epochsInput" type="number" value="50" /></label><label>Batch Size<input id="batchInput" type="number" value="16" /></label><label>Learning Rate<input id="lrInput" type="number" value="0.001" step="0.0001" /></label><label class="check-row"><input id="pretrainedInput" type="checkbox" checked /> Use pretrained weights</label></div>
+                </article>
+                <article class="bento-card">
+                  <div class="section-heading"><div><p class="eyebrow">Evaluation Metrics</p><h2>Core Metrics</h2></div><span id="aucBadge" class="pill done">AUC 0.91</span></div>
+                  <div class="score-grid"><article><span>Alert Precision</span><strong id="precisionScore">87%</strong><p>How accurate alerts are</p></article><article><span>Risk Recall</span><strong id="recallScore">84%</strong><p>How many risks are caught</p></article><article><span>F1 Score</span><strong id="f1Score">85%</strong><p>Overall performance</p></article><article><span>Mean AP</span><strong id="detailMapScore">82%</strong><p>Object detection quality</p></article></div>
+                  <div id="rocChart" class="chart-box compact-chart"></div>
+                </article>
+                <article class="bento-card">
+                  <div class="section-heading"><div><p class="eyebrow">Class Confusion</p><h2>Confusion Matrix</h2></div></div>
+                  <div id="confusionMatrix" class="matrix"></div>
+                </article>
+                <article class="bento-card export-panel">
+                  <div class="section-heading"><div><p class="eyebrow">Export and Deploy</p><h2>Model Export and Deployment</h2></div><button id="exportBtn" class="primary-action" type="button"><span class="material-symbols-outlined">ios_share</span>Export Model</button></div>
+                  <div class="export-grid"><label><input type="radio" name="exportFormat" value="pt" checked /> Weight File</label><label><input type="radio" name="exportFormat" value="onnx" /> Universal Model</label><label><input type="radio" name="exportFormat" value="engine" /> Inference Engine</label><label><input type="radio" name="exportFormat" value="tflite" /> Mobile Model</label></div>
+                  <div class="deploy-targets"><span>Web Demo</span><span>Local Computer</span><span>In-Vehicle Device</span><span>Edge Box</span><span>Realtime Camera Detection</span></div>
+                </article>
+                <article class="bento-card job-card">
+                  <div class="section-heading"><div><p class="eyebrow">Job Records</p><h2>Job Log</h2></div><span id="activeJobId" class="pill">No Job</span></div>
+                  <pre id="jobLog" class="job-log">Waiting for backend jobs...</pre>
+                </article>
+              </section>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer"><span>© 2024 Vision Sentinel. Driver state monitoring system.</span><nav><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Support</a></nav></footer>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <div id="replayImportModal" class="replay-import-modal" hidden>
+      <div class="replay-import-card" role="dialog" aria-modal="true" aria-label="放映录制 JSON">
+        <div class="replay-import-head">
+          <h3>放映标注录制 <span class="material-symbols-outlined">movie</span></h3>
+          <button id="replayImportClose" class="replay-import-close" type="button" aria-label="关闭">&times;</button>
+        </div>
+        <div id="replayImportDrop" class="replay-import-drop">
+          <span class="material-symbols-outlined">upload_file</span>
+          <p>把录制 JSON 拖到这里,或</p>
+          <label class="primary-action replay-import-pick"><input id="replayImportFile" type="file" accept=".json,application/json" /><span>选择文件</span></label>
+          <small>支持 storage/annotation-tracks/ 文件夹里的 JSON,或任何导出的标注录制 JSON</small>
+        </div>
+        <div id="replayImportInfo" class="replay-import-info" hidden></div>
+        <button id="replayImportPlay" class="primary-action replay-import-play" type="button" hidden><span class="material-symbols-outlined">play_circle</span><span>完整放映</span></button>
+      </div>
+    </div>
+    <script src="app.js?v=20260906-file-backend-redirect"></script>
+    <script src="driver-inference.js?v=20260909-low-render-resolution"></script>
+  </body>
+</html>

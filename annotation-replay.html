@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Annotation Replay — Vision Sentinel</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      background: radial-gradient(circle at 50% 30%, #101a33 0%, #070b16 70%);
+      font-family: system-ui, -apple-system, sans-serif;
+      color: #dbeafe;
+      padding: 24px;
+    }
+    h1 { font-size: 18px; font-weight: 700; letter-spacing: 0.04em; color: #93c5fd; }
+    .stage {
+      position: relative;
+      width: min(92vw, 960px);
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(96, 165, 250, 0.25);
+      box-shadow: 0 24px 60px rgba(2, 6, 23, 0.8);
+      background: #0b1220;
+    }
+    .stage.alarm { border-color: rgba(255, 70, 81, 0.85); box-shadow: 0 0 0 2px rgba(255, 70, 81, 0.45), 0 24px 60px rgba(2, 6, 23, 0.8); }
+    .alarm-banner {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 18px;
+      border-radius: 999px;
+      background: rgba(255, 70, 81, 0.92);
+      color: #fff1f2;
+      font-weight: 800;
+      font-size: 14px;
+      letter-spacing: 0.02em;
+      box-shadow: 0 6px 24px rgba(255, 70, 81, 0.45);
+      animation: alarm-pulse 1s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .alarm-banner.hidden { display: none; }
+    @keyframes alarm-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.55; }
+    }
+    canvas { display: block; width: 100%; }
+    .hint { font-size: 13px; color: #64748b; text-align: center; line-height: 1.7; }
+    .hint a { color: #70d7ff; }
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      width: min(92vw, 960px);
+      font-size: 13px;
+    }
+    .controls button {
+      background: rgba(96, 165, 250, 0.12);
+      border: 1px solid rgba(96, 165, 250, 0.35);
+      color: #dbeafe;
+      border-radius: 8px;
+      padding: 7px 14px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .controls button:hover { background: rgba(96, 165, 250, 0.24); }
+    .controls input[type="range"] { flex: 1; accent-color: #70d7ff; }
+    .controls .time { min-width: 96px; text-align: right; font-variant-numeric: tabular-nums; color: #93c5fd; }
+    .empty {
+      padding: 60px 30px;
+      text-align: center;
+      color: #64748b;
+      font-size: 15px;
+      line-height: 2;
+    }
+    .empty b { color: #dbeafe; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <h1>ANNOTATION REPLAY · 蓝/红/黄标注循环回放</h1>
+  <div class="stage">
+    <canvas id="replayCanvas" width="1056" height="594"></canvas>
+    <div id="alarmBanner" class="alarm-banner hidden"></div>
+    <div id="emptyState" class="empty hidden">
+      还没有录制内容。<br />
+      回到检测页打开摄像头,点击 <b>Record</b> 开始、再次点击停止,<br />
+      然后回到本页即可循环播放蓝/红/黄标注。
+    </div>
+  </div>
+  <div class="controls" id="trackControls">
+    <label for="trackSelect" style="color:#93c5fd;">保存的录制:</label>
+    <select id="trackSelect" style="flex:1; background:#101a33; color:#dbeafe; border:1px solid rgba(96,165,250,0.35); border-radius:8px; padding:7px 10px; font-size:13px;"></select>
+    <button id="reloadTracksBtn" type="button" title="重新读取服务器文件夹">↻ Refresh</button>
+  </div>
+  <div class="controls" id="controls">
+    <button id="playPauseBtn" type="button">⏸ Pause</button>
+    <input id="progressBar" type="range" min="0" max="1000" value="0" />
+    <span class="time" id="timeLabel">0.0s / 0.0s</span>
+    <button id="speedBtn" type="button">1×</button>
+  </div>
+  <p class="hint">检测页 <a href="/index.html">Live Driver State Detection</a> 点 <b>Record</b> 开始/停止录制 · 每次录制保存为一个独立 JSON 文件,存放在项目 <code>storage/annotation-tracks/</code> 文件夹,同时写入浏览器 localStorage(key: <code>dms_annotation_track</code>)。</p>
+
+  <script>
+    window.addEventListener("error", (event) => {
+      document.title = "E:" + (event.message || "unknown error");
+    });
+    (function () {
+      const STORAGE_KEY = "dms_annotation_track";
+      const SPEEDS = [0.5, 1, 2, 4];
+      const canvas = document.getElementById("replayCanvas");
+      const context = canvas.getContext("2d");
+      const emptyState = document.getElementById("emptyState");
+      const controls = document.getElementById("controls");
+      const playPauseBtn = document.getElementById("playPauseBtn");
+      const progressBar = document.getElementById("progressBar");
+      const timeLabel = document.getElementById("timeLabel");
+      const speedBtn = document.getElementById("speedBtn");
+      const alarmBanner = document.getElementById("alarmBanner");
+      const stage = document.querySelector(".stage");
+      const trackSelect = document.getElementById("trackSelect");
+      const reloadTracksBtn = document.getElementById("reloadTracksBtn");
+      const ALARM_LABELS = {
+        phone: "⚠ Phone Call 打电话报警",
+        drowsy: "⚠ Eye Closure 闭眼疲劳报警",
+        head_down: "⚠ Head Down 低头报警",
+        gaze_off: "⚠ Gaze Offset 视线偏离报警",
+      };
+
+      let frames = [];
+      let durationMs = 0;
+      let playheadMs = 0;
+      let lastTickAt = 0;
+      let playing = true;
+      let speedIndex = 1;
+      let dragging = false;
+
+      function applyPayload(payload) {
+        frames = payload?.frames?.length ? payload.frames : [];
+        durationMs = payload?.durationMs || (frames.length > 1 ? frames[frames.length - 1].t - frames[0].t : 0);
+        const hasTrack = frames.length > 0;
+        emptyState.classList.toggle("hidden", hasTrack);
+        controls.style.visibility = hasTrack ? "visible" : "hidden";
+        if (hasTrack) {
+          const last = frames[frames.length - 1];
+          canvas.width = last.aw || canvas.width;
+          canvas.height = last.ah || canvas.height;
+          playheadMs = 0;
+        }
+      }
+
+      function loadTrack() {
+        let payload = null;
+        try {
+          payload = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+        } catch (error) {
+          console.warn("Annotation track parse failed", error);
+        }
+        applyPayload(payload);
+      }
+
+      async function loadTrackFromServer(name) {
+        try {
+          const response = await fetch(`/api/annotation-tracks/${encodeURIComponent(name)}`);
+          if (!response.ok) throw new Error(await response.text());
+          applyPayload(await response.json());
+          return true;
+        } catch (error) {
+          console.warn("Annotation track load failed", error);
+          return false;
+        }
+      }
+
+      async function refreshTrackList(preferredName) {
+        let items = [];
+        try {
+          const response = await fetch("/api/annotation-tracks");
+          if (response.ok) items = (await response.json()).items || [];
+        } catch (error) {
+          console.warn("Annotation track list unavailable", error);
+        }
+        trackSelect.innerHTML = "";
+        if (!items.length) {
+          const option = document.createElement("option");
+          option.textContent = "服务器文件夹暂无录制,使用浏览器本地数据";
+          option.value = "";
+          trackSelect.appendChild(option);
+          loadTrack();
+          return;
+        }
+        items.forEach((item) => {
+          const option = document.createElement("option");
+          option.value = item.name;
+          const kb = item.size > 1024 ? ` · ${(item.size / 1024).toFixed(0)} KB` : "";
+          option.textContent = `${item.name}${kb}`;
+          trackSelect.appendChild(option);
+        });
+        const pick = preferredName && items.some((item) => item.name === preferredName) ? preferredName : items[0].name;
+        trackSelect.value = pick;
+        await loadTrackFromServer(pick);
+      }
+
+      function frameAt(playhead) {
+        if (!frames.length) return null;
+        const time = frames[0].t + Math.min(playhead, durationMs);
+        let low = 0;
+        let high = frames.length - 1;
+        while (low < high) {
+          const mid = (low + high + 1) >> 1;
+          if (frames[mid].t <= time) low = mid;
+          else high = mid - 1;
+        }
+        return frames[low];
+      }
+
+      function drawFrame(frame) {
+        const w = canvas.width;
+        const h = canvas.height;
+        context.clearRect(0, 0, w, h);
+        context.fillStyle = "#0b1220";
+        context.fillRect(0, 0, w, h);
+        if (!frame) return;
+        const x = (value) => value * w;
+        const y = (value) => value * h;
+        const lineWidth = Math.max(2, w / 420);
+
+        // 蓝色:关键点连线(脸轮廓/眼睛/鼻梁/嘴唇)
+        context.strokeStyle = "rgba(96, 165, 250, 0.7)";
+        context.lineWidth = Math.max(1.2, lineWidth * 0.38);
+        context.lineJoin = "round";
+        (frame.paths || []).forEach((path) => {
+          context.beginPath();
+          path.forEach((point, index) => {
+            if (index === 0) context.moveTo(x(point[0]), y(point[1]));
+            else context.lineTo(x(point[0]), y(point[1]));
+          });
+          context.closePath();
+          context.stroke();
+        });
+
+        // 蓝色:关键点圆点
+        (frame.dots || []).forEach((dot) => {
+          const key = dot[2] === 1;
+          const radius = key ? lineWidth * 1.6 : lineWidth * 1.1;
+          context.beginPath();
+          context.fillStyle = key ? "#dbeafe" : "#3b82f6";
+          context.arc(x(dot[0]), y(dot[1]), radius, 0, Math.PI * 2);
+          context.fill();
+          context.beginPath();
+          context.strokeStyle = "rgba(248, 250, 252, 0.95)";
+          context.lineWidth = Math.max(0.9, lineWidth * 0.22);
+          context.arc(x(dot[0]), y(dot[1]), radius + 0.9, 0, Math.PI * 2);
+          context.stroke();
+        });
+
+        // 黄色:视线箭头
+        (frame.gaze || []).forEach((ray) => {
+          const ox = x(ray.o[0]);
+          const oy = y(ray.o[1]);
+          const originRadius = Math.max(4.5, lineWidth * 1.55);
+          context.save();
+          context.lineCap = "round";
+          context.shadowColor = "#f4f07a";
+          context.shadowBlur = 10;
+          context.fillStyle = "#fffbd1";
+          context.beginPath();
+          context.arc(ox, oy, originRadius, 0, Math.PI * 2);
+          context.fill();
+          if (ray.e) {
+            const ex = x(ray.e[0]);
+            const ey = y(ray.e[1]);
+            const angle = Math.atan2(ey - oy, ex - ox);
+            const arrowSize = Math.max(11, lineWidth * 3.6);
+            context.strokeStyle = "rgba(244, 240, 122, 0.44)";
+            context.lineWidth = Math.max(9, lineWidth * 2.7);
+            context.shadowBlur = 24;
+            context.beginPath();
+            context.moveTo(ox, oy);
+            context.lineTo(ex, ey);
+            context.stroke();
+            context.strokeStyle = "#fffbd1";
+            context.lineWidth = Math.max(3.2, lineWidth * 0.92);
+            context.shadowBlur = 12;
+            context.beginPath();
+            context.moveTo(ox, oy);
+            context.lineTo(ex, ey);
+            context.stroke();
+            context.fillStyle = "#f4f07a";
+            context.beginPath();
+            context.moveTo(ex, ey);
+            context.lineTo(ex - arrowSize * Math.cos(angle - Math.PI / 6), ey - arrowSize * Math.sin(angle - Math.PI / 6));
+            context.lineTo(ex - arrowSize * Math.cos(angle + Math.PI / 6), ey - arrowSize * Math.sin(angle + Math.PI / 6));
+            context.closePath();
+            context.fill();
+          } else {
+            context.strokeStyle = "rgba(244, 240, 122, 0.84)";
+            context.lineWidth = Math.max(2.2, lineWidth * 0.62);
+            context.beginPath();
+            context.arc(ox, oy, originRadius * 1.85, 0, Math.PI * 2);
+            context.stroke();
+          }
+          context.restore();
+        });
+
+        // 蓝色:人脸检测框(四角括号样式)+ FACE 01 标签
+        if (frame.faceBox) {
+          const box = frame.faceBox;
+          const bx1 = x(box.x1);
+          const by1 = y(box.y1);
+          const bx2 = x(box.x2);
+          const by2 = y(box.y2);
+          const bw = Math.max(1, bx2 - bx1);
+          const bh = Math.max(1, by2 - by1);
+          const corner = Math.max(18, Math.min(bw, bh) * 0.16);
+          const strokeWidth = Math.max(2.4, lineWidth * 0.78);
+          context.save();
+          context.lineCap = "round";
+          context.lineJoin = "round";
+          context.shadowColor = "rgba(96, 165, 250, 0.75)";
+          context.shadowBlur = 14;
+          context.strokeStyle = "rgba(96, 165, 250, 0.32)";
+          context.lineWidth = Math.max(1.2, strokeWidth * 0.48);
+          context.strokeRect(bx1, by1, bw, bh);
+          context.strokeStyle = "#70d7ff";
+          context.lineWidth = strokeWidth;
+          context.beginPath();
+          context.moveTo(bx1, by1 + corner);
+          context.lineTo(bx1, by1);
+          context.lineTo(bx1 + corner, by1);
+          context.moveTo(bx2 - corner, by1);
+          context.lineTo(bx2, by1);
+          context.lineTo(bx2, by1 + corner);
+          context.moveTo(bx2, by2 - corner);
+          context.lineTo(bx2, by2);
+          context.lineTo(bx2 - corner, by2);
+          context.moveTo(bx1 + corner, by2);
+          context.lineTo(bx1, by2);
+          context.lineTo(bx1, by2 - corner);
+          context.stroke();
+          context.shadowBlur = 0;
+          context.font = `800 ${Math.max(11, w / 82)}px system-ui, sans-serif`;
+          const labelWidth = context.measureText(box.label).width + 16;
+          const labelHeight = Math.max(20, w / 60);
+          const labelY = Math.max(labelHeight + 6, by1 - 6);
+          context.fillStyle = "rgba(8, 16, 48, 0.76)";
+          context.fillRect(bx1, labelY - labelHeight, labelWidth, labelHeight);
+          context.fillStyle = "#dbeafe";
+          context.fillText(box.label, bx1 + 8, labelY - 6);
+          context.restore();
+        }
+
+        // 红色:行为框(Phone Call …%)
+        (frame.redBoxes || []).forEach((box) => {
+          const bx1 = x(box.x1);
+          const by1 = y(box.y1);
+          const bx2 = x(box.x2);
+          const by2 = y(box.y2);
+          const bw = Math.max(1, bx2 - bx1);
+          const bh = Math.max(1, by2 - by1);
+          const corner = Math.max(12, Math.min(bw, bh) * 0.16);
+          context.save();
+          context.lineJoin = "round";
+          context.lineCap = "round";
+          context.strokeStyle = "#ff4651";
+          context.fillStyle = "rgba(255, 70, 81, 0.14)";
+          context.lineWidth = lineWidth;
+          context.shadowColor = "rgba(255, 70, 81, 0.82)";
+          context.shadowBlur = 16;
+          context.strokeRect(bx1, by1, bw, bh);
+          context.shadowBlur = 0;
+          context.fillRect(bx1, by1, bw, bh);
+          context.font = `800 ${Math.max(13, w / 86)}px system-ui, sans-serif`;
+          const labelWidth = context.measureText(box.label).width + 16;
+          const labelHeight = Math.max(22, (Math.max(13, w / 86)) * 1.65);
+          const labelX = Math.max(4, Math.min(bx1, w - labelWidth - 4));
+          const labelY = by1 - labelHeight > 2 ? by1 - labelHeight : by1 + 2;
+          context.fillStyle = "rgba(104, 21, 39, 0.88)";
+          context.fillRect(labelX, labelY, labelWidth, labelHeight);
+          context.fillStyle = "#ffe4e6";
+          context.fillText(box.label, labelX + 8, labelY + labelHeight - 7);
+          context.strokeStyle = "#ffe4e6";
+          context.lineWidth = Math.max(1.4, lineWidth * 0.48);
+          context.beginPath();
+          context.moveTo(bx1, by1 + corner);
+          context.lineTo(bx1, by1);
+          context.lineTo(bx1 + corner, by1);
+          context.moveTo(bx2 - corner, by1);
+          context.lineTo(bx2, by1);
+          context.lineTo(bx2, by1 + corner);
+          context.moveTo(bx2, by2 - corner);
+          context.lineTo(bx2, by2);
+          context.lineTo(bx2 - corner, by2);
+          context.moveTo(bx1 + corner, by2);
+          context.lineTo(bx1, by2);
+          context.lineTo(bx1, by2 - corner);
+          context.stroke();
+          context.fillStyle = "#ff4651";
+          context.beginPath();
+          context.arc(bx2, by1, Math.max(4, lineWidth * 1.8), 0, Math.PI * 2);
+          context.fill();
+          context.restore();
+        });
+
+        // 姿态角标签(P..° Y..° R..°)
+        if (frame.poseLabel) {
+          context.save();
+          context.font = `700 ${Math.max(12, w / 72)}px system-ui, sans-serif`;
+          const metrics = context.measureText(frame.poseLabel);
+          const labelHeight = Math.max(22, w / 52);
+          const labelX = Math.max(8, (w - metrics.width - 16) / 2);
+          const labelY = h - 8;
+          context.fillStyle = "rgba(8, 22, 39, 0.78)";
+          context.fillRect(labelX, labelY - labelHeight, metrics.width + 16, labelHeight);
+          context.fillStyle = "#dbeafe";
+          context.fillText(frame.poseLabel, labelX + 8, labelY - 7);
+          context.restore();
+        }
+      }
+
+      function tick(now) {
+        if (playing && frames.length > 1 && !dragging) {
+          // 标签页在后台时 rAF 会暂停,恢复瞬间 delta 会很大,钳制避免播放位置跳变
+          const delta = Math.min(now - lastTickAt, 250) * SPEEDS[speedIndex];
+          playheadMs = (playheadMs + delta) % Math.max(durationMs, 1);
+        }
+        lastTickAt = now;
+        if (frames.length) {
+          const frame = frameAt(playheadMs);
+          drawFrame(frame);
+          const ratio = durationMs ? playheadMs / durationMs : 0;
+          if (!dragging) progressBar.value = Math.round(ratio * 1000);
+          timeLabel.textContent = `${(playheadMs / 1000).toFixed(1)}s / ${(durationMs / 1000).toFixed(1)}s`;
+          const alarms = frame?.alarm || [];
+          if (alarms.length) {
+            alarmBanner.textContent = alarms.map((key) => ALARM_LABELS[key] || `⚠ ${key}`).join("　");
+            alarmBanner.classList.remove("hidden");
+            stage.classList.add("alarm");
+          } else {
+            alarmBanner.classList.add("hidden");
+            stage.classList.remove("alarm");
+          }
+        } else {
+          drawFrame(null);
+          alarmBanner.classList.add("hidden");
+          stage.classList.remove("alarm");
+        }
+        requestAnimationFrame(tick);
+      }
+
+      playPauseBtn.addEventListener("click", () => {
+        playing = !playing;
+        playPauseBtn.textContent = playing ? "⏸ Pause" : "▶ Play";
+      });
+      speedBtn.addEventListener("click", () => {
+        speedIndex = (speedIndex + 1) % SPEEDS.length;
+        speedBtn.textContent = `${SPEEDS[speedIndex]}×`;
+      });
+      progressBar.addEventListener("input", () => {
+        dragging = true;
+        playheadMs = (progressBar.value / 1000) * durationMs;
+      });
+      progressBar.addEventListener("change", () => {
+        dragging = false;
+      });
+      window.addEventListener("storage", (event) => {
+        if (event.key === STORAGE_KEY && !trackSelect.value) loadTrack();
+      });
+      reloadTracksBtn.addEventListener("click", () => refreshTrackList(trackSelect.value || undefined));
+      trackSelect.addEventListener("change", () => {
+        if (trackSelect.value) loadTrackFromServer(trackSelect.value);
+      });
+
+      // 检测页弹窗导入的 JSON 通过 ?source=local 直接放映,跳过服务器列表
+      const sourceParam = new URLSearchParams(location.search).get("source");
+      if (sourceParam === "local") {
+        const option = document.createElement("option");
+        option.textContent = "浏览器本地数据(导入的 JSON)";
+        option.value = "";
+        trackSelect.appendChild(option);
+        loadTrack();
+      } else {
+        refreshTrackList();
+      }
+      lastTickAt = performance.now();
+      requestAnimationFrame(tick);
+    })();
+  </script>
+</body>
+</html>

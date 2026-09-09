@@ -1,0 +1,29 @@
+.idea/
+.DS_Store
+
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+.env
+.env.*
+
+certs/
+*.key
+*.pem
+
+*.log
+
+# 后端运行时数据(SQLite/上传样本/任务日志等, 见 backend/README.md 数据存储)
+storage/
+
+# rk3588 rknn 迁移产物(rk3588_dms): 大文件不入库
+*.rknn
+rk3588_dms/models/onnx/dataset.txt
+logs/rknn/*
+logs/dms/*
+!logs/rknn/.gitkeep.md
+!logs/dms/.gitkeep.md
+board_results/
+.venv-rknn/

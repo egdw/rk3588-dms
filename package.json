@@ -1,0 +1,24 @@
+{
+  "name": "vision-sentinel-driver-state-platform",
+  "version": "0.1.0",
+  "private": true,
+  "description": "司机状态检测模型训练与评估平台",
+  "scripts": {
+    "start": "bash ./start-backend.sh",
+    "start:https": "VISION_SENTINEL_HTTPS=1 bash ./start-backend.sh",
+    "dev": "bash ./start-backend.sh",
+    "open": "VISION_SENTINEL_OPEN_BROWSER=1 bash ./start-backend.sh",
+    "check": "npm run check:js && npm run check:python",
+    "check:js": "node --check app.js && node --check driver-inference.js",
+    "check:python": "python3 -m py_compile backend/server.py",
+    "health": "curl http://127.0.0.1:8000/api/health"
+  },
+  "keywords": [
+    "driver-state-detection",
+    "vision-sentinel",
+    "yolo",
+    "annotation",
+    "training-platform"
+  ],
+  "license": "UNLICENSED"
+}
