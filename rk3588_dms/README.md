@@ -205,7 +205,26 @@ python rk3588_dms/test_camera.py --camera /dev/video0
 3. 重跑 `compare_outputs.py` 对比 FP vs INT8;
 4. **精度明显下降则比赛版本继续用 FP**, 不为速度牺牲识别稳定性。
 
-## 三、集成阶段预告(本阶段不实施)
+## 三、NPU 三核并行(已实现并实测)
+
+RK3588 有 3 个 NPU 核。`config/dms.json` 中每个模型通过 `npu_core` 字段绑核
+(chaitanya=0 / soham=1 / coco=2, 全局 `runtime.npu_core` 为默认值), 
+`runtime.parallel.ParallelDetectorGroup` 用线程级并行同时推理(RKNN 在 C 层释放
+GIL, 无需多进程, 可直接共享摄像头帧), `tools/benchmark_parallel.py` 一键实测。
+
+三个 FP 模型真机基准(A588 板, 2026-09-10, face-test.png, warmup10/runs100):
+
+```text
+顺序执行  : 175.4 ms (chaitanya 48.1 + soham 51.6 + coco 51.1)
+三核并行  :  74.9 ms   加速比 2.34x   理论 FPS 13.4
+检出 sanity: soham SafeDriving 0.64 / coco vase 0.48 / chaitanya 0(阈值内无目标)
+```
+
+并行后 74.9ms 略高于最慢单模型(~51ms): 三模型共享 DRAM 带宽 + CPU 预处理线程
+竞争所致。13.4 FPS 已满足比赛 AI 目标; 若后续需要更快, 再上 INT8(预计并行墙钟
+可到 ~40ms)。
+
+## 四、集成阶段预告(本阶段不实施)
 
 - **摄像头共享**: 浏览器与 Python 不能同时开摄像头。方案(按优先级):
   1. Camera Capture Service 单点采集(Python 打开 /dev/video0), 通过
@@ -220,7 +239,7 @@ python rk3588_dms/test_camera.py --camera /dev/video0
 - **状态融合/报警时序留在浏览器**(阈值是比赛调优结果, 不迁移不改动)。
 - MediaPipe FaceLandmarker、6DRepNet 不迁移(分析见 docs/rknn/ 对应文档)。
 
-## 四、常用命令速查
+## 五、常用命令速查
 
 ```bash
 python tools/check_rknn_env.py                          # 自动识别 PC/设备
@@ -228,12 +247,13 @@ python tools/model_inspect.py <model.onnx>              # 模型结构检查
 python rk3588_dms/tools/convert_chaitanya.py            # FP 转换
 python rk3588_dms/test_image.py --image x.jpg           # 单图(板上)
 python rk3588_dms/tools/benchmark_rknn.py               # 基准
+python rk3588_dms/tools/benchmark_parallel.py           # 三模型三核并行基准
 python rk3588_dms/test_camera.py --camera /dev/video0   # 摄像头
 python rk3588_dms/tools/compare_outputs.py              # 一致性对比
 python -m unittest discover -s rk3588_dms/tests -v      # 单元测试(纯 numpy/cv2)
 ```
 
-## 五、日志
+## 六、日志
 
 - `logs/rknn/` —— 转换日志、benchmark JSON、对比明细
 - `logs/dms/` —— 预留给原生 DMS 服务运行日志(模型加载/初始化耗时/摄像头事件/
