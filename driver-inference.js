@@ -901,6 +901,9 @@
       context.drawImage(img, 0, 0, canvas.width, canvas.height);
     };
     img.onerror = () => firstFrameReject?.(new Error("MJPEG 流中断: 检查原生服务 /video.mjpg"));
+    // 跨源(8000 页面 -> 8600 MJPEG)必须声明 anonymous, 服务端已发 ACAO:*;
+    // 否则 canvas 非 origin-clean, captureStream 会抛异常
+    img.crossOrigin = "anonymous";
     img.src = `${NATIVE_SERVICE_BASE}/video.mjpg`;
     native.img = img;
     native.streamCanvas = canvas;
