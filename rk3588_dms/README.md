@@ -264,8 +264,8 @@ GIL, 无需多进程, 可直接共享摄像头帧), `tools/benchmark_parallel.py
 三模型 INT8 三核并行推理 + WebSocket 检测推送 + 板端报警音频, 单进程:
 
 ```bash
-# 板上启动(真摄像头)
-.venv/bin/python rk3588_dms/service/dms_service.py
+# 板上启动(真摄像头; taskset 绑大核 4-7: 墙钟 ~60ms→~48ms 且方差收窄)
+taskset -c 4-7 .venv/bin/python rk3588_dms/service/dms_service.py
 # 无摄像头调试(静态图当帧源)
 .venv/bin/python rk3588_dms/service/dms_service.py --test-image testdata/dms/test_0001.jpg
 ```
