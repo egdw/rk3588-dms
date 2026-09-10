@@ -171,6 +171,15 @@
   };
   const MANUAL_CONTROL_PATH = "/api/manual-control";
   const MANUAL_CONTROL_POLL_MS = 800;
+  // ---------- 原生 NPU 推理模式(页面/样式零改动, 只换推理来源) ----------
+  // 打开方式: index.html?infer=native#/live-detection (缺省仍为浏览器推理, 随时可回退)
+  const NATIVE_INFER_MODE = (new URLSearchParams(window.location.search).get("infer")
+    || window.VISION_SENTINEL_INFER_MODE || "").toLowerCase() === "native";
+  const NATIVE_SERVICE_BASE = (new URLSearchParams(window.location.search).get("nativeBase")
+    || window.VISION_SENTINEL_NATIVE_BASE
+    || `http://${window.location.hostname}:8600`).replace(/\/$/, "");
+  const NATIVE_WS_URL = `ws://${new URL(NATIVE_SERVICE_BASE).host}/ws/dms/native`;
+  const NATIVE_RECONNECT_MS = 3000;
   const MQTT_WS_URL = new URLSearchParams(window.location.search).get("mqttWs")
     || window.VISION_SENTINEL_MQTT_WS_URL
     || "wss://192.168.2.13:8084/mqtt";
@@ -340,6 +349,17 @@
       lastPose: null,
       consecutiveFailures: 0,
       message: "",
+    },
+    nativeInfer: {
+      socket: null,
+      connected: false,
+      models: {},
+      frame: [0, 0],
+      inferenceMs: 0,
+      reconnectTimer: null,
+      img: null,
+      streamCanvas: null,
+      stream: null,
     },
   };
   const context = elements.canvas.getContext("2d");
@@ -762,7 +782,170 @@
     });
   }
 
+  // ===================== 原生 NPU 推理模式(浏览器侧) =====================
+  // 结果语义与浏览器 parseDetections 输出同构; 阈值过滤/统一 key/phone 归属/
+  // NMS/drowsy 抑制/手动控制/报警时序全部沿用浏览器原逻辑, 保证显示一致。
+
+  function nativeObjectDetections() {
+    const native = state.nativeInfer;
+    const dimensions = sourceDimensions(elements.cameraVideo);
+    if (!dimensions.width || !dimensions.height) return [];
+    const selected = selectedModels();
+    const detections = [];
+    for (const modelName of Object.keys(native.models)) {
+      if (!selected.includes(modelName)) continue;
+      for (const det of native.models[modelName]) {
+        const originalClass = det.originalClass;
+        const key = UNIFIED_CLASSES[originalClass] || originalClass;
+        if (!ACTIVE_DETECTION_KEYS.has(key)) continue;
+        // COCO 是手机检测的唯一来源，屏蔽旧模型的高误报 phone 输出
+        if (key === "phone" && modelName !== PHONE_OBJECT_MODEL) continue;
+        if (det.confidence < confidenceThresholdForKey(key)) continue;
+        detections.push({
+          key,
+          originalClass,
+          confidence: det.confidence,
+          source: modelName,
+          box: [
+            det.box[0] * dimensions.width,
+            det.box[1] * dimensions.height,
+            det.box[2] * dimensions.width,
+            det.box[3] * dimensions.height,
+          ],
+        });
+      }
+    }
+    return detections;
+  }
+
+  function startNativeWebSocket() {
+    const native = state.nativeInfer;
+    if (native.reconnectTimer) window.clearTimeout(native.reconnectTimer);
+    native.reconnectTimer = null;
+    try {
+      native.socket = new WebSocket(NATIVE_WS_URL);
+    } catch (error) {
+      console.warn("Native WS failed to open", error);
+      scheduleNativeReconnect();
+      return;
+    }
+    native.socket.onopen = () => {
+      native.connected = true;
+      if (!state.manualControl.enabled) {
+        elements.modelReady.textContent = "Native NPU";
+        elements.runtimeLabel.textContent = `${MODEL_NAMES[elements.modelSelect.value]} ready · NPU native`;
+      }
+    };
+    native.socket.onmessage = (event) => {
+      try {
+        const payload = JSON.parse(event.data);
+        if (payload.type !== "detections") return;
+        native.models = payload.models || {};
+        native.frame = payload.frame || [0, 0];
+        native.inferenceMs = payload.inference_ms || 0;
+      } catch (error) {
+        console.warn("Native WS payload parse failed", error);
+      }
+    };
+    native.socket.onclose = () => {
+      native.connected = false;
+      scheduleNativeReconnect();
+    };
+    native.socket.onerror = () => native.socket?.close();
+  }
+
+  function scheduleNativeReconnect() {
+    const native = state.nativeInfer;
+    if (native.reconnectTimer || !NATIVE_INFER_MODE) return;
+    native.reconnectTimer = window.setTimeout(() => {
+      native.reconnectTimer = null;
+      startNativeWebSocket();
+    }, NATIVE_RECONNECT_MS);
+  }
+
+  function stopNativeWebSocket() {
+    const native = state.nativeInfer;
+    if (native.reconnectTimer) window.clearTimeout(native.reconnectTimer);
+    native.reconnectTimer = null;
+    native.connected = false;
+    if (native.socket) {
+      native.socket.onopen = null;
+      native.socket.onmessage = null;
+      native.socket.onclose = null;
+      native.socket.onerror = null;
+      native.socket.close();
+      native.socket = null;
+    }
+  }
+
+  async function startNativeCameraStream() {
+    const native = state.nativeInfer;
+    // 隐藏 canvas 接收 MJPEG 帧 -> captureStream 喂给现有 #cameraVideo:
+    // 视频显示/object-fit 映射/MediaPipe VIDEO 模式/关键区域裁切全部原样工作
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d", { alpha: false });
+    const img = new Image();
+    let firstFrame = null;
+    let firstFrameReject = null;
+    const firstFramePromise = new Promise((resolve, reject) => {
+      firstFrame = resolve;
+      firstFrameReject = reject;
+    });
+    window.setTimeout(() => firstFrameReject?.(new Error("MJPEG 超时(>15s): 检查服务与摄像头")), 15000);
+    img.onload = () => {
+      if (canvas.width !== img.naturalWidth || canvas.height !== img.naturalHeight) {
+        canvas.width = img.naturalWidth || 640;
+        canvas.height = img.naturalHeight || 480;
+        firstFrame?.();
+      }
+      context.drawImage(img, 0, 0, canvas.width, canvas.height);
+    };
+    img.onerror = () => firstFrameReject?.(new Error("MJPEG 流中断: 检查原生服务 /video.mjpg"));
+    img.src = `${NATIVE_SERVICE_BASE}/video.mjpg`;
+    native.img = img;
+    native.streamCanvas = canvas;
+    await firstFramePromise;
+    native.stream = canvas.captureStream(30);
+    elements.cameraVideo.srcObject = native.stream;
+    await elements.cameraVideo.play();
+  }
+
+  function stopNativeCameraStream() {
+    const native = state.nativeInfer;
+    if (native.img) {
+      native.img.onload = null;
+      native.img.onerror = null;
+      native.img.src = "";
+      native.img = null;
+    }
+    native.stream?.getTracks().forEach((track) => track.stop());
+    native.stream = null;
+    native.streamCanvas = null;
+  }
+
+  function postNativeAlert(key) {
+    fetch(`${NATIVE_SERVICE_BASE}/alert`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ key }),
+    }).catch((error) => console.warn("Native alert post failed", error));
+  }
+
   async function verifyModelFiles() {
+    if (NATIVE_INFER_MODE) {
+      try {
+        const response = await fetch(`${NATIVE_SERVICE_BASE}/health`, { cache: "no-store" });
+        const health = response.ok ? await response.json() : null;
+        if (!health?.ok) throw new Error("service not ok");
+        elements.sourceStatus.textContent = `Native NPU service · ${health.camera ? "camera live" : "camera pending"}`;
+        elements.modelReady.textContent = "Native Ready";
+      } catch (error) {
+        elements.sourceStatus.textContent = "Native NPU service unreachable";
+        elements.sourceStatus.classList.add("error");
+        elements.modelReady.textContent = "Service Offline";
+      }
+      return;
+    }
     if (window.location.protocol === "file:") {
       elements.sourceStatus.textContent = "Open with local server";
       elements.sourceStatus.classList.add("error");
@@ -811,6 +994,12 @@
   }
 
   async function ensureModels() {
+    if (NATIVE_INFER_MODE && state.cameraRunning) {
+      // native 模式: YOLO 在板端 NPU, 浏览器不加载 ONNX
+      if (!state.nativeInfer.socket) startNativeWebSocket();
+      elements.modelReady.textContent = state.nativeInfer.connected ? "Native NPU" : "Native connecting";
+      return;
+    }
     await ensureOnnxRuntime();
     ort.env.wasm.numThreads = window.crossOriginIsolated ? Math.max(1, Math.min(navigator.hardwareConcurrency || 4, 4)) : 1;
     ort.env.wasm.simd = true;
@@ -3005,6 +3194,15 @@
     const lastGlobal = state.alertAudio.lastPlayedAt.get("__global") || 0;
     if (now - lastForKey < ALERT_AUDIO_COOLDOWN_MS || now - lastGlobal < 900) return;
 
+    if (NATIVE_INFER_MODE) {
+      // 报警音频由板端 ffplay 直接播放(音量 100), 浏览器只上报 key;
+      // 触发节奏(冷却/优先级/手动控制)沿用浏览器原逻辑, 保证行为一致
+      state.alertAudio.lastPlayedAt.set(selected.key, now);
+      state.alertAudio.lastPlayedAt.set("__global", now);
+      postNativeAlert(selected.key);
+      return;
+    }
+
     const audio = alertAudioForKey(selected.key);
     if (!audio) return;
     if (state.alertAudio.current && state.alertAudio.current !== audio) {
@@ -3306,24 +3504,36 @@
             return [];
       });
       await ensureModels();
-      const prep = preprocess(inferenceSource);
-      const objectDetections = [];
-      for (const modelName of selectedModels()) {
-        const session = state.sessions[modelName];
-        const outputs = await session.run({ [session.inputNames[0]]: prep.tensor });
-        objectDetections.push(...parseDetections(outputs, prep, modelName));
+      let objectDetections;
+      if (cameraMode && NATIVE_INFER_MODE) {
+        // 原生模式: 检测来自板端 NPU(WebSocket 缓存), 坐标已映射到当前帧尺寸;
+        // 后续融合链路(suppressOverlaps/报警/UI)与浏览器推理完全一致
+        objectDetections = nativeObjectDetections();
+      } else {
+        const prep = preprocess(inferenceSource);
+        objectDetections = [];
+        for (const modelName of selectedModels()) {
+          const session = state.sessions[modelName];
+          const outputs = await session.run({ [session.inputNames[0]]: prep.tensor });
+          objectDetections.push(...parseDetections(outputs, prep, modelName));
+        }
       }
       const faceDetections = await headPosePromise;
       if (cameraMode) {
         state.headPose.objectDetections = objectDetections;
-        objectDetections.push(...(await detectPhoneAroundFace(inferenceSource, objectDetections)));
+        if (!NATIVE_INFER_MODE) {
+          // ROI 复检依赖浏览器端 COCO 会话, native 模式由板端全帧 COCO 承担手机检测
+          objectDetections.push(...(await detectPhoneAroundFace(inferenceSource, objectDetections)));
+        }
       }
       const merged = applyManualControl(suppressOverlaps([...suppressModelDrowsy(objectDetections), ...faceDetections]));
       drawResults(displaySource, merged, cameraMode);
       updateKeyRegions(cameraMode ? cameraModelCanvas : displaySource, merged);
       updateResults(merged);
       const latency = Math.round(performance.now() - startedAt);
-      elements.speed.textContent = `Inference ${latency} ms · ${state.onnxBackend === "webgpu" ? "WebGPU" : "WASM (CPU)"}${cameraMode ? " · smooth video" : ""}`;
+      elements.speed.textContent = cameraMode && NATIVE_INFER_MODE
+        ? `NPU ${Math.round(state.nativeInfer.inferenceMs)} ms · native${state.nativeInfer.connected ? "" : " (reconnecting)"}`
+        : `Inference ${latency} ms · ${state.onnxBackend === "webgpu" ? "WebGPU" : "WASM (CPU)"}${cameraMode ? " · smooth video" : ""}`;
       setTelemetryValue(elements.topLatency, `${latency} ms`);
       if (state.cameraStartedAt) {
         const elapsedSeconds = Math.floor((Date.now() - state.cameraStartedAt) / 1000);
@@ -3365,6 +3575,12 @@
   }
 
   function cameraCaptureUnavailableMessage() {
+    if (NATIVE_INFER_MODE) {
+      if (window.location.protocol === "https:") {
+        return `native 模式当前页面是 https, MJPEG/WS 会被浏览器拦截(mixed content)。请改用 http 打开本页(或给原生服务配置 https)。`;
+      }
+      return "";
+    }
     if (window.location.protocol === "file:") {
       return `当前是 file:// 直接打开，摄像头识别依赖本地服务加载 ONNX/WASM/模型文件。请在终端运行 npm run start:https，然后打开 ${localServerHintUrl()}`;
     }
@@ -3385,6 +3601,7 @@
   function stopCamera() {
     state.cameraRunning = false;
     state.cameraStartedAt = 0;
+    if (NATIVE_INFER_MODE) stopNativeInfer();
     if (state.alertAudio.current) {
       state.alertAudio.current.pause();
       state.alertAudio.current.currentTime = 0;
@@ -3449,19 +3666,24 @@
       return;
     }
     try {
-      unlockAlertAudio();
-      setLoading(true, "Requesting camera permission...");
-      state.stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: "user",
-          width: { ideal: CAMERA_CAPTURE_WIDTH, max: CAMERA_CAPTURE_MAX_WIDTH },
-          height: { ideal: CAMERA_CAPTURE_HEIGHT, max: CAMERA_CAPTURE_MAX_HEIGHT },
-          frameRate: { ideal: CAMERA_CAPTURE_FPS, max: CAMERA_CAPTURE_FPS },
-        },
-        audio: false,
-      });
-      elements.cameraVideo.srcObject = state.stream;
-      await elements.cameraVideo.play();
+      setLoading(true, NATIVE_INFER_MODE ? "Connecting native NPU service..." : "Requesting camera permission...");
+      if (NATIVE_INFER_MODE) {
+        await startNativeCameraStream();
+        startNativeWebSocket();
+      } else {
+        unlockAlertAudio();
+        state.stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: "user",
+            width: { ideal: CAMERA_CAPTURE_WIDTH, max: CAMERA_CAPTURE_MAX_WIDTH },
+            height: { ideal: CAMERA_CAPTURE_HEIGHT, max: CAMERA_CAPTURE_MAX_HEIGHT },
+            frameRate: { ideal: CAMERA_CAPTURE_FPS, max: CAMERA_CAPTURE_FPS },
+          },
+          audio: false,
+        });
+        elements.cameraVideo.srcObject = state.stream;
+        await elements.cameraVideo.play();
+      }
       state.cameraRunning = true;
       state.cameraStartedAt = Date.now();
       elements.canvas.classList.remove("active", "camera-overlay");
@@ -3485,6 +3707,13 @@
       setLoading(false);
       notify(error.name === "NotAllowedError" ? "Camera permission was not granted" : `Camera startup failed: ${error.message}`);
     }
+  }
+
+  function stopNativeInfer() {
+    stopNativeWebSocket();
+    stopNativeCameraStream();
+    state.nativeInfer.models = {};
+    state.nativeInfer.inferenceMs = 0;
   }
 
   if (elements.imageInput) {
