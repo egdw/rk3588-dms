@@ -133,9 +133,16 @@ def check_device() -> int:
 
     # NPU 驱动证据
     npu_evidence = ""
-    if Path("/sys/kernel/debug/rknpu/version").exists():
-        npu_evidence = "/sys/kernel/debug/rknpu/version"
-    else:
+    try:
+        debugfs_version = Path("/sys/kernel/debug/rknpu/version")
+        if debugfs_version.exists():
+            try:
+                npu_evidence = f"RKNPU {debugfs_version.read_text(errors='ignore').strip()}"
+            except PermissionError:
+                npu_evidence = "/sys/kernel/debug/rknpu/version 存在(非 root 只能确认路径)"
+    except OSError:
+        pass
+    if not npu_evidence:
         try:
             dmesg = subprocess.run(["dmesg"], capture_output=True, text=True, timeout=5).stdout
             if "RKNPU" in dmesg or "rknpu" in dmesg:

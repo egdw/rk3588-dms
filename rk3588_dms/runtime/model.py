@@ -59,9 +59,12 @@ def probe_npu_environment() -> NPU_STATUS:
         pass
     status.is_rk3588 = "rk3588" in (status.device_tree_model + compatible).lower()
 
-    if Path("/sys/kernel/debug/rknpu/version").exists():
-        status.rknpu_driver_evidence = "/sys/kernel/debug/rknpu/version 存在"
-    else:
+    try:
+        if Path("/sys/kernel/debug/rknpu/version").exists():
+            status.rknpu_driver_evidence = "/sys/kernel/debug/rknpu/version 存在"
+    except OSError:  # 非 root 访问 debugfs 可能 PermissionError(路径存在即算证据)
+        status.rknpu_driver_evidence = "/sys/kernel/debug/rknpu 路径存在(需 root 读取详情)"
+    if not status.rknpu_driver_evidence:
         try:
             dmesg = subprocess.run(
                 ["dmesg"], capture_output=True, text=True, timeout=5
