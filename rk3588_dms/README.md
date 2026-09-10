@@ -227,24 +227,36 @@ python rk3588_dms/tools/compare_outputs.py --model-name chaitanya \
 (保守), 切换只需把 `config/dms.json` 对应模型的 `rknn` 路径改为
 `*_int8.rknn`。三模型并行若叠加 INT8, 预计并行墙钟 ~40ms。
 
-## 三、NPU 三核并行(已实现并实测)
+## 三、NPU 三核并行与量化(已实现并实测)
 
 RK3588 有 3 个 NPU 核。`config/dms.json` 中每个模型通过 `npu_core` 字段绑核
-(chaitanya=0 / soham=1 / coco=2, 全局 `runtime.npu_core` 为默认值), 
+(chaitanya=0 / soham=1 / coco=2, 全局 `runtime.npu_core` 为默认值),
 `runtime.parallel.ParallelDetectorGroup` 用线程级并行同时推理(RKNN 在 C 层释放
-GIL, 无需多进程, 可直接共享摄像头帧), `tools/benchmark_parallel.py` 一键实测。
+GIL, 无需多进程, 可直接共享摄像头帧), `tools/benchmark_parallel.py` 一键实测,
+`--variant int8` / `--variant int8,fp,int8` 可测任意 FP/INT8 组合。
 
-三个 FP 模型真机基准(A588 板, 2026-09-10, face-test.png, warmup10/runs100):
+### 真机实测汇总(A588 板, 2026-09-10, face-test.png, warmup10/runs100)
 
-```text
-顺序执行  : 175.4 ms (chaitanya 48.1 + soham 51.6 + coco 51.1)
-三核并行  :  74.9 ms   加速比 2.34x   理论 FPS 13.4
-检出 sanity: soham SafeDriving 0.64 / coco vase 0.48 / chaitanya 0(阈值内无目标)
-```
+| 部署形态 | 单核耗时 | 三核并行墙钟 | 理论 FPS |
+| ---- | ---- | ---- | ---- |
+| 全 FP | 48.1 / 51.6 / 51.1 ms | 74.9 ms (2.34x) | 13.4 |
+| 全 INT8 | **18.8 / 22.0 / 20.4 ms** | **43.8 ms (2.29x)** | **22.8** |
+| 混合 int8,fp,int8(soham 保 FP) | 21.0 / 49.3 / 21.0 ms | 68.1 ms (1.86x) | 14.7 |
 
-并行后 74.9ms 略高于最慢单模型(~51ms): 三模型共享 DRAM 带宽 + CPU 预处理线程
-竞争所致。13.4 FPS 已满足比赛 AI 目标; 若后续需要更快, 再上 INT8(预计并行墙钟
-可到 ~40ms)。
+### INT8 量化精度(46 张真实座舱图, FP 与 INT8 均在真 NPU 上对比)
+
+| 模型 | 类别一致率 | 平均 IoU | 平均 \|Δconf\| | 漏检/多检 | 结论 |
+| ---- | ---- | ---- | ---- | ---- | ---- |
+| chaitanya | 10/10 (100%) | 0.9825 | 0.0277 | 0 / 0 | 优秀, 可直接用 INT8 |
+| coco | 67/67 (100%) | 0.99 | 0.0156 | 5 / 6 | 优秀(阈值边缘正常抖动) |
+| soham | 108/108 (100%) | 0.9464 | 0.0853 | 20 / 2 | SafeDriving 置信度整体下移; 涉警类别(Drowsy 0.5→0.38)均低于浏览器 0.6 门槛, 判定行为不变 |
+
+报告: `docs/rknn/chaitanya_int8_vs_fp.md`、`docs/rknn/soham_int8_vs_fp.md`、`docs/rknn/coco_int8_vs_fp.md`。
+
+**部署建议**: 全 INT8(43.8ms / 22.8 FPS)为首选; 若对 soham 状态显示的平滑度有
+顾虑, 用混合 `int8,fp,int8`(68.1ms / 14.7 FPS)也完全达标。切换只需改
+`config/dms.json` 各模型的 `rknn` 路径(`*_fp.rknn` ↔ `*_int8.rknn`)。
+比赛默认配置当前保留 FP。
 
 ## 四、集成阶段预告(本阶段不实施)
 
