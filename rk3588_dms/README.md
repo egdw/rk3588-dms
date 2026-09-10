@@ -196,14 +196,36 @@ python rk3588_dms/test_camera.py --camera /dev/video0
 ⚠️ 摄像头独占: 浏览器 `getUserMedia` 与本程序不能同时占用 `/dev/video0`。
 单独测试时先不要打开网页检测页。
 
-### 6. INT8 量化(后续阶段, FP 全部通过后再做)
+### 6. INT8 量化(已完成并真机验证, 2026-09-10)
 
-1. 准备校准集 100~300 张真实驾驶舱图片, 生成 `rk3588_dms/models/onnx/dataset.txt`
-   (每行一张图片的**绝对路径**, 覆盖不同光线/姿态/手机/安全带/低头);
-2. `python rk3588_dms/tools/convert_chaitanya.py --int8`
-   → 产物 `chaitanya_best_int8.rknn`;
-3. 重跑 `compare_outputs.py` 对比 FP vs INT8;
-4. **精度明显下降则比赛版本继续用 FP**, 不为速度牺牲识别稳定性。
+校准集: 比赛视频(1280x720@60fps, 115s)均匀抽帧 320 张 → 274 张校准
+(letterbox 640x640 灰底128, 与推理预处理一致, 保证 toolkit 内部 resize 为恒等)
++ 46 张测试集(已入仓 `testdata/dms/`)。校准图与 dataset.txt 留在真机本地
+(dataset.txt 为机器相关绝对路径, 已 gitignore)。
+
+```bash
+python rk3588_dms/tools/convert_chaitanya.py --int8    # 用 config 的 quant_dataset
+# FP vs INT8 真机对比(--rknn=FP 参考, --rknn2=INT8 对照, 46 张测试图):
+python rk3588_dms/tools/compare_outputs.py --model-name chaitanya \
+  --images testdata/dms \
+  --rknn rk3588_dms/models/rknn/chaitanya_best_fp.rknn \
+  --rknn2 rk3588_dms/models/rknn/chaitanya_best_int8.rknn --mode device
+```
+
+**实测结果**(A588 板真 NPU, 报告 `docs/rknn/chaitanya_int8_vs_fp.md`):
+
+| 指标 | FP RKNN | INT8 RKNN |
+| ---- | ---- | ---- |
+| 平均推理 | 41.7 ms | **20.4 ms (2.05x)** |
+| P50 / P95 | 41.2 / 46.5 ms | 20.1 / 23.3 ms |
+| 理论 FPS | 24.0 | **49.1** |
+| 模型大小 | 7.0 MB | 4.2 MB |
+| 精度(46 张真实座舱图) | 基线 | 类别一致率 10/10, 平均 IoU 0.9825, 平均 \|Δconf\| 0.0277, 零漏检零多检 |
+
+唯一差异样本: test_0148 Cigarette 0.571(FP) vs 0.667(INT8) —— INT8 更自信,
+两者均远超 0.25 阈值, 判定行为不变。**INT8 可用**; 比赛默认仍配置为 FP
+(保守), 切换只需把 `config/dms.json` 对应模型的 `rknn` 路径改为
+`*_int8.rknn`。三模型并行若叠加 INT8, 预计并行墙钟 ~40ms。
 
 ## 三、NPU 三核并行(已实现并实测)
 
