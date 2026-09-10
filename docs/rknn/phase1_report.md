@@ -1,9 +1,10 @@
 # 第一阶段报告（RK3588 RKNN 迁移 · chaitanya_best）
 
-- 日期：2026-09-09（第二版：模型资产已到位并完成 PC 侧全部可执行验证）
-- 开发环境：Windows 开发机（非 RK3588），项目副本 `D:\project\dms`
-- 结论状态：**READY FOR RK3588 TEST**（模型全部就位 + 重导出完成 + PC 数值验证通过；
-  仅剩 rknn-toolkit2 转换与真机 NPU 推理需在目标硬件执行）
+- 日期：2026-09-10（第三版：**真机 STEP 5/6 已通过**，见第 5/6/8 节实测数据）
+- 开发/真机环境：Windows 开发机（代码）+ **dcztl（192.168.10.182，RK3588 A588 定制板，
+  kernel 5.10.198，RKNPU 驱动 v0.9.8，librknnrt 2.3.2）——转换与真机推理同一台**
+- 结论状态：**第一阶段停止线已达成**——chaitanya_best FP RKNN 在 RK3588 NPU 上
+  单图正确识别（bbox 与浏览器 ONNX 像素级一致），基准 41.7ms 平均 / 24 FPS
 
 ## 0. 环境事实
 
@@ -59,14 +60,40 @@ config `conversion.*.onnx_candidates` 已调整为 **rknn_source 优先**，浏�
 
 ## 4. RKNN build 是否成功？
 
-**未执行**（本机无法安装 rknn-toolkit2，Python 3.13 无对应发行版）。在具备
-rknn-toolkit2 的环境执行：`python rk3588_dms/tools/convert_chaitanya.py`
-（现在会自动选中 `rknn_source/chaitanya_best_rknn.onnx`）。
+**成功**（2026-09-10，dcztl/RK3588，rknn-toolkit2 2.3.2，Python 3.12 venv）：
+`chaitanya_best_fp.rknn` 7.0MB（FP，权重 FP16），转换 + 模拟器验证（Δconf=0.0001）
+一条命令完成：`python rk3588_dms/tools/convert_chaitanya.py --validate-image face-test.png`。
+
+过程中排掉的三个坑（已全部修复并推送）：
+1. Python 3.12 venv 不预装 setuptools → `pkg_resources` 缺失（toolkit2 硬依赖，
+   需 `pip install "setuptools<81"`）；
+2. toolkit2 2.x 无 `deinit()`（是 `release()`）——finally 里的 AttributeError 曾把
+   成功转换变成报错；
+3. toolkit-lite2 2.3+ 推理要求显式 4 维输入 (1,H,W,3)，且 `load_rknn` 的模型
+   不能进模拟器（模拟器验证必须挂在 build 后同一对象上）。
 
 ## 5. RK3588 是否成功加载 / 6. NPU 是否正常推理？
 
-**待真机**。命令与防伪措施不变：`test_image.py` 强制设备自检
-（aarch64 + device-tree rk3588 + rknpu 驱动证据），无静默 CPU 回退。
+**均已成功**（dcztl 真机实测，`test_image.py --mode device`）：
+
+```text
+runtime      : RK3588 NPU (rknn-toolkit-lite2)
+device check : machine=aarch64 Linux model=ztl, A588
+npu driver   : RKNPU driver v0.9.8（sudo dmesg/debugfs 确认）
+model init   : 306.5 ms    preprocess: 8.1 ms
+inference    : 46.8 ms     postprocess: 1.1 ms
+```
+
+NPU 检出与浏览器 ONNX 对照（低阈值 0.05，face-test.png）：
+
+| 来源 | 类别 | 置信度 | bbox |
+| ---- | ---- | ---- | ---- |
+| 浏览器 ONNX（onnxruntime） | Cigarette | 0.1153 | [329, 294, 486, 351] |
+| RKNN 模拟器（toolkit2） | Cigarette | 0.1152 | [329, 294, 486, 351] |
+| **RKNN 真机 NPU（lite2）** | **Cigarette** | **0.1190** | **[329, 294, 486, 351]** |
+
+**bbox 像素级一致**；置信度 Δ=0.0037（NPU FP16 权重精度，远小于 0.02 容差）。
+生产阈值 0.25 下该图正确地 0 检出，三方行为一致。
 
 ## 7. 原模型 vs 重导出结果差异（FP32，PC 实测 2026-09-09）
 
@@ -84,10 +111,20 @@ letterbox + 三分支解码路径**）对比浏览器标准 ONNX（同预处理�
 `docs/rknn/{chaitanya,soham,coco}_validation.md` 已由工具生成（当前为 1 张健全性
 样本；正式 ≥20 张现场测试集对比仍待补，要求见 `testdata/dms/README.md`）。
 
-## 8. 单次推理耗时？
+## 8. 单次推理耗时？（真机实测 2026-09-10）
 
-**未执行**（待真机）。`tools/benchmark_rknn.py` 就绪（warmup 20 / runs 200，
-min/max/avg/p50/p95/FPS，NPU_CORE_AUTO）。
+`tools/benchmark_rknn.py --mode device --warmup 20 --runs 200`（NPU_CORE_AUTO，
+静态 640×640 随机输入）：
+
+```text
+Average inference : 41.662 ms
+min / max         : 39.038 / 57.002 ms
+P50 / P95         : 41.203 / 46.481 ms
+Theoretical FPS   : 24.0
+```
+
+远超比赛需求（建议 DMS AI 10~15 FPS），还有三核分配与 INT8 的余量。
+原始数据：dcztl `logs/rknn/benchmark_chaitanya_20260910-183205.json`。
 
 ## 9. 当前发现的问题
 
