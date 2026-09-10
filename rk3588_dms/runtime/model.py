@@ -195,10 +195,15 @@ class RKNNModel:
 
     def close(self) -> None:
         if self._rknn is not None and not self._closed:
-            try:
-                self._rknn.deinit()
-            except Exception:  # noqa: BLE001
-                pass
+            # toolkit2/toolkit-lite2 2.x 的释放 API 是 release(); 兼容旧版 deinit()
+            for name in ("release", "deinit"):
+                fn = getattr(self._rknn, name, None)
+                if callable(fn):
+                    try:
+                        fn()
+                    except Exception:  # noqa: BLE001
+                        pass
+                    break
         self._closed = True
         self._rknn = None
 

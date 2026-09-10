@@ -165,6 +165,19 @@ def validate_in_simulator(rknn, config, root: Path, image_path: Path) -> bool:
     return False
 
 
+def release_rknn(rknn) -> None:
+    """兼容释放: toolkit2 2.x 是 release(), 旧版/变体可能是 deinit()。"""
+    for name in ("release", "deinit"):
+        fn = getattr(rknn, name, None)
+        if callable(fn):
+            try:
+                fn()
+            except Exception as exc:  # noqa: BLE001 - 释放失败不影响转换结果
+                print(f"[WARN] rknn.{name}() 释放异常: {exc}")
+            return
+    print("[WARN] RKNN 对象没有 release/deinit 方法, 跳过释放")
+
+
 def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(description="chaitanya ONNX -> RKNN(FP 优先) 转换")
     parser.add_argument("--config", default=str(PACKAGE_ROOT / "config" / "dms.json"))
@@ -301,7 +314,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         print(f"\n[FAIL] 转换失败: {exc}", file=sys.stderr)
         raise
     finally:
-        rknn.deinit()
+        release_rknn(rknn)
         sys.stdout = tee._stdout
         tee.close()
 
