@@ -258,22 +258,55 @@ GIL, 无需多进程, 可直接共享摄像头帧), `tools/benchmark_parallel.py
 `config/dms.json` 各模型的 `rknn` 路径(`*_fp.rknn` ↔ `*_int8.rknn`)。
 比赛默认配置当前保留 FP。
 
-## 四、集成阶段预告(本阶段不实施)
+## 四、原生 DMS 服务(已实现, 2026-09-10)
 
-- **摄像头共享**: 浏览器与 Python 不能同时开摄像头。方案(按优先级):
-  1. Camera Capture Service 单点采集(Python 打开 /dev/video0), 通过
-     MJPEG/WS 分发给浏览器显示 + 本模块推理;
-  2. 或复用现有视频链路, 浏览器继续显示, 原生服务只做推理(需 v4l2 分配共享)。
-  第一阶段不解决, 单独测试即可。
-- **WebSocket 输出**: 新增 `/ws/dms/native` 推送
-  `{"type":"dms_result","source":"rk3588_rknn","models":{...}}`;
-  当前系统本没有结果输出通道, 属新增能力, 不破坏现有 MQTT/HTTP。
-- **browser/native 双模式**: 配置 `dms.inference_mode`, browser=现状不动,
-  native=浏览器不加载三个 YOLO、只连 WS; 切换不需重编译。
-- **状态融合/报警时序留在浏览器**(阈值是比赛调优结果, 不迁移不改动)。
-- MediaPipe FaceLandmarker、6DRepNet 不迁移(分析见 docs/rknn/ 对应文档)。
+`rk3588_dms/service/dms_service.py` —— 摄像头独占采集 + MJPEG 推流 +
+三模型 INT8 三核并行推理 + WebSocket 检测推送 + 板端报警音频, 单进程:
 
-## 五、常用命令速查
+```bash
+# 板上启动(真摄像头)
+.venv/bin/python rk3588_dms/service/dms_service.py
+# 无摄像头调试(静态图当帧源)
+.venv/bin/python rk3588_dms/service/dms_service.py --test-image testdata/dms/test_0001.jpg
+```
+
+| 端点 | 说明 |
+| ---- | ---- |
+| `GET /video.mjpg` | MJPEG 流(multipart/x-mixed-replace), 浏览器显示用 |
+| `WS /ws/dms/native` | 推送 `{type:"detections", models:{chaitanya/soham/coco:[{originalClass,key,confidence,box(归一化)}]}, frame, inference_ms}`(约 12fps, 与浏览器 parseDetections 输出同构) |
+| `POST /alert {key}` | 板端 ffplay 播放报警 mp3(音量 100, 每 key 冷却 4.5s 与浏览器一致) |
+| `GET /health` | 摄像头/推理/客户端状态 |
+
+### 浏览器接入(页面与样式零改动)
+
+`driver-inference.js` 增加 `?infer=native` 模式(缺省仍为纯浏览器推理, 随时回退):
+
+- **视频**: MJPEG 帧 → 隐藏 canvas `captureStream()` → 原有 `#cameraVideo`——
+  显示/object-fit 映射/MediaPipe VIDEO 模式/关键区域裁切全部原样工作;
+- **推理**: YOLO 检测来自 WS 缓存(坐标按当前帧尺寸反归一化), 阈值过滤/
+  统一 key/phone 归属/NMS/drowsy 抑制/手动控制/报警时序/模型选择器全沿用
+  浏览器原有逻辑; MediaPipe 人脸通道照旧在浏览器;
+- **音频**: 报警触发时 POST key 给服务, 板端 ffplay 音量 100 播放,
+  触发节奏(优先级/冷却)沿用浏览器逻辑;
+- 一致性证据: test_0001 帧 soham SafeDriving 板端 0.8481 vs 浏览器 FP ONNX 0.848。
+
+```text
+打开: http://<板子IP>:8000/index.html?infer=native#/live-detection
+回退: 去掉 ?infer=native 即恢复纯浏览器推理(什么都不用改)
+```
+
+⚠️ 注意: native 模式请用 **http** 打开页面(https 页面会拦截 http 的 MJPEG/WS,
+浏览器会给出明确提示); 服务地址可用 `?nativeBase=http://IP:8600` 覆盖。
+已知差异: 浏览器端"手机 ROI ±22° 复检"在 native 模式不可用(依赖浏览器端
+COCO 会话), 手机检测由板端全帧 COCO 承担, 极小目标召回略低于纯浏览器模式。
+
+## 五、集成边界(明确不做/后续)
+
+- 状态融合/报警时序留在浏览器(阈值是比赛调优结果, 不迁移不改动);
+- MediaPipe FaceLandmarker、6DRepNet 不迁移(浏览器/后端保留, 见 docs/rknn/ 分析);
+- 后续可选: MPP/RGA 零拷贝采集替换 OpenCV、service 常驻 systemd、HTTPS 反代。
+
+## 六、常用命令速查
 
 ```bash
 python tools/check_rknn_env.py                          # 自动识别 PC/设备
@@ -282,12 +315,13 @@ python rk3588_dms/tools/convert_chaitanya.py            # FP 转换
 python rk3588_dms/test_image.py --image x.jpg           # 单图(板上)
 python rk3588_dms/tools/benchmark_rknn.py               # 基准
 python rk3588_dms/tools/benchmark_parallel.py           # 三模型三核并行基准
+.venv/bin/python rk3588_dms/service/dms_service.py      # 原生 DMS 服务(板上)
 python rk3588_dms/test_camera.py --camera /dev/video0   # 摄像头
 python rk3588_dms/tools/compare_outputs.py              # 一致性对比
 python -m unittest discover -s rk3588_dms/tests -v      # 单元测试(纯 numpy/cv2)
 ```
 
-## 六、日志
+## 七、日志
 
 - `logs/rknn/` —— 转换日志、benchmark JSON、对比明细
 - `logs/dms/` —— 预留给原生 DMS 服务运行日志(模型加载/初始化耗时/摄像头事件/
