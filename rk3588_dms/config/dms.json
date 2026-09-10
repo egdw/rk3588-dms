@@ -299,7 +299,7 @@
     "enabled": true,
     "host": "0.0.0.0",
     "port": 8600,
-    "inference_fps_target": 12,
+    "inference_fps_target": 15,
     "models_enabled": [
       "chaitanya",
       "soham",

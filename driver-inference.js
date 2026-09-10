@@ -11,6 +11,9 @@
   const PHONE_ROI_RESULT_HOLD_MS = 2400;
   const IOU_THRESHOLD = 0.45;
   const CAMERA_INTERVAL_MS = 500;
+  // native 模式下模型循环只做"取 WS 缓存 + 融合 + 绘制"(无 ONNX), 可以也必须跑快:
+  // 板端 WS 推送 ~15fps, 若仍按 500ms 采样, 画面检测框实际刷新只有 ~2fps
+  const NATIVE_CAMERA_INTERVAL_MS = 100;
   const FACE_TRACK_INTERVAL_MS = 150;
   const CAMERA_MODEL_START_DELAY_MS = 600;
   const CAMERA_RENDER_MAX_WIDTH = 960;
@@ -3671,7 +3674,7 @@
         return;
       }
     }
-    window.setTimeout(cameraLoop, CAMERA_INTERVAL_MS);
+    window.setTimeout(cameraLoop, NATIVE_INFER_MODE ? NATIVE_CAMERA_INTERVAL_MS : CAMERA_INTERVAL_MS);
   }
 
   async function toggleCamera() {
