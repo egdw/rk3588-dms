@@ -56,13 +56,22 @@ class ParallelDetectorGroup:
         self.close()
 
 
-def build_group(model_names: List[str], mode: str = "device", core_override: str | None = None):
-    """按 config 构建并行组(延迟导入避免循环依赖)。"""
+def build_group(
+    model_names: List[str],
+    mode: str = "device",
+    core_override: str | None = None,
+    paths: Dict[str, str] | None = None,
+):
+    """按 config 构建并行组(延迟导入避免循环依赖)。
+
+    paths: 可选 {model_name: rknn 路径} 覆盖 config 路径(如 FP/INT8 变体切换)。
+    """
     from test_image import build_detector
 
+    paths = paths or {}
     detectors = {}
     for name in model_names:
-        detectors[name] = build_detector(name, None, mode, core=core_override)
+        detectors[name] = build_detector(name, paths.get(name), mode, core=core_override)
         print(f"[INIT] {name}: core={detectors[name].model.core} "
               f"backend={detectors[name].model.backend} "
               f"init={detectors[name].model.init_ms:.0f}ms")

@@ -30,8 +30,9 @@ def main() -> int:
                         help="逗号分隔的模型名(默认全部; 只测已存在 .rknn 的模型)")
     parser.add_argument("--mode", default="device", choices=["auto", "device", "simulator"])
     parser.add_argument("--core", default=None, help="覆盖核绑定(默认按 config: 0/1/2)")
-    parser.add_argument("--variant", choices=["fp", "int8"], default="fp",
-                        help="模型变体: 把 config 路径里的 _fp 替换为 _int8(缺 INT8 的模型自动跳过)")
+    parser.add_argument("--variant", default="fp",
+                        help="fp|int8, 或逗号分隔按 --models 顺序逐模型指定(如 int8,fp,int8);"
+                             "把 config 路径里的 _fp 替换为 _int8(缺文件自动跳过)")
     parser.add_argument("--warmup", type=int, default=10)
     parser.add_argument("--runs", type=int, default=100)
     parser.add_argument("--image", help="测试图片(缺省用随机噪声帧, 只测耗时)")
@@ -49,13 +50,17 @@ def main() -> int:
     requested = [m.strip() for m in args.models.split(",") if m.strip()]
     config = load_config(PACKAGE_ROOT / "config" / "dms.json")
 
+    variants = args.variant.split(",")
     available = []
-    for name in requested:
+    paths: dict[str, Path] = {}
+    for index, name in enumerate(requested):
+        variant = variants[index] if index < len(variants) else "fp"
         rknn_path = (PACKAGE_ROOT.parent / config["runtime"]["models"][name]["rknn"]).resolve()
-        if args.variant == "int8":
+        if variant == "int8":
             rknn_path = Path(str(rknn_path).replace("_fp.rknn", "_int8.rknn"))
         if rknn_path.exists():
             available.append(name)
+            paths[name] = rknn_path
         else:
             print(f"[SKIP] {name}: 未找到 {rknn_path.name} (先转换)")
     if len(available) < 2:
@@ -70,7 +75,8 @@ def main() -> int:
     else:
         frame = np.random.default_rng(7).integers(0, 255, (480, 640, 3), dtype=np.uint8)
 
-    group = build_group(available, mode=args.mode, core_override=args.core)
+    group = build_group(available, mode=args.mode, core_override=args.core,
+                        paths={k: str(v) for k, v in paths.items()})
     print("=" * 64)
     print(f"models: {available} | cores: {group.cores} | backends: {group.backends}")
     print(f"warmup {args.warmup} / runs {args.runs}")
