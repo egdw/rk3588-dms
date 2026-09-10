@@ -186,7 +186,9 @@ def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(description="chaitanya ONNX -> RKNN(FP 优先) 转换")
     parser.add_argument("--config", default=str(PACKAGE_ROOT / "config" / "dms.json"))
     parser.add_argument("--source", help="覆盖配置, 直接指定 ONNX 路径")
-    parser.add_argument("--int8", action="store_true", help="生成 INT8 量化模型(默认 FP)")
+    parser.add_argument("--int8", action="store_true", help="生成 INT8(w8a8) 量化模型(默认 FP)")
+    parser.add_argument("--quant-dtype", choices=["w8a8", "w4a16"], default=None,
+                        help="量化类型: w8a8=INT8(默认随 --int8), w4a16=4bit 权重+FP16 激活(隐含 --int8)")
     parser.add_argument("--output", help="覆盖输出 .rknn 路径")
     parser.add_argument("--validate-image", help="导出后在模拟器上用该图片验证(与浏览器 ONNX 对比, 需 onnxruntime+opencv)")
     args = parser.parse_args(argv)
@@ -221,8 +223,14 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     # 2. 输出与日志路径 ----------------------------------------------------
     # 第一轮强制 FP(非 INT8): --int8 显式开启, 属于后续阶段
-    quantization = args.int8
-    out_name = conv.get("output_name_int8" if quantization else "output_name", "chaitanya_best_fp.rknn")
+    quant_dtype = args.quant_dtype or ("w8a8" if args.int8 else None)
+    quantization = quant_dtype is not None
+    if quant_dtype == "w8a8":
+        out_name = conv.get("output_name_int8", "chaitanya_best_int8.rknn")
+    elif quant_dtype == "w4a16":
+        out_name = "chaitanya_best_w4a16.rknn"
+    else:
+        out_name = conv.get("output_name", "chaitanya_best_fp.rknn")
     out_dir = (root / config["paths"]["rknn_outdir"]).resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
     output = Path(args.output) if args.output else out_dir / out_name
@@ -238,7 +246,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     print(f"  input model      : {source}")
     print(f"  output model     : {output}")
     print(f"  target platform  : {platform}")
-    print(f"  quantization     : {'INT8' if quantization else 'FP (no quantization)'}")
+    print(f"  quantization     : {quant_dtype if quant_dtype else 'FP (no quantization)'}")
     print(f"  input size       : {input_size[0]}x{input_size[1]}")
     print(f"  mean/std         : {conv.get('mean_values')} / {conv.get('std_values')}")
     print(f"  log              : {log_path}")
@@ -275,8 +283,13 @@ def main(argv: Optional[List[str]] = None) -> int:
     try:
         mean_values = conv.get("mean_values", [[0, 0, 0]])
         std_values = conv.get("std_values", [[255, 255, 255]])
-        print("\n--> rknn.config(target_platform=%s)" % platform)
-        if rknn.config(mean_values=mean_values, std_values=std_values, target_platform=platform) != 0:
+        config_kwargs = dict(mean_values=mean_values, std_values=std_values, target_platform=platform)
+        if quant_dtype:
+            config_kwargs["quantized_dtype"] = quant_dtype
+            print(f"--> rknn.config(target_platform={platform}, quantized_dtype={quant_dtype})")
+        else:
+            print(f"\n--> rknn.config(target_platform={platform})")
+        if rknn.config(**config_kwargs) != 0:
             raise RuntimeError("rknn.config 失败")
 
         print(f"--> rknn.load_onnx({source})")

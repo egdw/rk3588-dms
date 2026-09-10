@@ -413,9 +413,11 @@ def main() -> int:
     # 汇总 markdown ---------------------------------------------------------
     doc_dir = (root / "docs" / "rknn").resolve()
     doc_dir.mkdir(parents=True, exist_ok=True)
-    doc_path = doc_dir / (
-        f"{args.model_name}_int8_vs_fp.md" if rknn2_live is not None else f"{args.model_name}_validation.md"
-    )
+    if rknn2_live is not None:
+        suffix = Path(args.rknn2).stem.replace(f"{args.model_name}_best_", "") or "quant"
+        doc_path = doc_dir / f"{args.model_name}_{suffix}_vs_fp.md"
+    else:
+        doc_path = doc_dir / f"{args.model_name}_validation.md"
     lines = [
         f"# {args.model_name} RKNN 一致性验证报告",
         "",
