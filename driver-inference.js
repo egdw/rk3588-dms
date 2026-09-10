@@ -791,6 +791,13 @@
     const native = state.nativeInfer;
     const dimensions = sourceDimensions(elements.cameraVideo);
     if (!dimensions.width || !dimensions.height) return [];
+    // 坐标空间: 叠加层/关键区域/标注录制都工作在渲染画布(cameraFrameCanvas,
+    // 视频在其中 contain 居中 letterbox)坐标系, 而 MediaPipe 也在该空间分析,
+    // 所以归一化检测必须经 cameraMediaLayout(视频->画布的真实映射)换算,
+    // 不能直接按视频原始宽高反归一化(宽高比不同会整体错位)
+    const layout = cameraMediaLayout(elements.cameraVideo, elements.canvas.width, elements.canvas.height);
+    const toCanvasX = (nx) => nx * dimensions.width * layout.scale + layout.offsetX;
+    const toCanvasY = (ny) => ny * dimensions.height * layout.scale + layout.offsetY;
     const selected = selectedModels();
     const detections = [];
     for (const modelName of Object.keys(native.models)) {
@@ -808,10 +815,10 @@
           confidence: det.confidence,
           source: modelName,
           box: [
-            det.box[0] * dimensions.width,
-            det.box[1] * dimensions.height,
-            det.box[2] * dimensions.width,
-            det.box[3] * dimensions.height,
+            toCanvasX(det.box[0]),
+            toCanvasY(det.box[1]),
+            toCanvasX(det.box[2]),
+            toCanvasY(det.box[3]),
           ],
         });
       }
