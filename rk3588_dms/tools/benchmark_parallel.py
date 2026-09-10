@@ -30,6 +30,8 @@ def main() -> int:
                         help="逗号分隔的模型名(默认全部; 只测已存在 .rknn 的模型)")
     parser.add_argument("--mode", default="device", choices=["auto", "device", "simulator"])
     parser.add_argument("--core", default=None, help="覆盖核绑定(默认按 config: 0/1/2)")
+    parser.add_argument("--variant", choices=["fp", "int8"], default="fp",
+                        help="模型变体: 把 config 路径里的 _fp 替换为 _int8(缺 INT8 的模型自动跳过)")
     parser.add_argument("--warmup", type=int, default=10)
     parser.add_argument("--runs", type=int, default=100)
     parser.add_argument("--image", help="测试图片(缺省用随机噪声帧, 只测耗时)")
@@ -50,6 +52,8 @@ def main() -> int:
     available = []
     for name in requested:
         rknn_path = (PACKAGE_ROOT.parent / config["runtime"]["models"][name]["rknn"]).resolve()
+        if args.variant == "int8":
+            rknn_path = Path(str(rknn_path).replace("_fp.rknn", "_int8.rknn"))
         if rknn_path.exists():
             available.append(name)
         else:
