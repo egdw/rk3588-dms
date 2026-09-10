@@ -108,6 +108,8 @@ def validate_in_simulator(rknn, config, root: Path, image_path: Path) -> bool:
 
     model_config = _load_config(config)["runtime"]["models"]["chaitanya"]
     classes: List[str] = list(model_config["classes"])
+    # 生产阈值下小图常 0 检出(空验证无意义), 验证固定用低阈值看真实数值差
+    validate_conf = 0.05
     ref_path = root / "Driver-Monitoring-System/public/static/models/chaitanya_best.onnx"
     if not ref_path.exists():
         print(f"[WARN] 跳过模拟器验证(找不到参考 ONNX: {ref_path})")
@@ -121,15 +123,15 @@ def validate_in_simulator(rknn, config, root: Path, image_path: Path) -> bool:
                      pad_color=tuple(model_config["letterbox_pad_color"]))
     rgb = cv2.cvtColor(prep.image, cv2.COLOR_BGR2RGB)
 
-    print("--> 模拟器验证: init_runtime()(无 target) + 单图推理")
+    print(f"--> 模拟器验证: init_runtime()(无 target) + 单图推理(conf>={validate_conf})")
     if rknn.init_runtime() != 0:
         print("[WARN] 模拟器 init_runtime 失败, 跳过验证(不影响导出的 .rknn 与真机验证)")
         return False
-    outputs = rknn.inference(inputs=[np.ascontiguousarray(rgb)], data_format="nhwc")
+    outputs = rknn.inference(inputs=[np.ascontiguousarray(rgb[None])], data_format="nhwc")
     raw = decode_rknn_modelzoo_branches(
         [np.asarray(o) for o in outputs], len(classes),
         input_size=int(model_config["input_size"][0]),
-        confidence_threshold=float(model_config.get("confidence_threshold", 0.25)),
+        confidence_threshold=validate_conf,
         iou_threshold=float(model_config.get("iou_threshold", 0.45)),
     )
     cand_dets = [
@@ -137,7 +139,9 @@ def validate_in_simulator(rknn, config, root: Path, image_path: Path) -> bool:
                   confidence=float(s), bbox=unletterbox_box(b, prep))
         for b, s, c in raw
     ]
-    ref_dets = OnnxReference(ref_path, model_config).infer(frame)
+    ref_config = dict(model_config)
+    ref_config["confidence_threshold"] = validate_conf
+    ref_dets = OnnxReference(ref_path, ref_config).infer(frame)
     pairs, ref_extra, cand_extra = match_detections(ref_dets, cand_dets, 0.5)
 
     print(f"    参考(浏览器 ONNX): {len(ref_dets)} 检出 | RKNN 模拟器: {len(cand_dets)} 检出")
