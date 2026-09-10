@@ -188,7 +188,8 @@ class RKNNModel:
         """输入 uint8 RGB HWC letterbox 后图像, 返回输出张量列表。"""
         if self._closed or self._rknn is None:
             raise RuntimeError("模型未初始化或已释放")
-        img = np.ascontiguousarray(image_rgb_hwc, dtype=np.uint8)
+        # lite2 2.3+ 要求显式 4 维 (1,H,W,3) nhwc, 不会自动扩 batch 维
+        img = np.ascontiguousarray(image_rgb_hwc, dtype=np.uint8)[None]
         started = time.perf_counter()
         outputs = self._rknn.inference(inputs=[img], data_format="nhwc")
         self.last_inference_ms = (time.perf_counter() - started) * 1000
