@@ -23,7 +23,8 @@ PACKAGE_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(PACKAGE_ROOT))
 
 
-def build_detector(model_name: str, model_path, mode: str, core: str = "auto"):
+def build_detector(model_name: str, model_path, mode: str, core=None):
+    """core=None 时使用 config 中该模型的 npu_core 配置(chaitanya=0/soham=1/coco=2)。"""
     from runtime.base_detector import load_config
 
     config = load_config(PACKAGE_ROOT / "config" / "dms.json")
@@ -47,6 +48,7 @@ def main() -> int:
     parser.add_argument("--model-name", default="chaitanya", choices=["chaitanya", "soham", "coco"])
     parser.add_argument("--image", required=True, help="测试图片路径")
     parser.add_argument("--mode", default="auto", choices=["auto", "device", "simulator"])
+    parser.add_argument("--core", default=None, help="NPU core: auto/0/1/2(缺省用 config 的 npu_core)")
     parser.add_argument("--json", help="把结果写入 JSON 文件(供 compare_outputs.py)")
     parser.add_argument("--show", action="store_true", help="OpenCV 弹窗显示检测结果(需要桌面环境)")
     args = parser.parse_args()
@@ -62,7 +64,7 @@ def main() -> int:
         print("[FAIL] 缺少 opencv-python: pip install opencv-python", file=sys.stderr)
         return 2
 
-    detector = build_detector(args.model_name, args.model, args.mode)
+    detector = build_detector(args.model_name, args.model, args.mode, core=args.core)
     frame = cv2.imread(str(image_path), cv2.IMREAD_COLOR)
     if frame is None:
         print(f"[FAIL] 图片解码失败: {image_path}", file=sys.stderr)

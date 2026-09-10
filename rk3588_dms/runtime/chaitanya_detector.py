@@ -27,7 +27,7 @@ class ChaitanyaDetector(RknnYoloDetector):
         config_path: Optional[str | Path] = None,
         mode: str = "auto",
         rknn_path: Optional[str | Path] = None,
-        core: str = "auto",
+        core: Optional[str] = None,
         confidence_threshold: Optional[float] = None,
     ):
         config = load_config(config_path or PACKAGE_ROOT / "config" / "dms.json")

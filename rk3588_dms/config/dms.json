@@ -72,11 +72,13 @@
   "runtime": {
     "mode": "auto",
     "npu_core": "auto",
+    "_npu_core说明": "全局默认核绑定(auto/0/1/2); 各模型可用自身 npu_core 字段覆盖。三模型并行时各绑一核(0/1/2), 总延迟≈最慢模型",
     "warmup_runs": 2,
     "log_stats_interval_seconds": 5,
     "models": {
       "chaitanya": {
         "rknn": "rk3588_dms/models/rknn/chaitanya_best_fp.rknn",
+        "npu_core": "0",
         "classes": ["Cigarette", "Drinking", "Eating", "Phone", "Seatbelt"],
         "unified_classes": {
           "Cigarette": "smoking",
@@ -92,6 +94,7 @@
       },
       "soham": {
         "rknn": "rk3588_dms/models/rknn/soham_best_fp.rknn",
+        "npu_core": "1",
         "classes": ["Distracted", "Drinking", "Drowsy", "Eating", "PhoneUse", "SafeDriving", "Seatbelt", "Smoking"],
         "unified_classes": {
           "Distracted": "distracted",
@@ -111,6 +114,7 @@
       },
       "coco": {
         "rknn": "rk3588_dms/models/rknn/yolov8n_coco_fp.rknn",
+        "npu_core": "2",
         "classes_file": null,
         "classes": [
           "person", "bicycle", "car", "motorcycle", "airplane", "bus", "train", "truck", "boat", "traffic light",

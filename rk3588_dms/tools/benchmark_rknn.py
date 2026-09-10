@@ -42,7 +42,7 @@ def main() -> int:
     parser.add_argument("--model", help=".rknn 路径(缺省读 config)")
     parser.add_argument("--model-name", default="chaitanya", choices=["chaitanya", "soham", "coco"])
     parser.add_argument("--mode", default="auto", choices=["auto", "device", "simulator"])
-    parser.add_argument("--core", default="auto", help="NPU core: auto/0/1/2 (第一阶段固定 auto)")
+    parser.add_argument("--core", default=None, help="NPU core: auto/0/1/2 (缺省用 config 的 npu_core)")
     parser.add_argument("--warmup", type=int, default=20)
     parser.add_argument("--runs", type=int, default=200)
     args = parser.parse_args()

@@ -13,6 +13,7 @@ from .postprocess import decode_ultralytics_output, decode_rknn_modelzoo_branche
 from .model import RKNNModel, RuntimeMode, NPU_STATUS, probe_npu_environment
 from .base_detector import RknnYoloDetector, load_config, find_project_root
 from .chaitanya_detector import ChaitanyaDetector
+from .parallel import ParallelDetectorGroup
 
 __all__ = [
     "Detection",
@@ -31,4 +32,5 @@ __all__ = [
     "load_config",
     "find_project_root",
     "ChaitanyaDetector",
+    "ParallelDetectorGroup",
 ]

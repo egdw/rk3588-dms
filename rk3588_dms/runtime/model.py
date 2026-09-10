@@ -152,10 +152,10 @@ class RKNNModel:
         )
 
         core_mask = {
-            "auto": getattr(RKNNLite, "NPU_CORE_AUTO", 3),
-            "0": getattr(RKNNLite, "NPU_CORE_0", 0),
-            "1": getattr(RKNNLite, "NPU_CORE_1", 1),
-            "2": getattr(RKNNLite, "NPU_CORE_2", 2),
+            "auto": getattr(RKNNLite, "NPU_CORE_AUTO", 0),
+            "0": getattr(RKNNLite, "NPU_CORE_0", 1),
+            "1": getattr(RKNNLite, "NPU_CORE_1", 2),
+            "2": getattr(RKNNLite, "NPU_CORE_2", 4),
         }.get(str(self.core).lower())
         if core_mask is None:
             raise ValueError(f"非法 npu core 配置: {self.core} (可选 auto/0/1/2)")

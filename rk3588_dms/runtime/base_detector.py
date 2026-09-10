@@ -60,7 +60,7 @@ class RknnYoloDetector:
         model_path: str | Path,
         mode: str = "auto",
         config_root: Optional[Path] = None,
-        core: str = "auto",
+        core: Optional[str] = None,
         confidence_threshold: Optional[float] = None,
     ):
         self.classes: List[str] = list(model_config["classes"])
@@ -80,6 +80,8 @@ class RknnYoloDetector:
             path = (root / path).resolve()
         self.model_path = path
 
+        # NPU 核绑定: 显式参数 > 模型配置 npu_core > "auto"
+        core = core or model_config.get("npu_core", "auto")
         self.model = RKNNModel(path, mode=mode, core=core)
         self.model_name = self.model_name or "base"
 
