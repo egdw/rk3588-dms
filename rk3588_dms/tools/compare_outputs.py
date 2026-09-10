@@ -195,6 +195,7 @@ def main() -> int:
     parser.add_argument("--images", help="测试图片目录/单张图片(默认 testdata/dms)")
     parser.add_argument("--onnx", help="参考 ONNX 路径(默认浏览器模型路径)")
     parser.add_argument("--rknn", help="RKNN 模型路径(模式A)")
+    parser.add_argument("--rknn2", help="给出后: 以 --rknn 模型为参考、--rknn2 为对照(FP vs INT8 对比)")
     parser.add_argument("--mode", default="simulator", choices=["auto", "device", "simulator"])
     parser.add_argument("--rknn-json-dir", help="模式B: 板上导出的 JSON 目录")
     parser.add_argument("--candidate-onnx", help="模式C: 用 onnxruntime 预检 Rockchip 风格重导出 ONNX(与 RKNN 同解码路径)")
@@ -254,8 +255,12 @@ def main() -> int:
 
     # RKNN 端 --------------------------------------------------------------
     rknn_live: Optional[RknnLive] = None
+    rknn2_live: Optional[RknnLive] = None  # --rknn2 模式: 参考侧也用 RKNN(FP), 对照侧为 --rknn(通常是 INT8)
     json_dir: Optional[Path] = None
     candidate: object = None
+    if args.rknn2 and not args.rknn:
+        print("[FAIL] --rknn2 必须与 --rknn 成对给出(--rknn=FP 参考, --rknn2=INT8 对照)", file=sys.stderr)
+        return 1
     if args.candidate_onnx:
         candidate_path = Path(args.candidate_onnx)
         if not candidate_path.exists():
@@ -269,6 +274,8 @@ def main() -> int:
             return 1
     else:
         rknn_live = RknnLive(args.model_name, args.rknn, args.mode)
+        if args.rknn2:
+            rknn2_live = RknnLive(args.model_name, args.rknn2, args.mode)
 
     out_dir = (root / config["paths"].get("conversion_logs", "logs/rknn")).resolve()
     stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -292,7 +299,7 @@ def main() -> int:
         if frame is None:
             print(f"[WARN] 跳过无法解码的图片: {image_path}")
             continue
-        ref_dets = reference.infer(frame)
+        ref_dets = rknn2_live.infer(frame) if rknn2_live is not None else reference.infer(frame)
 
         if candidate is not None:
             rknn_dets = candidate.infer(frame)
@@ -376,9 +383,10 @@ def main() -> int:
 
     summary = {
         "model": args.model_name,
-        "reference_onnx": str(onnx_path),
+        "reference_onnx": str(args.rknn) if rknn2_live is not None else str(onnx_path),
         "rknn_source": (
-            str(args.candidate_onnx) if args.candidate_onnx
+            str(args.rknn2) if rknn2_live is not None
+            else str(args.candidate_onnx) if args.candidate_onnx
             else str(args.rknn_json_dir) if json_dir
             else str(args.rknn or "config默认")
         ),
@@ -405,12 +413,15 @@ def main() -> int:
     # 汇总 markdown ---------------------------------------------------------
     doc_dir = (root / "docs" / "rknn").resolve()
     doc_dir.mkdir(parents=True, exist_ok=True)
-    doc_path = doc_dir / f"{args.model_name}_validation.md"
+    doc_path = doc_dir / (
+        f"{args.model_name}_int8_vs_fp.md" if rknn2_live is not None else f"{args.model_name}_validation.md"
+    )
     lines = [
         f"# {args.model_name} RKNN 一致性验证报告",
         "",
         f"- 生成时间: {summary['timestamp']}",
-        f"- 参考(Reference): `{summary['reference_onnx']}` (onnxruntime, 与浏览器同预处理/解码)",
+        f"- 参考(Reference): `{summary['reference_onnx']}`"
+        + (" (FP RKNN 真机)" if rknn2_live is not None else " (onnxruntime, 与浏览器同预处理/解码)"),
         f"- RKNN 来源: {summary['rknn_source']}",
         "",
         "## 汇总指标",
