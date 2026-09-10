@@ -65,11 +65,15 @@ def log(message: str) -> None:
 
 # ------------------------------------------------------------------ camera
 class CameraThread(threading.Thread):
-    """独占采集, 维护最新帧; 打开失败/掉线自动重试并明确记日志。"""
+    """独占采集, 维护最新帧; 打开失败/掉线自动重试并明确记日志。
 
-    def __init__(self, device, width, height, fps):
+    test_image: 调试用——循环把一张静态图当帧源(无摄像头环境验证全链路)。
+    """
+
+    def __init__(self, device, width, height, fps, test_image: str | None = None):
         super().__init__(daemon=True, name="camera")
         self.device, self.width, self.height, self.fps = device, width, height, fps
+        self.test_image = test_image
         self._lock = threading.Lock()
         self._frame: np.ndarray | None = None
         self._frame_id = 0
@@ -86,6 +90,19 @@ class CameraThread(threading.Thread):
             return (self._frame, self._frame_id) if self._frame is not None else (None, 0)
 
     def run(self) -> None:
+        if self.test_image:
+            image = cv2.imread(self.test_image, cv2.IMREAD_COLOR)
+            if image is None:
+                log(f"[CAMERA][FAIL] --test-image 无法读取: {self.test_image}")
+                return
+            log(f"[CAMERA] 测试图模式: {self.test_image} ({image.shape[1]}x{image.shape[0]}) 循环输出")
+            interval = 1.0 / max(1, self.fps)
+            while not _stop.is_set():
+                with self._lock:
+                    self._frame = image.copy()
+                    self._frame_id += 1
+                _stop.wait(interval)
+            return
         backoff = 1.0
         while not _stop.is_set():
             if self._open():
@@ -461,6 +478,7 @@ def main() -> int:
     parser.add_argument("--camera", default=None)
     parser.add_argument("--infer-fps", type=int, default=None)
     parser.add_argument("--mode", default="device", choices=["auto", "device", "simulator"])
+    parser.add_argument("--test-image", default=None, help="调试: 用静态图当帧源(无摄像头验证链路)")
     args = parser.parse_args()
 
     config = load_config(args.config)
@@ -480,24 +498,19 @@ def main() -> int:
         camera_device,
         int(camera_config.get("width", 640)), int(camera_config.get("height", 480)),
         int(camera_config.get("fps", 30)),
+        test_image=args.test_image,
     )
     STATE.camera.start()
     STATE.audio = AudioPlayer(find_project_root(PACKAGE_ROOT))
 
-    # 等第一帧(摄像头就绪)再起推理, 避免空转日志
-    for _ in range(100):
-        frame, _ = STATE.camera.latest()
-        if frame is not None or _stop.is_set():
-            break
-        time.sleep(0.1)
-
+    # HTTP 立即可用(health 反映摄像头状态); 推理线程自己等待首帧
+    server = ThreadingHTTPServer((host, port), make_handler(STATE))
     infer_thread = threading.Thread(
         target=inference_loop, args=(STATE, model_names, args.mode, infer_fps),
         daemon=True, name="inference",
     )
     infer_thread.start()
 
-    server = ThreadingHTTPServer((host, port), make_handler(STATE))
     log(f"[SERVICE] http://{host}:{port}  (MJPEG /video.mjpg | WS /ws/dms/native | 健康检查 /health)")
     log(f"[SERVICE] 浏览器打开: http://<板子IP>:8000/index.html?infer=native#/live-detection")
     try:
