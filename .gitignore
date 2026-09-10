@@ -20,6 +20,7 @@ storage/
 
 # rk3588 rknn 迁移产物(rk3588_dms): 大文件不入库
 *.rknn
+check*.onnx
 rk3588_dms/models/onnx/dataset.txt
 logs/rknn/*
 logs/dms/*

@@ -86,12 +86,92 @@ def precheck_onnx(path: Path) -> List[str]:
     return warnings
 
 
+def validate_in_simulator(rknn, config, root: Path, image_path: Path) -> bool:
+    """转换后在模拟器(无 target)上用内存模型跑一张图, 与浏览器 ONNX 对比。
+
+    toolkit2 2.3+ 不允许 load_rknn 的模型进模拟器, 因此必须在 build 之后、
+    同一个 RKNN 对象上 init_runtime() 验证 —— 本函数在导出成功后调用。
+    """
+    try:
+        import cv2
+        import onnxruntime  # noqa: F401
+        import numpy as np
+    except ImportError as exc:
+        print(f"[WARN] 跳过模拟器验证(缺依赖: {exc} —— pip install onnxruntime opencv-python)")
+        return False
+
+    from runtime.base_detector import load_config as _load_config
+    from runtime.detection import Detection
+    from runtime.postprocess import decode_rknn_modelzoo_branches, iou
+    from runtime.preprocess import letterbox, unletterbox_box
+    from tools.compare_outputs import OnnxReference, match_detections
+
+    model_config = _load_config(config)["runtime"]["models"]["chaitanya"]
+    classes: List[str] = list(model_config["classes"])
+    ref_path = root / "Driver-Monitoring-System/public/static/models/chaitanya_best.onnx"
+    if not ref_path.exists():
+        print(f"[WARN] 跳过模拟器验证(找不到参考 ONNX: {ref_path})")
+        return False
+    frame = cv2.imread(str(image_path), cv2.IMREAD_COLOR)
+    if frame is None:
+        print(f"[WARN] 跳过模拟器验证(图片无法读取: {image_path})")
+        return False
+
+    prep = letterbox(frame, tuple(model_config["input_size"]),
+                     pad_color=tuple(model_config["letterbox_pad_color"]))
+    rgb = cv2.cvtColor(prep.image, cv2.COLOR_BGR2RGB)
+
+    print("--> 模拟器验证: init_runtime()(无 target) + 单图推理")
+    if rknn.init_runtime() != 0:
+        print("[WARN] 模拟器 init_runtime 失败, 跳过验证(不影响导出的 .rknn 与真机验证)")
+        return False
+    outputs = rknn.inference(inputs=[np.ascontiguousarray(rgb)], data_format="nhwc")
+    raw = decode_rknn_modelzoo_branches(
+        [np.asarray(o) for o in outputs], len(classes),
+        input_size=int(model_config["input_size"][0]),
+        confidence_threshold=float(model_config.get("confidence_threshold", 0.25)),
+        iou_threshold=float(model_config.get("iou_threshold", 0.45)),
+    )
+    cand_dets = [
+        Detection(class_id=c, class_name=classes[c] if 0 <= c < len(classes) else str(c),
+                  confidence=float(s), bbox=unletterbox_box(b, prep))
+        for b, s, c in raw
+    ]
+    ref_dets = OnnxReference(ref_path, model_config).infer(frame)
+    pairs, ref_extra, cand_extra = match_detections(ref_dets, cand_dets, 0.5)
+
+    print(f"    参考(浏览器 ONNX): {len(ref_dets)} 检出 | RKNN 模拟器: {len(cand_dets)} 检出")
+    max_delta = 0.0
+    consistent = True
+    for ref_det, cand_det in pairs:
+        delta = abs(ref_det.confidence - cand_det.confidence)
+        max_delta = max(max_delta, delta)
+        box_iou = iou(ref_det.bbox, cand_det.bbox)
+        if ref_det.class_id != cand_det.class_id or box_iou < 0.9:
+            consistent = False
+        print(f"    {ref_det.class_name:<10} conf {ref_det.confidence:.4f} vs {cand_det.confidence:.4f}"
+              f" (Δ{delta:.4f})  IoU={box_iou:.4f}")
+    if ref_extra:
+        consistent = False
+        print(f"    仅参考有: {[d.class_name for d in ref_extra]}")
+    if cand_extra:
+        consistent = False
+        print(f"    仅 RKNN 有: {[d.class_name for d in cand_extra]}")
+
+    if consistent and max_delta <= 0.02:
+        print(f"[PASS] 模拟器验证通过: {len(pairs)} 对全匹配, 最大 Δconf={max_delta:.4f} (<=0.02)")
+        return True
+    print(f"[WARN] 模拟器验证存在差异: 配对 {len(pairs)}, 最大 Δconf={max_delta:.4f} —— 请人工核对上方明细")
+    return False
+
+
 def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(description="chaitanya ONNX -> RKNN(FP 优先) 转换")
     parser.add_argument("--config", default=str(PACKAGE_ROOT / "config" / "dms.json"))
     parser.add_argument("--source", help="覆盖配置, 直接指定 ONNX 路径")
     parser.add_argument("--int8", action="store_true", help="生成 INT8 量化模型(默认 FP)")
     parser.add_argument("--output", help="覆盖输出 .rknn 路径")
+    parser.add_argument("--validate-image", help="导出后在模拟器上用该图片验证(与浏览器 ONNX 对比, 需 onnxruntime+opencv)")
     args = parser.parse_args(argv)
 
     config = load_config(args.config)
@@ -204,6 +284,10 @@ def main(argv: Optional[List[str]] = None) -> int:
 
         if not output.exists() or output.stat().st_size == 0:
             raise RuntimeError(f"导出文件异常: {output}")
+
+        if args.validate_image:
+            # 必须在 deinit 之前: toolkit2 2.3+ 模拟器只能跑 build 后的内存模型
+            validate_in_simulator(rknn, args.config, root, Path(args.validate_image).expanduser())
 
         elapsed = time.perf_counter()
         size_mb = output.stat().st_size / 1024 / 1024
