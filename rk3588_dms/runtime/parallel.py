@@ -26,12 +26,26 @@ class ParallelDetectorGroup:
         self.last_wall_ms = 0.0
 
     def infer_all(self, frame_bgr) -> Dict[str, "object"]:
-        """同一帧并行送入所有模型, 返回 {model_name: DetectionResult}。"""
+        """同一帧并行送入所有模型, 返回 {model_name: DetectionResult}。
+
+        letterbox 与 BGR->RGB 只做一次共享给三个模型(各自尺寸/灰底一致时),
+        消除 3 次重复 resize/cvtColor 的 CPU 抖动。
+        """
+        import cv2
+
+        from .preprocess import letterbox
+
         started = time.perf_counter()
-        futures = {
-            name: self._pool.submit(detector.infer, frame_bgr)
-            for name, detector in self.detectors.items()
-        }
+        first = next(iter(self.detectors.values()))
+        shared_prep = letterbox(frame_bgr, first.input_size, pad_color=first.pad_color)
+        shared_rgb = cv2.cvtColor(shared_prep.image, cv2.COLOR_BGR2RGB)
+
+        def run(detector):
+            if detector.input_size == first.input_size and detector.pad_color == first.pad_color:
+                return detector.infer(frame_bgr, prep=shared_prep, rgb=shared_rgb)
+            return detector.infer(frame_bgr)  # 配置不一致时退回各自私有预处理
+
+        futures = {name: self._pool.submit(run, detector) for name, detector in self.detectors.items()}
         results = {name: future.result() for name, future in futures.items()}
         self.last_wall_ms = (time.perf_counter() - started) * 1000.0
         return results

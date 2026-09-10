@@ -121,12 +121,14 @@ class CameraThread(threading.Thread):
             else cv2.VideoCapture(index)
         if not cap.isOpened():
             return False
+        # UVC 摄像头默认 YUY2 常被限 10fps; 请求 MJPG 格式通常可解锁 30fps
+        cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))
         cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.width)
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.height)
         cap.set(cv2.CAP_PROP_FPS, self.fps)
         self._capture = cap
         actual = (cap.get(cv2.CAP_PROP_FRAME_WIDTH), cap.get(cv2.CAP_PROP_FRAME_HEIGHT), cap.get(cv2.CAP_PROP_FPS))
-        log(f"[CAMERA] 已打开 {self.device}, 实际 w/h/fps = {actual}")
+        log(f"[CAMERA] 已打开 {self.device}(MJPG fourcc 已请求), 实际 w/h/fps = {actual}")
         return True
 
     def _loop(self) -> bool:
@@ -441,7 +443,9 @@ def inference_loop(state: ServiceState, model_names, mode, infer_fps) -> None:
                     ],
                 }
                 for det in result.detections
-                if det.confidence >= 0.05  # 低于所有业务阈值的直接丢弃, 省带宽
+                # 服务端预过滤: 对齐浏览器阈值(phone 0.20 / 其余 0.25)并留 1 分缓冲,
+                # 之下必被浏览器丢弃 —— 只省传输/解析, 不改变任何判定行为
+                if det.confidence >= (0.19 if (det.unified_key or "") == "phone" else 0.24)
             ]
         payload = {
             "type": "detections",

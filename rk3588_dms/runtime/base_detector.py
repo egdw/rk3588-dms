@@ -86,13 +86,20 @@ class RknnYoloDetector:
         self.model_name = self.model_name or "base"
 
     # ------------------------------------------------------------------ infer
-    def infer(self, frame_bgr: np.ndarray) -> DetectionResult:
+    def infer(
+        self,
+        frame_bgr: np.ndarray,
+        prep: "PreprocessResult | None" = None,
+        rgb: np.ndarray | None = None,
+    ) -> DetectionResult:
         started = time.perf_counter()
-        prep = letterbox(frame_bgr, self.input_size, pad_color=self.pad_color)
+        if prep is None or prep.image.shape[:2] != (self.input_size[1], self.input_size[0]):
+            prep = letterbox(frame_bgr, self.input_size, pad_color=self.pad_color)
+        if rgb is None or rgb.shape[:2] != (self.input_size[1], self.input_size[0]):
+            # RKNN 输入: RGB HWC uint8; /255 由模型内 mean/std 承担
+            rgb = cv2.cvtColor(prep.image, cv2.COLOR_BGR2RGB)
         prep_ms = (time.perf_counter() - started) * 1000
 
-        # RKNN 输入: RGB HWC uint8; BGR->RGB 在这里完成, /255 由模型内 mean/std 承担
-        rgb = cv2.cvtColor(prep.image, cv2.COLOR_BGR2RGB)
         outputs = self.model.infer(rgb)
         infer_ms = self.model.last_inference_ms
 
