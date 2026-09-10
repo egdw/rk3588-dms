@@ -36,10 +36,8 @@ def build_detector(model_name: str, model_path, mode: str, core=None):
         return ChaitanyaDetector(mode=mode, rknn_path=rknn_path, core=core)
     from runtime.base_detector import RknnYoloDetector
 
-    class _Detector(RknnYoloDetector):
-        model_name = model_name
-
-    return _Detector(model_config=model_config, model_path=rknn_path, mode=mode, core=core)
+    detector_cls = type(f"{model_name.title()}Detector", (RknnYoloDetector,), {"model_name": model_name})
+    return detector_cls(model_config=model_config, model_path=rknn_path, mode=mode, core=core)
 
 
 def main() -> int:
