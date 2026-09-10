@@ -51,10 +51,11 @@ def main() -> int:
     config = load_config(PACKAGE_ROOT / "config" / "dms.json")
 
     variants = args.variant.split(",")
+    single = len(variants) == 1  # 单值: 应用到全部模型; 列表: 按位置对应, 越位回退 fp
     available = []
     paths: dict[str, Path] = {}
     for index, name in enumerate(requested):
-        variant = variants[index] if index < len(variants) else "fp"
+        variant = variants[0] if single else (variants[index] if index < len(variants) else "fp")
         rknn_path = (PACKAGE_ROOT.parent / config["runtime"]["models"][name]["rknn"]).resolve()
         if variant == "int8":
             rknn_path = Path(str(rknn_path).replace("_fp.rknn", "_int8.rknn"))
