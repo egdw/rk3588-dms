@@ -123,6 +123,7 @@ class CameraThread(threading.Thread):
             return False
         # UVC 摄像头默认 YUY2 常被限 10fps; 请求 MJPG 格式通常可解锁 30fps
         cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))
+        cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)  # 最小驱动缓冲, 降低取帧滞后(不支持则忽略)
         cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.width)
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.height)
         cap.set(cv2.CAP_PROP_FPS, self.fps)
@@ -268,10 +269,35 @@ def ws_read_frame(conn) -> tuple[int, bytes] | None:
 
 
 # ------------------------------------------------------------------ server
+class SharedJpeg:
+    """同一帧只编码一次, 多个 MJPEG 客户端共享字节(此前每客户端各编一遍)。"""
+
+    def __init__(self, camera: CameraThread, quality: int = 85):
+        self.camera = camera
+        self.quality = quality
+        self._lock = threading.Lock()
+        self._frame_id = -1
+        self._data: bytes | None = None
+
+    def get(self) -> bytes | None:
+        frame, frame_id = self.camera.latest()
+        if frame is None:
+            return None
+        with self._lock:
+            if frame_id != self._frame_id:
+                ok, encoded = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, self.quality])
+                if not ok:
+                    return None
+                self._data = encoded.tobytes()
+                self._frame_id = frame_id
+            return self._data
+
+
 class ServiceState:
     camera: CameraThread
     audio: AudioPlayer
     hub = WSHub()
+    jpeg: SharedJpeg
     detections_payload: dict = {"type": "detections", "models": {}, "frame": [0, 0], "inference_ms": 0}
     payload_lock = threading.Lock()
     stats = {"inferences": 0, "started": time.time()}
@@ -328,17 +354,13 @@ def make_handler(state: ServiceState):
             self.send_header("Content-Type", "multipart/x-mixed-replace; boundary=frame")
             self.send_header("Cache-Control", "no-store")
             self.end_headers()
-            last_id = -1
+            last_data = None
             while not _stop.is_set():
-                frame, frame_id = state.camera.latest()
-                if frame is None or frame_id == last_id:
-                    time.sleep(0.01)
+                data = state.jpeg.get()
+                if data is None or data is last_data:
+                    time.sleep(0.005)
                     continue
-                last_id = frame_id
-                ok, encoded = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, 85])
-                if not ok:
-                    continue
-                data = encoded.tobytes()
+                last_data = data
                 try:
                     self.wfile.write(
                         b"--frame\r\nContent-Type: image/jpeg\r\nContent-Length: "
@@ -505,6 +527,7 @@ def main() -> int:
         test_image=args.test_image,
     )
     STATE.camera.start()
+    STATE.jpeg = SharedJpeg(STATE.camera)
     STATE.audio = AudioPlayer(find_project_root(PACKAGE_ROOT))
 
     # HTTP 立即可用(health 反映摄像头状态); 推理线程自己等待首帧
