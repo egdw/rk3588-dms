@@ -164,7 +164,16 @@ def main(argv: Optional[List[str]] = None) -> int:
         return 2
 
     # 4. 转换 --------------------------------------------------------------
-    rknn = RKNN(verbose=True)
+    try:
+        rknn = RKNN(verbose=True)
+    except ModuleNotFoundError as exc:
+        if "pkg_resources" in str(exc):
+            raise RuntimeError(
+                "rknn-toolkit2 依赖 pkg_resources(由 setuptools 提供), "
+                "而 Python 3.12+ 的 venv 默认不再安装 setuptools。"
+                "请在当前环境执行: pip install 'setuptools<81' 后重试"
+            ) from exc
+        raise
 
     try:
         mean_values = conv.get("mean_values", [[0, 0, 0]])

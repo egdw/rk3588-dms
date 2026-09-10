@@ -36,11 +36,15 @@ Windows / Linux 均可运行(真机推理只能在 RK3588 上)。
 ### 1. 环境准备
 
 ```bash
-# 建议独立虚拟环境(Python 3.8~3.11, 以 rknn-toolkit2 官方支持为准)
+# 建议独立虚拟环境(Python 3.8~3.12, 以 rknn-toolkit2 官方支持为准)
 python -m venv .venv-rknn
 # Windows: .venv-rknn\Scripts\activate    Linux: source .venv-rknn/bin/activate
 
 pip install rknn-toolkit2 onnx onnxruntime opencv-python numpy
+# Python 3.12+ 的 venv 默认不装 setuptools, 而 rknn-toolkit2 依赖 pkg_resources:
+pip install "setuptools<81"
+# 若报 "compiled using NumPy 1.x" 类错误(旧版 toolkit2 与 numpy 2 不兼容):
+pip install "numpy<2"
 # rknn-toolkit2 完整安装方式(含依赖)见官方仓库:
 #   https://github.com/airockchip/rknn-toolkit2  (packages 目录下对应平台的 whl)
 
