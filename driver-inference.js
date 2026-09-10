@@ -360,6 +360,7 @@
       img: null,
       streamCanvas: null,
       stream: null,
+      drawTimer: null,
     },
   };
   const context = elements.canvas.getContext("2d");
@@ -892,13 +893,11 @@
       firstFrameReject = reject;
     });
     window.setTimeout(() => firstFrameReject?.(new Error("MJPEG 超时(>15s): 检查服务与摄像头")), 15000);
+    // 注意: <img> 对 multipart MJPEG 只在流开始时触发一次 onload,
+    // 后续帧不会重复触发 —— 必须用绘制循环持续把 img 当前解码帧画进 canvas,
+    // captureStream 才有连续帧(否则视频冻结在第一帧)。
     img.onload = () => {
-      if (canvas.width !== img.naturalWidth || canvas.height !== img.naturalHeight) {
-        canvas.width = img.naturalWidth || 640;
-        canvas.height = img.naturalHeight || 480;
-        firstFrame?.();
-      }
-      context.drawImage(img, 0, 0, canvas.width, canvas.height);
+      if (img.naturalWidth) firstFrame?.();
     };
     img.onerror = () => firstFrameReject?.(new Error("MJPEG 流中断: 检查原生服务 /video.mjpg"));
     // 跨源(8000 页面 -> 8600 MJPEG)必须声明 anonymous, 服务端已发 ACAO:*;
@@ -907,6 +906,15 @@
     img.src = `${NATIVE_SERVICE_BASE}/video.mjpg`;
     native.img = img;
     native.streamCanvas = canvas;
+    const drawTimer = window.setInterval(() => {
+      if (!img.naturalWidth) return;
+      if (canvas.width !== img.naturalWidth || canvas.height !== img.naturalHeight) {
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+      }
+      context.drawImage(img, 0, 0, canvas.width, canvas.height);
+    }, 33); // ~30fps, 与摄像头帧率对齐
+    native.drawTimer = drawTimer;
     await firstFramePromise;
     native.stream = canvas.captureStream(30);
     elements.cameraVideo.srcObject = native.stream;
@@ -915,6 +923,10 @@
 
   function stopNativeCameraStream() {
     const native = state.nativeInfer;
+    if (native.drawTimer) {
+      window.clearInterval(native.drawTimer);
+      native.drawTimer = null;
+    }
     if (native.img) {
       native.img.onload = null;
       native.img.onerror = null;
