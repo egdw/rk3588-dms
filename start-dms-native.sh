@@ -97,10 +97,10 @@ case "${1:-start}" in
     [ -n "$IP" ] || IP="<板子IP>"
     echo
     echo "=============================================================="
-    echo " 浏览器打开(原生 NPU 推理):"
-    echo "   http://${IP}:8000/index.html?infer=native#/live-detection"
+    echo " 浏览器打开(默认即原生 NPU 推理):"
+    echo "   http://${IP}:8000/dms"
     echo " 回退纯浏览器推理:"
-    echo "   http://${IP}:8000/index.html#/live-detection"
+    echo "   http://${IP}:8000/index.html?infer=browser#/live-detection"
     echo " 停止: ./start-dms-native.sh stop   状态: status   日志: logs [service|backend]"
     echo "=============================================================="
     ;;

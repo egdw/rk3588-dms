@@ -1274,6 +1274,13 @@ class Handler(BaseHTTPRequestHandler):
                 return self.json_response(manual_control_payload())
             if path == "/api/head-pose/6drepnet/status":
                 return self.json_response(sixdrepnet_status())
+            if path == "/dms":
+                # 比赛现场短路径: 直达实时检测页(前端默认已是 native NPU 推理)
+                self.send_response(HTTPStatus.FOUND)
+                self.send_header("Location", "/index.html#/live-detection")
+                self.send_header("Content-Length", "0")
+                self.end_headers()
+                return
             return self.static_response(path)
         except KeyError:
             return self.error_response(HTTPStatus.NOT_FOUND, "resource not found")

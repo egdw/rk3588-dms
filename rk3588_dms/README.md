@@ -291,8 +291,8 @@ taskset -c 4-7 .venv/bin/python rk3588_dms/service/dms_service.py
 - 一致性证据: test_0001 帧 soham SafeDriving 板端 0.8481 vs 浏览器 FP ONNX 0.848。
 
 ```text
-打开: http://<板子IP>:8000/index.html?infer=native#/live-detection
-回退: 去掉 ?infer=native 即恢复纯浏览器推理(什么都不用改)
+打开: http://<板子IP>:8000/dms (默认即 native; /dms 为后端短路径, 302 到实时检测页)
+回退: http://<板子IP>:8000/index.html?infer=browser#/live-detection
 ```
 
 ⚠️ 注意: native 模式请用 **http** 打开页面(https 页面会拦截 http 的 MJPEG/WS,

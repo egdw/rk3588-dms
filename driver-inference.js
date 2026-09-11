@@ -175,9 +175,9 @@
   const MANUAL_CONTROL_PATH = "/api/manual-control";
   const MANUAL_CONTROL_POLL_MS = 800;
   // ---------- 原生 NPU 推理模式(页面/样式零改动, 只换推理来源) ----------
-  // 打开方式: index.html?infer=native#/live-detection (缺省仍为浏览器推理, 随时可回退)
+  // 默认 native(板端 NPU); 回退纯浏览器推理: ?infer=browser
   const NATIVE_INFER_MODE = (new URLSearchParams(window.location.search).get("infer")
-    || window.VISION_SENTINEL_INFER_MODE || "").toLowerCase() === "native";
+    || window.VISION_SENTINEL_INFER_MODE || "native").toLowerCase() === "native";
   const NATIVE_SERVICE_BASE = (new URLSearchParams(window.location.search).get("nativeBase")
     || window.VISION_SENTINEL_NATIVE_BASE
     || `http://${window.location.hostname}:8600`).replace(/\/$/, "");
