@@ -29,6 +29,7 @@ import hashlib
 import json
 import os
 import shutil
+import socket
 import struct
 import subprocess
 import sys
@@ -201,12 +202,12 @@ class AudioPlayer:
         if not self.ffplay:
             log("[AUDIO][WARN] 未找到 ffplay, 报警音频不可用(apt install ffmpeg)")
 
-    def play(self, key: str) -> dict:
+    def play(self, key: str, force: bool = False) -> dict:
         now = time.time()
         with self._lock:
             if not self.ffplay or key not in ALERT_AUDIO_FILES:
                 return {"played": False, "reason": "no ffplay or unknown key"}
-            if now - self._last_played.get(key, 0) < ALERT_AUDIO_COOLDOWN_MS / 1000:
+            if not force and now - self._last_played.get(key, 0) < ALERT_AUDIO_COOLDOWN_MS / 1000:
                 return {"played": False, "reason": "cooldown"}
             file_path = self.root / ALERT_AUDIO_FILES[key]
             if not file_path.exists():
@@ -221,6 +222,171 @@ class AudioPlayer:
             )
             log(f"[AUDIO] 播放报警: {key} -> {file_path.name}")
             return {"played": True}
+
+
+# ------------------------------------------------------------ mqtt command
+# 板端直接订阅 MQTT(纯 stdlib TCP, 免浏览器 wss 自签证书问题):
+# 命令 -> 后端 /api/manual-control(顶栏状态, 浏览器 800ms 轮询跟随) + 板端直接放报警音
+MQTT_COMMAND_ALIASES = {
+    "manual_enter": ("manual", ""), "enter": ("manual", ""), "manual": ("manual", ""),
+    "clear": ("manual", ""),
+    "manual_exit": ("auto", ""), "exit": ("auto", ""), "auto": ("auto", ""),
+    "safe": ("manual", "safe"), "normal": ("manual", "safe"),
+    "drowsy": ("manual", "drowsy"), "eye": ("manual", "drowsy"), "eye_closure": ("manual", "drowsy"),
+    "head": ("manual", "head_down"), "head_down": ("manual", "head_down"),
+    "gaze": ("manual", "gaze_off"), "gaze_off": ("manual", "gaze_off"),
+    "phone": ("manual", "phone"), "phone_call": ("manual", "phone"), "call": ("manual", "phone"),
+}
+
+
+def decode_mqtt_command(payload: bytes):
+    """返回 (mode, key) 或 None。兼容 {"command": "..."} / {"mode","key"} / 裸字符串。"""
+    import json as _json
+
+    text = payload.decode("utf-8", "ignore").strip()
+    if not text:
+        return None
+    try:
+        data = _json.loads(text)
+    except ValueError:
+        data = {"command": text}
+    if not isinstance(data, dict):
+        return None
+    if str(data.get("mode", "")).strip().lower() in ("manual", "auto"):
+        return (str(data.get("mode")).strip().lower(), str(data.get("key", "")).strip().lower())
+    raw = str(data.get("command") or data.get("key") or data.get("state") or data.get("status") or "")
+    command = raw.strip().lower().replace("\\", "")
+    command = "_".join(part for part in command.replace("-", " ").split())
+    return MQTT_COMMAND_ALIASES.get(command)
+
+
+class MqttCommandThread(threading.Thread):
+    """订阅 vision-sentinel/control, 命令驱动手动控制状态与板端报警音。"""
+
+    def __init__(self, host, port, topic, backend_url, audio: AudioPlayer):
+        super().__init__(daemon=True, name="mqtt-command")
+        self.host, self.port, self.topic = host, port, topic
+        self.backend_url = backend_url.rstrip("/")
+        self.audio = audio
+        self._socket = None
+
+    def run(self) -> None:
+        import urllib.request
+
+        backoff = 2.0
+        while not _stop.is_set():
+            try:
+                self._socket = socket.create_connection((self.host, self.port), timeout=10)
+                self._mqtt_handshake()
+                log(f"[MQTT] 已连接 {self.host}:{self.port}, 订阅 {self.topic}")
+                backoff = 2.0
+                self._read_loop()
+            except Exception as exc:
+                if _stop.is_set():
+                    return
+                log(f"[MQTT] 连接断开({exc}), {backoff:.0f}s 后重试")
+                _stop.wait(backoff)
+                backoff = min(backoff * 2, 30.0)
+
+    # ---- 极简 MQTT v311 客户端(仅 CONNECT/SUBSCRIBE/PUBLISH/PING) ----
+    @staticmethod
+    def _enc_len(n: int) -> bytes:
+        out = b""
+        while True:
+            b = n % 128
+            n //= 128
+            out += bytes([b | 0x80 if n else b])
+            if not n:
+                return out
+
+    @staticmethod
+    def _mstr(s: str) -> bytes:
+        raw = s.encode()
+        return struct.pack(">H", len(raw)) + raw
+
+    def _packet(self, body: bytes, typ: int) -> None:
+        self._socket.sendall(bytes([typ]) + self._enc_len(len(body)) + body)
+
+    def _mqtt_handshake(self) -> None:
+        self._socket.settimeout(30)
+        body = self._mstr("MQTT") + bytes([4, 2]) + struct.pack(">H", 60) + self._mstr("rk3588-dms-%d" % os.getpid())
+        self._packet(body, 0x10)
+        head, resp = self._recv_packet()
+        if head is None or head >> 4 != 2 or not resp or resp[-1] != 0:
+            raise RuntimeError(f"CONNACK 拒绝: {resp.hex() if resp else '空'}")
+        self._packet(struct.pack(">H", 1) + self._mstr(self.topic) + bytes([1]), 0x82)  # QoS1 订阅
+        head, resp = self._recv_packet()
+        if head is None or head >> 4 != 9:
+            raise RuntimeError(f"SUBACK 异常: {resp.hex() if resp else '空'}")
+
+    def _recv_packet(self):
+        """返回 (完整固定头字节, body) 或 (None, None)。"""
+        header = self._recv_exact(1)
+        if not header:
+            return None, None
+        mult, val = 1, 0
+        while True:
+            b = self._recv_exact(1)
+            if b is None:
+                return None, None
+            val += (b[0] & 127) * mult
+            mult *= 128
+            if not b[0] & 128:
+                break
+        body = self._recv_exact(val)
+        if body is None:
+            return None, None
+        return header[0], body
+
+    def _recv_exact(self, n: int) -> bytes | None:
+        buf = b""
+        while len(buf) < n:
+            chunk = self._socket.recv(n - len(buf))
+            if not chunk:
+                return None
+            buf += chunk
+        return buf
+
+    def _read_loop(self) -> None:
+        import urllib.request
+
+        while not _stop.is_set():
+            head, body = self._recv_packet()
+            if head is None:
+                raise RuntimeError("连接被关闭")
+            if head >> 4 != 3:  # 只关心 PUBLISH
+                continue
+            tl = struct.unpack(">H", body[0:2])[0]
+            topic = body[2:2 + tl].decode("utf-8", "ignore")
+            qos = (head >> 1) & 3
+            payload_start = 2 + tl + (2 if qos else 0)
+            payload = body[payload_start:]
+            if qos == 1 and payload_start >= 4:
+                pid = struct.unpack(">H", body[2 + tl:payload_start])[0]
+                try:
+                    self._packet(struct.pack(">H", pid), 0x40)  # PUBACK, 防 broker 重发
+                except OSError:
+                    pass
+            if topic != self.topic:
+                continue
+            decoded = decode_mqtt_command(payload)
+            if not decoded:
+                log(f"[MQTT] 忽略无法识别的命令: {payload[:60]!r}")
+                continue
+            mode, key = decoded
+            log(f"[MQTT] 命令: mode={mode} key={key or '-'}")
+            try:
+                request = urllib.request.Request(
+                    f"{self.backend_url}/api/manual-control",
+                    data=json.dumps({"mode": mode, "key": key, "source": "mqtt"}).encode(),
+                    headers={"Content-Type": "application/json"}, method="POST",
+                )
+                urllib.request.urlopen(request, timeout=5).read()
+            except Exception as exc:
+                log(f"[MQTT][WARN] 更新手动控制失败: {exc}")
+            if key in ALERT_AUDIO_FILES:
+                # 手动命令: 每条必响, 不走自动冷却
+                self.audio.play(key, force=True)
 
 
 # ------------------------------------------------------------ websocket hub
@@ -564,6 +730,17 @@ def main() -> int:
     STATE.camera.start()
     STATE.jpeg = SharedJpeg(STATE.camera)
     STATE.audio = AudioPlayer(find_project_root(PACKAGE_ROOT))
+
+    # MQTT 手动控制: 默认订阅 192.168.2.13:1883 的 vision-sentinel/control(DMS_MQTT_HOST= 空可关)
+    mqtt_host = os.environ.get("DMS_MQTT_HOST", "192.168.2.13")
+    if mqtt_host:
+        MqttCommandThread(
+            mqtt_host,
+            int(os.environ.get("DMS_MQTT_PORT", "1883")),
+            os.environ.get("DMS_MQTT_TOPIC", "vision-sentinel/control"),
+            os.environ.get("DMS_BACKEND_URL", "http://127.0.0.1:8080"),
+            STATE.audio,
+        ).start()
 
     # HTTP 立即可用(health 反映摄像头状态); 推理线程自己等待首帧
     server = ThreadingHTTPServer((host, port), make_handler(STATE))

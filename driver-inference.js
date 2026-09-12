@@ -311,7 +311,9 @@
       pingTimer: null,
       packetId: 1,
       connected: false,
-      enabled: true,
+      // MQTT 命令已由板端 dms_service 直接订阅并驱动 /api/manual-control,
+      // 浏览器默认不再订阅(避免重复播报); 需要时 URL 加 ?mqttWs=... 开启
+      enabled: false,
     },
     annotationRecorder: {
       recording: false,
