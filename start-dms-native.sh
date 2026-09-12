@@ -80,7 +80,7 @@ case "${1:-start}" in
 
     # 2/2 原生 NPU 服务(MJPEG/三模型INT8三核推理/WS/报警音频), 端口 8600, 绑大核
     start_one "dms_service(8600)" "$SERVICE_PID_FILE" "$SERVICE_LOG" \
-      "cd '$ROOT' && exec taskset -c 4-7 '$ROOT/.venv/bin/python' rk3588_dms/service/dms_service.py"
+      "cd '$ROOT' && DMS_CAMERA=\${DMS_CAMERA:-/dev/video1} exec taskset -c 4-7 '$ROOT/.venv/bin/python' rk3588_dms/service/dms_service.py --camera \${DMS_CAMERA:-/dev/video1}"
 
     echo "== 等待就绪 =="
     if wait_health "http://127.0.0.1:${BACKEND_PORT}/api/health" 15; then
