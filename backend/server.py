@@ -101,7 +101,8 @@ CONTROL_LABELS = {
 }
 CONTROL_LOCK = threading.Lock()
 MANUAL_CONTROL = {
-    "enabled": False,
+    # 默认手动模式: 本地推理不触发顶栏报警/声音, 只显示; 报警由外部 MQTT 命令(vision-sentinel/control)驱动
+    "enabled": True,
     "key": "",
     "label": "",
     "confidence": 0.99,
