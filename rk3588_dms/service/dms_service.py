@@ -14,7 +14,7 @@
 
 用法(RK3588 板上):
   .venv/bin/python rk3588_dms/service/dms_service.py            # 默认 config
-  .venv/bin/python rk3588_dms/service/dms_service.py --camera /dev/video0 --infer-fps 12
+  .venv/bin/python rk3588_dms/service/dms_service.py            # 摄像头自动扫描, 可选 --camera /dev/videoN 指定
 浏览器:
   http://<板子IP>:8000/index.html?infer=native#/live-detection
   (native 模式请用 http 打开页面, 避免 https 页面的 mixed content 拦截
@@ -64,6 +64,20 @@ def log(message: str) -> None:
 
 
 # ------------------------------------------------------------------ camera
+def candidate_camera_devices() -> list[str]:
+    """所有 /dev/video* 候选, 按序号升序(数字节点优先, 排除 video-dec/enc 等命名节点)。"""
+    import glob
+    import re as _re
+
+    paths = glob.glob("/dev/video*")
+
+    def sort_key(path: str):
+        m = _re.search(r"(\d+)$", path)
+        return (0, int(m.group(1))) if m else (1, path)
+
+    return sorted(paths, key=sort_key)
+
+
 class CameraThread(threading.Thread):
     """独占采集, 维护最新帧; 打开失败/掉线自动重试并明确记日志。
 
@@ -116,21 +130,41 @@ class CameraThread(threading.Thread):
             backoff = min(backoff * 2, 10.0)
 
     def _open(self) -> bool:
-        index = self.device if isinstance(self.device, int) else str(self.device)
-        cap = cv2.VideoCapture(index, cv2.CAP_V4L2) if isinstance(index, str) and index.startswith("/") \
-            else cv2.VideoCapture(index)
-        if not cap.isOpened():
-            return False
-        # UVC 摄像头默认 YUY2 常被限 10fps; 请求 MJPG 格式通常可解锁 30fps
-        cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))
-        cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)  # 最小驱动缓冲, 降低取帧滞后(不支持则忽略)
-        cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.width)
-        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.height)
-        cap.set(cv2.CAP_PROP_FPS, self.fps)
-        self._capture = cap
-        actual = (cap.get(cv2.CAP_PROP_FRAME_WIDTH), cap.get(cv2.CAP_PROP_FRAME_HEIGHT), cap.get(cv2.CAP_PROP_FPS))
-        log(f"[CAMERA] 已打开 {self.device}(MJPG fourcc 已请求), 实际 w/h/fps = {actual}")
-        return True
+        # 指定路径优先; 打不开(设备不存在/被占/是 metadata 节点)则自动扫描所有 /dev/video*
+        explicit = self.device if isinstance(self.device, str) and self.device.startswith("/") else None
+        if explicit is None and isinstance(self.device, int):
+            candidates: list = [self.device]
+        else:
+            candidates = ([explicit] if explicit else []) + candidate_camera_devices()
+        seen: set = set()
+        for index in candidates:
+            key = str(index)
+            if key in seen:
+                continue
+            seen.add(key)
+            cap = cv2.VideoCapture(index, cv2.CAP_V4L2) if isinstance(index, str) and index.startswith("/") \
+                else cv2.VideoCapture(index)
+            if not cap.isOpened():
+                cap.release()
+                continue
+            ok, frame = cap.read()  # 读一帧验证: metadata/无法采集的节点在这里被淘汰
+            if not ok or frame is None:
+                cap.release()
+                continue
+            if explicit is not None and index != explicit:
+                log(f"[CAMERA] 指定设备 {explicit} 打不开, 自动搜索命中 {index}")
+            # UVC 摄像头默认 YUY2 常被限 10fps; 请求 MJPG 格式通常可解锁 30fps
+            cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))
+            cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)  # 最小驱动缓冲, 降低取帧滞后(不支持则忽略)
+            cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.width)
+            cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.height)
+            cap.set(cv2.CAP_PROP_FPS, self.fps)
+            self.device = index
+            self._capture = cap
+            actual = (cap.get(cv2.CAP_PROP_FRAME_WIDTH), cap.get(cv2.CAP_PROP_FRAME_HEIGHT), cap.get(cv2.CAP_PROP_FPS))
+            log(f"[CAMERA] 已打开 {index}(MJPG fourcc 已请求), 实际 w/h/fps = {actual}")
+            return True
+        return False
 
     def _loop(self) -> bool:
         fails = 0
@@ -512,8 +546,9 @@ def main() -> int:
     camera_config = config.get("camera", {})
     host = args.host
     port = args.port or int(service_config.get("port", 8600))
-    device_arg = args.camera or camera_config.get("device", "/dev/video0")
-    camera_device = int(device_arg) if str(device_arg).isdigit() else device_arg
+    # 默认 auto: 自动扫描 /dev/video* 找第一个真正能出图的节点; 显式传 --camera 则优先尝试它
+    device_arg = args.camera or camera_config.get("device", "auto")
+    camera_device = int(device_arg) if str(device_arg).isdigit() else (None if device_arg == "auto" else device_arg)
     infer_fps = args.infer_fps or int(service_config.get("inference_fps_target", 12))
     model_names = service_config.get("models_enabled", ["chaitanya", "soham", "coco"])
 
