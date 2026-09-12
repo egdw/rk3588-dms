@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 一键启动 RK3588 原生 DMS(网页后端 :8000 + NPU 推理服务 :8600)
+# 一键启动 RK3588 原生 DMS(网页后端 :8080 + NPU 推理服务 :8600)
 #
 # 用法(板上):
 #   cd ~/code/rk3588-dms && ./start-dms-native.sh            # 启动并后台常驻
@@ -8,7 +8,7 @@
 #   ./start-dms-native.sh logs [backend|service]             # 跟踪日志
 #
 # 启动后浏览器打开(注意 http, 不要 https):
-#   http://<板子IP>:8000/index.html?infer=native#/live-detection
+#   http://<板子IP>:8080/index.html?infer=native#/live-detection
 # 回退纯浏览器推理: 去掉 ?infer=native
 
 set -u
@@ -19,6 +19,7 @@ VENV="$ROOT/.venv/bin/python"
 LOG_DIR="$ROOT/logs/dms"
 mkdir -p "$LOG_DIR"
 
+BACKEND_PORT="${DMS_BACKEND_PORT:-8080}"
 BACKEND_PID_FILE="$LOG_DIR/backend.pid"
 SERVICE_PID_FILE="$LOG_DIR/service.pid"
 BACKEND_LOG="$LOG_DIR/backend.log"
@@ -73,17 +74,17 @@ case "${1:-start}" in
   start)
     echo "== 启动原生 DMS =="
 
-    # 1/2 网页后端(静态页/手动控制/6DRepNet), 端口 8000
-    start_one "backend(8000)" "$BACKEND_PID_FILE" "$BACKEND_LOG" \
-      "cd '$ROOT' && exec $VENV backend/server.py"
+    # 1/2 网页后端(静态页/手动控制/6DRepNet), 端口 ${BACKEND_PORT}(8000 让给 g29-service)
+    start_one "backend(${BACKEND_PORT})" "$BACKEND_PID_FILE" "$BACKEND_LOG" \
+      "cd '$ROOT' && VISION_SENTINEL_PORT=$BACKEND_PORT exec $VENV backend/server.py"
 
     # 2/2 原生 NPU 服务(MJPEG/三模型INT8三核推理/WS/报警音频), 端口 8600, 绑大核
     start_one "dms_service(8600)" "$SERVICE_PID_FILE" "$SERVICE_LOG" \
       "cd '$ROOT' && exec taskset -c 4-7 '$ROOT/.venv/bin/python' rk3588_dms/service/dms_service.py"
 
     echo "== 等待就绪 =="
-    if wait_health "http://127.0.0.1:8000/api/health" 15; then
-      echo "[OK]   backend  健康: http://127.0.0.1:8000/api/health"
+    if wait_health "http://127.0.0.1:${BACKEND_PORT}/api/health" 15; then
+      echo "[OK]   backend  健康: http://127.0.0.1:${BACKEND_PORT}/api/health"
     else
       echo "[WARN] backend 15s 未就绪, 查看 logs/dms/backend.log"
     fi
@@ -98,9 +99,9 @@ case "${1:-start}" in
     echo
     echo "=============================================================="
     echo " 浏览器打开(默认即原生 NPU 推理):"
-    echo "   http://${IP}:8000/dms"
+    echo "   http://${IP}:${BACKEND_PORT}/dms"
     echo " 回退纯浏览器推理:"
-    echo "   http://${IP}:8000/index.html?infer=browser#/live-detection"
+    echo "   http://${IP}:${BACKEND_PORT}/index.html?infer=browser#/live-detection"
     echo " 停止: ./start-dms-native.sh stop   状态: status   日志: logs [service|backend]"
     echo "=============================================================="
     ;;
@@ -111,13 +112,13 @@ case "${1:-start}" in
     ;;
 
   restart)
-    "$0" stop
+    bash "$0" stop
     sleep 1
-    "$0" start
+    bash "$0" start
     ;;
 
   status)
-    for entry in "backend(8000):$BACKEND_PID_FILE" "dms_service(8600):$SERVICE_PID_FILE"; do
+    for entry in "backend(${BACKEND_PORT}):$BACKEND_PID_FILE" "dms_service(8600):$SERVICE_PID_FILE"; do
       name="${entry%%:*}"
       pidfile="${entry#*:}"
       if is_running "$pidfile"; then
